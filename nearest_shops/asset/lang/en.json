@@ -1,0 +1,17 @@
+{
+    "hello": "Welcome to My App",
+    "shoplistTitle":"Shops",
+    "login":"Login",
+    "email":"Email",
+    "loginButtonText":"Login",
+    "password":"Password",
+    "enterPassword":"Enter password",
+    "againPassword":"Enter again password",
+    "welcomeBack":"Welcome Back",
+    "createAccount":"Create Account",
+    "forgotPassword":"Forgot Password",
+    "theFieldRequired":"This field required.",
+    "enterValidEmail":"Enter a valid email."
+
+
+}

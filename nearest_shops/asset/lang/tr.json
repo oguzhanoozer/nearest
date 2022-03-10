@@ -1,0 +1,15 @@
+{
+    "hello": "Merhaba",
+    "shoplistTitle":"Mağazalar",
+    "login":"Giriş",
+    "email":"Email",
+    "loginButtonText":"Giriş Yap",
+    "password":"Şifre",
+    "enterPassword":"Şifre giriniz",
+    "againPassword":"Şifreyi yeniden giriniz",
+    "welcomeBack":"Tekrar Hoşgeldiniz",
+    "createAccount":"Hesap Oluştur",
+    "forgotPassword":"Şifremi unuttum",
+    "theFieldRequired":"Bu alanın doldurulması gerekiyor.",
+    "enterValidEmail":"Geçerli bir email adresi giriniz."
+}
