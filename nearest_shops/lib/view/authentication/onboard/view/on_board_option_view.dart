@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
-import 'package:nearest_shops/view/authentication/register/view/register_view.dart';
-import 'package:nearest_shops/view/authentication/shop_owner_register/view/shop_owner_register_view.dart';
+
 import '../../../../core/components/button/normal_button.dart';
+import '../../register/view/register_view.dart';
+import '../../shop_owner_register/view/shop_owner_register_view.dart';
 
 class OnBoardOptionView extends StatelessWidget {
   const OnBoardOptionView({Key? key}) : super(key: key);
@@ -24,7 +25,7 @@ class OnBoardOptionView extends StatelessWidget {
           ),
           NormalButton(
             child: Text(
-              "Next",
+              "Create Business Account",
               style: context.textTheme.headline6!
                   .copyWith(color: context.colorScheme.onSecondary),
             ),
@@ -40,7 +41,7 @@ class OnBoardOptionView extends StatelessWidget {
           ),
           NormalButton(
             child: Text(
-              "Login",
+              "Register",
               style: context.textTheme.headline6!
                   .copyWith(color: context.colorScheme.onSecondary),
             ),

@@ -35,11 +35,13 @@ class ProductDetailView extends StatelessWidget {
       child: Column(
         children: [
           Expanded(
-              flex: 2,
-              child: DashboardAdsSlider(
-                dashboardModelList: viewModel.dashboardModelList,
+            flex: 2,
+            child: Container(),
+            /*  child: DashboardAdsSlider(
+                productSliderList:  viewModel
                 onlyImage: true,
-              )),
+              )),*/
+          ),
           Expanded(
             flex: 2,
             child: Padding(

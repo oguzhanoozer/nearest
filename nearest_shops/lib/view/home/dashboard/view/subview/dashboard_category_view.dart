@@ -1,8 +1,8 @@
 part of '../dashboard_view.dart';
 
 extension _DashboardProductsWidgets on DashboardView {
-  Widget buildCategoriesTabBar(BuildContext context) {
-    return TabBar(
+  /*Widget buildCategoriesTabBar(BuildContext context,DashboardViewModel viewModel) {
+   return TabBar(
       labelColor: context.colorScheme.onError,
       //unselectedLabelColor: context.colorScheme.onError,
       indicatorColor: context.colorScheme.onSecondary,
@@ -19,39 +19,91 @@ extension _DashboardProductsWidgets on DashboardView {
       ],
     );
   }
+*/
 
-  Widget buildCategoriesRow(BuildContext context) {
-    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+  Widget buildCategoriesRow(
+      BuildContext context, DashboardViewModel viewModel) {
+    List<Widget> categoriesItem = [
+      buildCategoryContainer(
+          context, "All", ImagePaths.instance.technology, viewModel, 0),
+      buildCategoryContainer(
+          context, "Gift", ImagePaths.instance.gift, viewModel, 1),
+      buildCategoryContainer(
+          context, "Kitchen", ImagePaths.instance.kitchen, viewModel, 2),
+      buildCategoryContainer(
+          context, "Technology", ImagePaths.instance.technology, viewModel, 3),
+      buildCategoryContainer(
+          context, "Shoes", ImagePaths.instance.shoes, viewModel, 4),
+      buildCategoryContainer(
+          context, "Cars", ImagePaths.instance.cars, viewModel, 5),
+      buildCategoryContainer(
+          context, "Other", ImagePaths.instance.gift, viewModel, 6)
+    ];
+
+    return Observer(builder: (_) {
+      return SizedBox(
+        height: context.dynamicHeight(0.05),
+        child: ListView(
+            // shrinkWrap: true,
+            padding: const EdgeInsets.all(0.0),
+            scrollDirection: Axis.horizontal,
+            children: categoriesItem),
+      );
+    });
+
+    /* 
+  return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       buildCategoryContainer(context, "Shoes", ImagePaths.instance.shoes),
       buildCategoryContainer(context, "Gift", ImagePaths.instance.gift),
       buildCategoryContainer(context, "Kitchen", ImagePaths.instance.kitchen),
       buildCategoryContainer(context, "Cars", ImagePaths.instance.cars),
       buildCategoryContainer(
-          context, "Technology", ImagePaths.instance.technology),
+          context, "Technology", ImagePaths.instance.technology)
     ]);
+    */
   }
 
-  Widget buildCategoryContainer(
-      BuildContext context, String title, String iconUrl) {
-    return Container(
-      height: context.dynamicHeight(0.08),
-      width: context.dynamicHeight(0.08),
-      child: Column(
-        children: [
-          Expanded(
-            child: Center(
-                child: Image.asset(
-              iconUrl,
-              width: 40,
-              height: 40,
-              fit: BoxFit.cover,
-            )),
+  Widget buildCategoryContainer(BuildContext context, String title,
+      String iconUrl, DashboardViewModel viewModel, int categoryId) {
+    return GestureDetector(
+      onTap: () {
+        viewModel.changeCategoryId(categoryId);
+      },
+      child: Padding(
+        padding: context.horizontalPaddingLow,
+        child: Card(
+          shape: RoundedRectangleBorder(
+            side: BorderSide(
+                color: context.colorScheme.onInverseSurface, width: 0.5),
+            borderRadius: BorderRadius.circular(context.normalValue),
           ),
-          Text(
-            title,
-            style: context.textTheme.bodyMedium!.copyWith(color: Colors.black),
+          color: viewModel.categoryId == categoryId
+              ? Colors.grey[200]
+              : Colors.white,
+          //height: context.dynamicHeight(0.08),
+          //width: context.dynamicHeight(0.08),
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Row(
+              children: [
+                Center(
+                  child: Image.asset(
+                    iconUrl,
+                    //   width: 30,
+                    //  height: 30,
+                    fit: BoxFit.fill,
+                  ),
+                ),
+                SizedBox(width: 10),
+                Text(
+                  title,
+                  style: context.textTheme.bodyText2!
+                      .copyWith(color: Colors.black),
+                ),
+              ],
+            ),
           ),
-        ],
+        ),
       ),
     );
   }

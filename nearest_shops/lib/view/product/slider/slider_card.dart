@@ -1,80 +1,117 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:kartal/kartal.dart';
+import 'package:nearest_shops/view/home/product_detail/model/product_detail_model.dart';
 
 import '../../home/dashboard/model/dashboard_model.dart';
+import '../../home/dashboard/viewmodel/dashboard_view_model.dart';
+import '../contstants/image_path.dart';
 
 class SliderCard extends Card {
   final BuildContext context;
-  final DashboardModel dashboardModel;
+  final ProductDetailModel productDetailModel;
   final bool onlyImage;
+  final DashboardViewModel viewmodel;
 
   SliderCard({
-    required this.dashboardModel,
+    required this.productDetailModel,
     required this.context,
     required this.onlyImage,
+    required this.viewmodel,
   }) : super(
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
               side: BorderSide(width: 1, color: Colors.orange[100]!)),
           child: Padding(
-            padding: context.paddingNormal,
+            padding: context.paddingLow,
             child: Row(
               children: [
                 Expanded(
                   //child: Image.network(widget.dashboardModelList![index].url ?? "",
-                  child: buildProductImage(dashboardModel),
+                  child: buildProductImage(productDetailModel),
                 ),
                 onlyImage
                     ? Container()
                     : Expanded(
-                        child: buildProductDetail(dashboardModel, context),
+                        child: buildProductDetail(
+                            productDetailModel, context, viewmodel),
                       ),
               ],
             ),
           ),
         );
 
-  static Column buildProductDetail(
-      DashboardModel dashboardModel, BuildContext context) {
+  static Column buildProductDetail(ProductDetailModel productDetailModel,
+      BuildContext context, DashboardViewModel viewmodel) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        buildProductTitle(dashboardModel, context),
-        buildProductBody(dashboardModel),
-        SizedBox(height: 20),
-        buildProductPriceRow(dashboardModel, context),
+        buildProductTitle(productDetailModel, context),
+        buildProductSummary(productDetailModel, context),
+        buildProductPriceRow(productDetailModel, context, viewmodel),
       ],
     );
   }
 
-  static Row buildProductPriceRow(
-      DashboardModel dashboardModel, BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Text(
-          dashboardModel.price ?? "",
-          style: context.textTheme.headline6!
-              .copyWith(fontWeight: FontWeight.bold),
-        ),
-        Icon(Icons.shopping_bag),
-      ],
-    );
+  static Widget buildProductPriceRow(ProductDetailModel productDetailModel,
+      BuildContext context, DashboardViewModel viewmodel) {
+    return Observer(builder: (_) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Text(
+            productDetailModel.price.toString(),
+            style: context.textTheme.bodyText2!
+                .copyWith(fontWeight: FontWeight.bold),
+          ),
+          Icon(Icons.shopping_bag),
+          IconButton(
+              onPressed: () {
+                viewmodel.changeFavouriteList(
+                    productDetailModel.productId.toString());
+              },
+              icon: Icon(Icons.favorite),
+              color: viewmodel.userFavouriteList
+                      .contains(productDetailModel.productId)
+                  ? Colors.red
+                  : Colors.grey),
+        ],
+      );
+    });
   }
 
-  static Text buildProductBody(DashboardModel dashboardModel) =>
-      Text(dashboardModel.body ?? "");
+  static Text buildProductSummary(
+          ProductDetailModel productDetailModel, BuildContext context) =>
+      Text(productDetailModel.summary ?? "",
+          style: context.textTheme.bodySmall!);
 
   static Text buildProductTitle(
-      DashboardModel dashboardModel, BuildContext context) {
+      ProductDetailModel productDetailModel, BuildContext context) {
     return Text(
-      dashboardModel.title ?? "",
-      style: context.textTheme.headline4!
+      productDetailModel.name ?? "",
+      style: context.textTheme.bodyLarge!
           .copyWith(fontWeight: FontWeight.bold, color: Colors.black),
     );
   }
 
-  static Image buildProductImage(DashboardModel dashboardModel) {
-    return Image.asset(dashboardModel.url ?? "", fit: BoxFit.fill);
+  static Widget buildProductImage(ProductDetailModel productDetailModel) {
+    return Card(
+      clipBehavior: Clip.antiAliasWithSaveLayer,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: productDetailModel.imageUrlList!.isEmpty
+          ? Image.asset(
+              ImagePaths.instance.hazelnut,
+              //  height: context.dynamicHeight(0.1),
+              fit: BoxFit.fill,
+            )
+          : Image.network(
+              productDetailModel.imageUrlList!.first.toString(),
+              fit: BoxFit.fill,
+            ),
+    );
+
+    ///Image.asset(dashboardModel.imageUrlList.first ?? "", fit: BoxFit.fill);
   }
 }

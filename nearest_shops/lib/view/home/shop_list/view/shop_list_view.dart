@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:kartal/kartal.dart';
+import 'package:nearest_shops/view/home/shop_list/model/shop_model.dart';
 
 import '../../../../core/base/view/base_view.dart';
 import '../../../product/contstants/image_path.dart';
@@ -12,7 +14,10 @@ class ShopListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BaseView<ShopListViewModel>(
       viewModel: ShopListViewModel(),
-      onModelReady: (model) {},
+      onModelReady: (model) {
+        model.setContext(context);
+        model.init();
+      },
       onPageBuilder: (BuildContext context, ShopListViewModel viewmodel) =>
           buildScaffold(context, viewmodel),
     );
@@ -20,102 +25,127 @@ class ShopListView extends StatelessWidget {
 
   Widget buildScaffold(BuildContext context, ShopListViewModel viewmodel) {
     return Scaffold(
-      appBar: buildAppBar(context),
-      body: buildProductList(),
-    );
+        appBar: buildAppBar(context),
+        body: Observer(builder: (_) {
+          return viewmodel.isShopMapListLoading
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : buildShopList(viewmodel);
+        }));
   }
 
-  ListView buildProductList() {
+  Widget buildShopList(ShopListViewModel viewmodel) {
+    List<ShopModel> currentShopList = viewmodel.getListShopModel();
+
     return ListView.builder(
-      itemCount: 10,
+      itemCount: currentShopList.length,
       itemBuilder: (context, index) {
         return Padding(
           padding: context.paddingLow,
-          child: buildProductCard(context),
+          child: buildShopCard(context, currentShopList[index]),
         );
       },
     );
   }
 
-  Card buildProductCard(BuildContext context) {
+  Card buildShopCard(BuildContext context, ShopModel shopModel) {
     return Card(
       elevation: 2,
       borderOnForeground: true,
-      shadowColor: context.colorScheme.onSurfaceVariant,
+
+      /// shadowColor: context.colorScheme.onSurfaceVariant,
       margin: EdgeInsets.zero,
       child: Row(
         children: [
           Expanded(
-            flex: 2,
-            child: buildProductImage(context),
+            flex: 4,
+            child: buildShopImage(context, shopModel),
           ),
           Expanded(
-            flex: 5,
-            child: buildProductColumn(context),
+            flex: 3,
+            child: buildShopColumn(context, shopModel),
           ),
           Expanded(
-              flex: 1,
-              child: Icon(Icons.location_on_outlined,
-                  size: context.mediumValue * 1.5,
-                  color: context.colorScheme.onPrimary)),
+            flex: 3,
+            child: Column(
+              children: [
+                Icon(Icons.location_on_outlined,
+                    size: context.mediumValue,
+                    color: context.colorScheme.onPrimary),
+                OutlinedButton(
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(context
+                          .colorScheme.onSurfaceVariant
+                          .withOpacity(0.9))),
+                  onPressed: null,
+                  child: Text(
+                    "View Seller",
+                    style: context.textTheme.bodyText1!
+                        .copyWith(color: context.colorScheme.onSecondary),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Column buildProductColumn(BuildContext context) {
+  Column buildShopColumn(BuildContext context, ShopModel shopModel) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        buildProductTitle(context),
-        buildProductBody(context),
-        buildProductPriceRow(context),
+        buildShopTitle(context, shopModel),
+        buildShopBody(context, shopModel),
+        buildShopPriceRow(context, shopModel),
       ],
     );
   }
 
-  Row buildProductPriceRow(BuildContext context) {
+  Row buildShopPriceRow(BuildContext context, ShopModel shopModel) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text("\$500",
+        Text(shopModel.phoneNumber!,
             style: context.textTheme.headline6!.copyWith(
                 color: context.colorScheme.onPrimary,
                 fontWeight: FontWeight.bold)),
-        OutlinedButton(
-            style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(
-                    context.colorScheme.onSurfaceVariant.withOpacity(0.9))),
-            onPressed: null,
-            child: Text(
-              "See All Products",
-              style: context.textTheme.bodyText1!
-                  .copyWith(color: context.colorScheme.onSecondary),
-            )),
       ],
     );
   }
 
-  Text buildProductBody(BuildContext context) {
-    return Text("Shop subtitle",
+  Text buildShopBody(BuildContext context, ShopModel shopModel) {
+    return Text(shopModel.address!,
         style: context.textTheme.subtitle1!
             .copyWith(color: context.colorScheme.onPrimary));
   }
 
-  Text buildProductTitle(BuildContext context) {
-    return Text("Shop Title",
+  Text buildShopTitle(BuildContext context, ShopModel shopModel) {
+    return Text(shopModel.name!,
         style: context.textTheme.headline6!.copyWith(
             color: context.colorScheme.onPrimary, fontWeight: FontWeight.bold));
   }
 
-  Padding buildProductImage(BuildContext context) {
-    return Padding(
-      padding: context.paddingNormal,
-      child: Image.asset(
-        ImagePaths.instance.hazelnut,
-        height: context.dynamicHeight(0.1),
+  Widget buildShopImage(BuildContext context, ShopModel shopModel) {
+    return Card(
+      clipBehavior: Clip.antiAliasWithSaveLayer,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
       ),
+      child: shopModel.logoUrl!.isEmpty
+          ? Image.asset(
+              ImagePaths.instance.hazelnut,
+              height: context.dynamicHeight(0.15),
+              fit: BoxFit.fill,
+            )
+          : Image.network(
+              shopModel.logoUrl.toString(),
+              height: context.dynamicHeight(0.15),
+              fit: BoxFit.fill,
+            ),
     );
   }
 

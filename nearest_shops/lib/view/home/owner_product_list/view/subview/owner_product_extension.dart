@@ -1,6 +1,6 @@
 part of '../owner_product_list_view.dart';
 
-extension _Owner_product_extension on OwnerProductListView {
+extension _Owner_product_extension on OwnerUserProductListView {
   Positioned buildSearchTextField(BuildContext context) {
     return Positioned(
       top: context.dynamicHeight(0.03),

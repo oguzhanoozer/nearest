@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:kartal/kartal.dart';
-import 'package:nearest_shops/core/extension/string_extension.dart';
+
 import '../../../../core/base/view/base_view.dart';
 import '../../../../core/components/button/normal_button.dart';
 import '../../../../core/components/column/form_column.dart';
+import '../../../../core/extension/string_extension.dart';
 import '../../../../core/init/lang/locale_keys.g.dart';
 import '../viewmodel/shop_owner_login_view_model.dart';
 
@@ -100,7 +101,11 @@ class ShopOwnerRegisterView extends StatelessWidget {
           style: context.textTheme.headline6!
               .copyWith(color: context.colorScheme.onSecondary),
         ),
-        onPressed: viewModel.isLoading ? null : () async {},
+        onPressed: viewModel.isLoading
+            ? null
+            : () async {
+               await viewModel.registerOwnerData(context);
+              },
         color: context.appTheme.colorScheme.onSurfaceVariant,
       );
     });

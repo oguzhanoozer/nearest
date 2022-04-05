@@ -6,8 +6,10 @@ class ShopModel {
   String? logoUrl;
   String? id;
   GeoPoint? location;
+  String? phoneNumber;
+  String? email;
 
-  ShopModel({this.id, this.name, this.address, this.logoUrl, this.location});
+  ShopModel({this.id, this.name, this.address, this.logoUrl, this.location,this.email,this.phoneNumber});
 
   Map<String, dynamic> toMap() => {
         "name": name,
@@ -15,6 +17,8 @@ class ShopModel {
         "logoUrl": logoUrl,
         "location": location,
         "id": id,
+        "email": email,
+        "phoneNumber": phoneNumber,
       };
 
   factory ShopModel.fromJson(Map map) => ShopModel(
@@ -22,5 +26,7 @@ class ShopModel {
       address: map["address"],
       logoUrl: map["logoUrl"],
       location: map["location"],
-      id: map["id"]);
+      id: map["id"],
+      email: map["email"],
+      phoneNumber: map["phoneNumber"],);
 }

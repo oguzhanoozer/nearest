@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:kartal/kartal.dart';
-import 'map_shop_view.dart';
-import '../viewmodel/owner_product_list_view_model.dart';
-import '../../../product/slider/slider_card.dart';
 
 import '../../../../core/base/view/base_view.dart';
-import '../../../../core/components/button/normal_button.dart';
-import '../../../../core/components/button/text_button.dart';
+import '../../../product/contstants/image_path.dart';
+import '../viewmodel/owner_product_list_view_model.dart';
+import 'map_shop_view.dart';
 
 part 'subview/owner_product_extension.dart';
 
-class OwnerProductListView extends StatelessWidget {
-  const OwnerProductListView({Key? key}) : super(key: key);
+class OwnerUserProductListView extends StatelessWidget {
+  const OwnerUserProductListView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BaseView<OwnerProductListViewModel>(
       viewModel: OwnerProductListViewModel(),
-      onModelReady: (model) {},
+      onModelReady: (model) {
+        model.setContext(context);
+        model.init();
+      },
       onPageBuilder:
           (BuildContext context, OwnerProductListViewModel viewmodel) =>
               buildScaffold(context, viewmodel),
@@ -27,15 +28,21 @@ class OwnerProductListView extends StatelessWidget {
 
   Widget buildScaffold(
       BuildContext context, OwnerProductListViewModel viewmodel) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          MapShopView(),
-          buildSearchTextField(context),
-          buildDraggeableContainer(viewmodel)
-        ],
-      ),
-    );
+    return Observer(builder: (_) {
+      return Scaffold(
+        body: viewmodel.isShopMapLoading
+            ? Center(child: CircularProgressIndicator())
+            : Stack(
+                children: [
+                  MapShopView(viewModel: viewmodel),
+                  buildSearchTextField(context),
+                  viewmodel.isShopProductLoaded
+                      ? buildDraggeableContainer(viewmodel)
+                      : Container()
+                ],
+              ),
+      );
+    });
   }
 
   DraggableScrollableSheet buildDraggeableContainer(
@@ -55,7 +62,9 @@ class OwnerProductListView extends StatelessWidget {
                 topRight: Radius.circular(context.normalValue),
               ),
             ),
-            child: buildProductListView(myscrollController, viewmodel),
+            child: viewmodel.isShopProductLoading
+                ? Center(child: CircularProgressIndicator())
+                : buildProductListView(myscrollController, viewmodel),
           ),
         );
       },
@@ -66,7 +75,7 @@ class OwnerProductListView extends StatelessWidget {
       OwnerProductListViewModel viewmodel) {
     return ListView.builder(
       controller: myscrollController,
-      itemCount: viewmodel.dashboardModelList.length,
+      itemCount: viewmodel.getListProductDetailModel().length,
       itemBuilder: (BuildContext context, int index) {
         return Padding(
           padding: context.paddingNormal,
@@ -87,6 +96,7 @@ class OwnerProductListView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           buildProductImage(context, viewmodel, index),
+          context.emptySizedWidthBoxLow,
           buildProductDetail(viewmodel, index, context),
         ],
       ),
@@ -116,7 +126,7 @@ class OwnerProductListView extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          viewmodel.dashboardModelList[index].price ?? "",
+          viewmodel.getListProductDetailModel()[index].price!.toString(),
           style: context.textTheme.headline6!
               .copyWith(fontWeight: FontWeight.bold),
         ),
@@ -141,12 +151,12 @@ class OwnerProductListView extends StatelessWidget {
   }
 
   Text buildProductBody(OwnerProductListViewModel viewmodel, int index) =>
-      Text(viewmodel.dashboardModelList[index].body ?? "");
+      Text(viewmodel.getListProductDetailModel()[index].summary ?? "");
 
   Text buildProductTitle(
       OwnerProductListViewModel viewmodel, int index, BuildContext context) {
     return Text(
-      viewmodel.dashboardModelList[index].title ?? "",
+      viewmodel.getListProductDetailModel()[index].name ?? "",
       style: context.textTheme.headline5!.copyWith(
           fontWeight: FontWeight.bold, color: context.colorScheme.primary),
     );
@@ -156,14 +166,31 @@ class OwnerProductListView extends StatelessWidget {
       BuildContext context, OwnerProductListViewModel viewmodel, int index) {
     return Expanded(
       flex: 1,
-      //child: Image.network(widget.dashboardModelList![index].url ?? "",
-      child: Padding(
-        padding: context.paddingNormal,
-        child: Image.asset(
-          viewmodel.dashboardModelList[index].url ?? "",
-          fit: BoxFit.fill,
-          height: context.dynamicHeight(0.1),
+      child: Card(
+        elevation: 0,
+        clipBehavior: Clip.antiAliasWithSaveLayer,
+
+        /// borderOnForeground: true,
+        shape: RoundedRectangleBorder(
+          /// side: BorderSide(color: Colors.white70, width: 1),
+          borderRadius: BorderRadius.circular(10),
         ),
+        child:
+            viewmodel.getListProductDetailModel()[index].imageUrlList!.isEmpty
+                ? Image.asset(
+                    ImagePaths.instance.hazelnut,
+                    height: context.dynamicHeight(0.15),
+                    fit: BoxFit.fill,
+                  )
+                : Image.network(
+                    viewmodel
+                        .getListProductDetailModel()[index]
+                        .imageUrlList!
+                        .first
+                        .toString(),
+                    height: context.dynamicHeight(0.15),
+                    fit: BoxFit.fill,
+                  ),
       ),
     );
   }

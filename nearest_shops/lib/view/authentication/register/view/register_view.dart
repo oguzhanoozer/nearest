@@ -8,7 +8,6 @@ import '../../../../core/components/button/text_button.dart';
 import '../../../../core/components/column/form_column.dart';
 import '../../../../core/extension/string_extension.dart';
 import '../../../../core/init/lang/locale_keys.g.dart';
-import '../../login/view/login_view.dart';
 import '../viewmodel/register_view_model.dart';
 
 part 'subview/register_view_textfields.dart';
@@ -102,7 +101,7 @@ class RegisterView extends StatelessWidget {
         onPressed: viewModel.isLoading
             ? null
             : () async {
-                await viewModel.checkUserData(context);
+                await viewModel.checkUserData();
               },
         color: context.appTheme.colorScheme.onSurfaceVariant,
       );

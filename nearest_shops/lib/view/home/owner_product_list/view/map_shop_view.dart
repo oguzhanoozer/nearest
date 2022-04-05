@@ -1,20 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class MapShopView extends StatefulWidget {
-  @override
-  _MapShopViewState createState() => _MapShopViewState();
-}
+import '../viewmodel/owner_product_list_view_model.dart';
 
-double _originLatitude = 40.392300;
-double _originLongitude = 30.047840;
+class MapShopView extends StatelessWidget {
+  final OwnerProductListViewModel viewModel;
 
-class _MapShopViewState extends State<MapShopView> {
+  MapShopView({Key? key, required this.viewModel}) : super(key: key);
+
   GoogleMapController? _controller;
-  static final CameraPosition _initalCameraPosition = CameraPosition(
-    target: LatLng(_originLatitude, _originLongitude),
-    zoom: 12,
-  );
 
   @override
   Widget build(BuildContext context) {
@@ -22,11 +16,12 @@ class _MapShopViewState extends State<MapShopView> {
       body: GoogleMap(
         myLocationButtonEnabled: true,
         mapType: MapType.normal,
-        initialCameraPosition: _initalCameraPosition,
+        initialCameraPosition: viewModel.initalCameraPosition!,
         tiltGesturesEnabled: true,
         compassEnabled: true,
         scrollGesturesEnabled: true,
         zoomGesturesEnabled: true,
+        markers: viewModel.getListMarkerList(),
         onMapCreated: (GoogleMapController controller) {
           _controller = controller;
         },

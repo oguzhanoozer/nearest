@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:kartal/kartal.dart';
 
 import '../../../../core/base/view/base_view.dart';
 import '../../../../core/extension/widget_extension.dart';
-import '../../../../core/init/service/firebase_authentication.dart';
+import '../../../../core/init/service/authenticaion/firebase_authentication.dart';
 import '../../../product/contstants/image_path.dart';
 import '../../../product/grid/product_grid.dart';
 import '../../../product/slider/dashboard_ads_slider.dart';
+import '../../product_detail/model/product_detail_model.dart';
 import '../viewmodel/dashboard_view_model.dart';
 
 part 'subview/dashboard_category_view.dart';
@@ -18,7 +20,10 @@ class DashboardView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BaseView<DashboardViewModel>(
       viewModel: DashboardViewModel(),
-      onModelReady: (model) {},
+      onModelReady: (model) {
+        model.setContext(context);
+        model.init();
+      },
       onPageBuilder: (BuildContext context, DashboardViewModel viewmodel) =>
           buildScaffold(context, viewmodel),
     );
@@ -26,24 +31,42 @@ class DashboardView extends StatelessWidget {
 
   Scaffold buildScaffold(BuildContext context, DashboardViewModel viewmodel) =>
       Scaffold(
-        body: Padding(
-          padding: context.paddingNormal,
-          child: CustomScrollView(
-            slivers: [
-              buildSliverApp(context),
-              SizedBox(
-                height: context.dynamicHeight(0.25),
-                child: DashboardAdsSlider(
-                    dashboardModelList: viewmodel.dashboardModelList,
-                    onlyImage: false),
-              ).toSliver,
-              buildCategoriesText(context).toSliver,
-              //buildCategoriesTabBar(context).toSliver,
-              buildCategoriesRow(context).toSliver,
-              buildProductsGrid(context, viewmodel).toSliver,
-            ],
-          ),
-        ),
+        body: Observer(builder: (_) {
+          return Padding(
+            padding: context.paddingNormal,
+            child: CustomScrollView(
+              controller: viewmodel.controller,
+              slivers: [
+                buildSliverApp(context),
+                SizedBox(
+                  height: context.dynamicHeight(0.25),
+                  child: viewmodel.isProductSliderListLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : DashboardAdsSlider(
+                          viewmodel: viewmodel,
+                          productSliderList: viewmodel.getProductSliderList(),
+                          onlyImage: false),
+                ).toSliver,
+                buildCategoriesText(context).toSliver,
+                //buildCategoriesTabBar(context).toSliver,
+                buildCategoriesRow(context, viewmodel).toSliver,
+                viewmodel.isProductFirstListLoading
+                    ? const Center(child: CircularProgressIndicator()).toSliver
+                    : buildProductsGrid(
+                            context, viewmodel.getProductList(), viewmodel)
+                        .toSliver,
+                if (viewmodel.isProductMoreListLoading == true)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 10, bottom: 40),
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  ).toSliver,
+              ],
+            ),
+          );
+        }),
+        /*
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
           elevation: 4.0,
@@ -102,11 +125,12 @@ class DashboardView extends StatelessWidget {
           //color of the BottomAppBar
           color: Colors.white,
         ),
+        */
       );
 
   SliverAppBar buildSliverApp(BuildContext context) {
     return SliverAppBar(
-        expandedHeight: context.height * 0.18,
+        expandedHeight: context.height * 0.12,
         pinned: false,
         actions: [buildAppBarActionsContainer(context)],
         title: buildAppBarTitle(context),
@@ -119,12 +143,10 @@ class DashboardView extends StatelessWidget {
   }
 
   Widget buildProductsGrid(
-    BuildContext context,
-    DashboardViewModel viewModel,
-  ) {
-    return ProductGrid(
-      dashboardModel: viewModel.dashboardModelList,
-    );
+      BuildContext context,
+      List<ProductDetailModel> productDetailList,
+      DashboardViewModel viewModel) {
+    return ProductGrid(productList: productDetailList, viewModel: viewModel);
   }
 
   Widget buildCategoriesText(BuildContext context) {
@@ -152,7 +174,7 @@ class DashboardView extends StatelessWidget {
   Text buildTopCetegoriesText(BuildContext context) {
     return Text(
       "Top Categories",
-      style: context.textTheme.headline5!.copyWith(
+      style: context.textTheme.headline6!.copyWith(
         fontWeight: FontWeight.bold,
         color: context.colorScheme.primary,
       ),
@@ -179,10 +201,11 @@ class DashboardView extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            "Hey Oğuzhan",
-            style: context.textTheme.headline5,
+            "The Nearest",
+            style: context.textTheme.headline5!.copyWith(
+                color: context.appTheme.colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.bold),
           ),
-          Text("What you need to buy ?")
         ],
       ),
     );

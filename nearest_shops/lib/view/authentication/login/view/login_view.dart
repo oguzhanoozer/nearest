@@ -12,8 +12,7 @@ import '../../../../core/extension/string_extension.dart';
 import '../../../../core/init/lang/locale_keys.g.dart';
 import '../../../product/contstants/image_path_svg.dart';
 import '../../onboard/view/on_board_option_view.dart';
-import '../../onboard/view/onboard_view.dart';
-import '../../register/view/register_view.dart';
+import '../../reset_password/view/reset_password_view.dart';
 import '../viewmodel/login_view_model.dart';
 
 part 'subview/login_view_textfields.dart';
@@ -65,7 +64,7 @@ class LoginView extends StatelessWidget {
         buildEmailTextField(viewModel, context),
         context.emptySizedHeightBoxLow,
         buildPasswordTextField(viewModel, context),
-        buildForgotPasswordText(),
+        buildForgotPasswordText(context),
         context.emptySizedHeightBoxNormal,
         buildLoginButton(context, viewModel),
         buildCreateAccountButton(context),
@@ -162,11 +161,14 @@ class LoginView extends StatelessWidget {
     });
   }
 
-  Align buildForgotPasswordText() {
+  Align buildForgotPasswordText(BuildContext context) {
     return Align(
       alignment: Alignment.centerRight,
       child: NormalTextButton(
-          text: LocaleKeys.forgotPassword.locale, onPressed: () {}),
+          text: LocaleKeys.forgotPassword.locale,
+          onPressed: () {
+            context.navigateToPage(ResetPasswordView());
+          }),
     );
   }
 }

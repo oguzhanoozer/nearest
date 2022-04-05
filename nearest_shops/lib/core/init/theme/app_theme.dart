@@ -30,8 +30,7 @@ InputDecorationTheme buildInputDecorationTheme(ITheme theme) {
       floatingLabelStyle: TextStyle(color: theme.colors.colors.orange),
       focusColor: Colors.black12,
       filled: true,
-      
-      errorStyle: TextStyle(color:theme.colors.colors.red),
+      errorStyle: TextStyle(color: theme.colors.colors.red),
       fillColor: theme.colors.colors.lightGray,
       labelStyle: TextStyle(),
       errorBorder: OutlineInputBorder(

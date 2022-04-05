@@ -4,7 +4,8 @@ import 'package:kartal/kartal.dart';
 import 'package:mobx/mobx.dart';
 
 import '../../../../core/base/model/base_view_model.dart';
-import '../../../../core/init/service/firebase_authentication.dart';
+import '../../../../core/init/service/authenticaion/firebase_authentication.dart';
+import '../../../../core/init/service/firestorage/enum/document_collection_enums.dart';
 import '../../../product/showdialog/show_dialog.dart';
 import '../../login/view/login_view.dart';
 
@@ -39,7 +40,7 @@ abstract class _RegisterViewModelBase with Store, BaseViewModel {
     emailController!.text = "oguzoozer@gmail.com";
   }
 
-  Future<void> checkUserData(BuildContext context) async {
+  Future<void> checkUserData() async {
     isLoadingChange();
     if (formState.currentState!.validate()) {
       try {
@@ -47,18 +48,22 @@ abstract class _RegisterViewModelBase with Store, BaseViewModel {
             .createUserWithEmailandPassword(
                 email: emailController!.text,
                 password: passwordLaterController!.text);
-        if (!user!.emailVerified) {
-          await user.sendEmailVerification();
+        if (user != null) {
+          if (!user.emailVerified) {
+            await user.sendEmailVerification();
+          }
+          await FirebaseAuthentication.instance
+              .setUserRole(UserRole.USER.roleRawValue, user.uid);
+          await FirebaseAuthentication.instance.signOut();
+          await ShowRegisterAlertDialog.instance.getAlertDialog(context!);
+          context!.navigateToPage(LoginView());
         }
-        await FirebaseAuthentication.instance.signOut();
-        await ShowAlertDialog.instance.getAlertDialog(context);
-         context.navigateToPage(LoginView());
       } on FirebaseAuthException catch (e) {
         if (scaffoldState.currentState != null) {
           scaffoldState.currentState!
               .showSnackBar(SnackBar(content: Text(e.message.toString())));
 
-         /// Navigator.pop(context);
+          /// Navigator.pop(context);
         }
       }
     }

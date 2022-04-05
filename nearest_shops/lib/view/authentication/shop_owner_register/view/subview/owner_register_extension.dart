@@ -5,7 +5,8 @@ extension _RegisterOwnerExtension on ShopOwnerRegisterView {
       ShopOwnerRegisterViewModel viewModel, BuildContext context) {
     return Observer(builder: (_) {
       return TextFormField(
-        ///validator: (value) =>             value!.isNotEmpty ? null : LocaleKeys.theFieldRequired.locale,
+        validator: (value) =>
+            value!.isNotEmpty ? null : LocaleKeys.theFieldRequired.locale,
         controller: viewModel.passwordFirstController,
         obscureText: viewModel.isFirstLockOpen,
         decoration: buildFirstPasswordTextFieldDecoration(context, viewModel),
@@ -76,7 +77,7 @@ extension _RegisterOwnerExtension on ShopOwnerRegisterView {
       ShopOwnerRegisterViewModel viewModel, BuildContext context) {
     return TextFormField(
       validator: (value) =>
-          value!.isValidEmail ? null : LocaleKeys.enterValidEmail.locale,
+          value!.isNotEmpty ? null : LocaleKeys.enterValidEmail.locale,
       keyboardType: TextInputType.emailAddress,
       controller: viewModel.emailController,
       decoration: buildEmailTextFieldDecoration(context),
@@ -94,7 +95,8 @@ extension _RegisterOwnerExtension on ShopOwnerRegisterView {
   TextFormField buildNameTextField(
       ShopOwnerRegisterViewModel viewModel, BuildContext context) {
     return TextFormField(
-      validator: (value) {},
+      validator: (value) =>
+          value!.isNotEmpty ? null : LocaleKeys.enterValidEmail.locale,
       keyboardType: TextInputType.streetAddress,
       controller: viewModel.businessNameController,
       decoration: buildNameTextFieldDecoration(context),
@@ -114,7 +116,8 @@ extension _RegisterOwnerExtension on ShopOwnerRegisterView {
     return TextFormField(
       keyboardType: TextInputType.streetAddress,
       maxLines: 3,
-      validator: (value) {},
+      validator: (value) =>
+          value!.isNotEmpty ? null : LocaleKeys.enterValidEmail.locale,
       controller: viewModel.businessAdressController,
       decoration: buildAdressTextFieldDecoration(context),
     );
@@ -131,7 +134,8 @@ extension _RegisterOwnerExtension on ShopOwnerRegisterView {
   TextFormField buildPhoneTextField(
       ShopOwnerRegisterViewModel viewModel, BuildContext context) {
     return TextFormField(
-      validator: (value) {},
+      validator: (value) =>
+          value!.isNotEmpty ? null : LocaleKeys.enterValidEmail.locale,
       keyboardType: TextInputType.phone,
       controller: viewModel.businessPhoneController,
       decoration: buildPhoneTextFieldDecoration(context),

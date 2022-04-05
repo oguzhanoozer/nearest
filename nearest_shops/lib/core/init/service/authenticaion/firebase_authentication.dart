@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+
+import '../firestorage/firestorage_initialize.dart';
 
 class FirebaseAuthentication {
   static FirebaseAuthentication _instance = FirebaseAuthentication._init();
@@ -16,10 +19,14 @@ class FirebaseAuthentication {
 
   Stream<User?> authUser() {
     //try {
-      return _firebaseAuth.authStateChanges();
-   // } on FirebaseAuthException catch (e) {
+    return _firebaseAuth.authStateChanges();
+    // } on FirebaseAuthException catch (e) {
     //  rethrow;
-   // }
+    // }
+  }
+
+  User? authCurrentUser() {
+    return _firebaseAuth.currentUser;
   }
 
   Future<User?> createUserWithEmailandPassword(
@@ -40,6 +47,32 @@ class FirebaseAuthentication {
           email: email, password: password);
       return userCredentials.user;
     } on FirebaseAuthException catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> setUserRole(int roleValue, String userId) async {
+    try {
+      Map<String, dynamic> roleMap = {"role": roleValue, "id": userId,"favouriteList":[]};
+
+      await FirebaseCollectionRefInitialize.instance.usersCollectionReference
+          .doc(userId)
+          .set(roleMap);
+    } on FirebaseException catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<int> getUserRole(String userId) async {
+    try {
+      DocumentSnapshot userRoleSnapshot = await FirebaseCollectionRefInitialize
+          .instance.usersCollectionReference
+          .doc(userId)
+          .get();
+
+      final roleValue = userRoleSnapshot.get("role");
+      return roleValue;
+    } on FirebaseException catch (e) {
       rethrow;
     }
   }
@@ -68,6 +101,14 @@ class FirebaseAuthentication {
       } else {
         return null;
       }
+    } on FirebaseAuthException catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> resetPassword({required String email}) async {
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
     } on FirebaseAuthException catch (e) {
       rethrow;
     }

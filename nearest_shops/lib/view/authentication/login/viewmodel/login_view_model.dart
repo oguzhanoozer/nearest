@@ -4,7 +4,8 @@ import 'package:kartal/kartal.dart';
 import 'package:mobx/mobx.dart';
 
 import '../../../../core/base/model/base_view_model.dart';
-import '../../../../core/init/service/firebase_authentication.dart';
+import '../../../../core/init/service/authenticaion/firebase_authentication.dart';
+import '../../../../core/init/service/firestorage/enum/document_collection_enums.dart';
 import '../../onboard/view/onboard_view.dart';
 
 part 'login_view_model.g.dart';
@@ -42,7 +43,6 @@ abstract class _LoginViewModelBase with Store, BaseViewModel {
                 email: emailController!.text,
                 password: passwordController!.text);
         if (!user!.emailVerified) {
-        
           await FirebaseAuthentication.instance.signOut();
           await getAlertDialog(context!);
         }
@@ -80,6 +80,10 @@ abstract class _LoginViewModelBase with Store, BaseViewModel {
     try {
       final user = await FirebaseAuthentication.instance.signInWithGoogle();
       print(user);
+      if (user != null) {
+        await FirebaseAuthentication.instance
+            .setUserRole(UserRole.USER.roleRawValue, user.uid);
+      }
     } on FirebaseAuthException catch (e) {
       if (scaffoldState.currentState != null) {
         scaffoldState.currentState!
