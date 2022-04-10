@@ -30,8 +30,9 @@ class OwnerUserProductListView extends StatelessWidget {
       BuildContext context, OwnerProductListViewModel viewmodel) {
     return Observer(builder: (_) {
       return Scaffold(
+        key: viewmodel.scaffoldState,
         body: viewmodel.isShopMapLoading
-            ? Center(child: CircularProgressIndicator())
+            ? const Center(child: CircularProgressIndicator())
             : Stack(
                 children: [
                   MapShopView(viewModel: viewmodel),
@@ -127,11 +128,11 @@ class OwnerUserProductListView extends StatelessWidget {
       children: [
         Text(
           viewmodel.getListProductDetailModel()[index].price!.toString(),
-          style: context.textTheme.headline6!
+          style: context.textTheme.bodyText2!
               .copyWith(fontWeight: FontWeight.bold),
         ),
         Icon(Icons.shopping_bag),
-        buildAllSeeProductButton(context),
+        FittedBox(child: buildAllSeeProductButton(context)),
       ],
     );
   }

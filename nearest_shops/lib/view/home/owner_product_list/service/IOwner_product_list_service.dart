@@ -1,0 +1,62 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:nearest_shops/view/utility/error_helper.dart';
+
+import '../../../../core/init/service/firestorage/firestorage_initialize.dart';
+import '../../product_detail/model/product_detail_model.dart';
+
+abstract class IOwnerProductListService {
+  final GlobalKey<ScaffoldState> scaffoldState;
+  final BuildContext context;
+
+  IOwnerProductListService(this.scaffoldState, this.context);
+  Future<List<DocumentSnapshot>?> fetchDocsInShops();
+  Future<List<ProductDetailModel>?> fethcProductListModel(
+      {required String shopId});
+}
+
+class OwnerProductlistService extends IOwnerProductListService
+    with ErrorHelper {
+  OwnerProductlistService(
+      GlobalKey<ScaffoldState> scaffoldState, BuildContext context)
+      : super(scaffoldState, context);
+
+  @override
+  Future<List<DocumentSnapshot>?> fetchDocsInShops() async {
+    try {
+      final shopsListQuery = await FirebaseCollectionRefInitialize
+          .instance.shopsCollectionReference
+          .get();
+
+      return shopsListQuery.docs;
+    } on FirebaseException catch (e) {
+      showSnackBar(scaffoldState, context, e.message.toString());
+        return null;
+    }
+  
+  }
+
+  @override
+  Future<List<ProductDetailModel>?> fethcProductListModel(
+      {required String shopId}) async {
+    List<ProductDetailModel> _productsModelList = [];
+    try {
+      final productListQuery = await FirebaseCollectionRefInitialize
+          .instance.productsCollectionReference
+          .where("shopId", isEqualTo: shopId)
+          .limit(10)
+          .get();
+
+      List<DocumentSnapshot> productDocsInShops = productListQuery.docs;
+      for (var element in productDocsInShops) {
+        _productsModelList
+            .add(ProductDetailModel.fromJson(element.data() as Map));
+      }
+
+      return _productsModelList;
+    } on FirebaseException catch (e) {
+      showSnackBar(scaffoldState, context, e.message.toString());
+      return null;
+    }
+  }
+}

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:kartal/kartal.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:math';
 
@@ -30,6 +31,8 @@ abstract class _AddProductViewModelBase with Store, BaseViewModel {
   TextEditingController? productPriceController;
   TextEditingController? productLastSeenDateController;
 
+  late IShopOwnerAddProductService shopOwnerAddProductService;
+
   final ImagePicker picker = ImagePicker();
 
   @observable
@@ -44,8 +47,6 @@ abstract class _AddProductViewModelBase with Store, BaseViewModel {
   @observable
   bool isImageSelected = false;
 
-  List<String> imageStoreNameList = [];
-
   @observable
   int _groupId = 1;
 
@@ -57,7 +58,11 @@ abstract class _AddProductViewModelBase with Store, BaseViewModel {
   int get returnGroupId => _groupId;
 
   @override
-  void setContext(BuildContext context) => this.context = context;
+  void setContext(BuildContext context) {
+    this.context = context;
+    shopOwnerAddProductService =
+        ShopOwnerAddProductService(scaffoldState, context);
+  }
 
   @override
   Future<void> init(
@@ -77,6 +82,15 @@ abstract class _AddProductViewModelBase with Store, BaseViewModel {
           DateFormat('dd/MM/yyyy').format(productDetailModel.lastSeenDate!);
       productPriceController!.text = productDetailModel.price.toString();
     }
+  }
+
+  void clearTextController() {
+    productNameController!.text = "";
+    productSummaryController!.text = "";
+    productDetailController!.text = "";
+    productLastSeenDateController!.text = "";
+    productPriceController!.text = "";
+    tempFile.clear();
   }
 
   Future<File> urlToFile(String imageUrl) async {
@@ -110,22 +124,16 @@ abstract class _AddProductViewModelBase with Store, BaseViewModel {
   @action
   Future<void> selectImage() async {
     isImageSelectedChange();
-    //tempFile = [];
+
     pickedFile = await picker.pickMultiImage() ?? [];
 
-    //String urlr = "https://picsum.photos/id/237/200/300";
-    //var data = await urlToFile(urlr);
-
-    ///XFile selectedFile = pickedFile[0];
-    ///File selected = File(selectedFile.path);
-
-    List<File> xx = [];
+    List<File> tempFileList = [];
 
     for (var filex in pickedFile) {
-      xx.add(File(filex.path));
+      tempFileList.add(File(filex.path));
     }
 
-    tempFile.addAll(xx);
+    tempFile.addAll(tempFileList);
     isImageSelectedChange();
   }
 
@@ -143,30 +151,31 @@ abstract class _AddProductViewModelBase with Store, BaseViewModel {
               ? productModel!.productId!
               : DateTime.now().millisecondsSinceEpoch.toString();
 
-          List<String> imageList = await uploadImage(pickedFile, productId);
+          List<String> imageList = await shopOwnerAddProductService.uploadImage(
+              pickedFile, productId);
           ProductDetailModel productData = ProductDetailModel(
-            name: productNameController!.text,
-            detail: productDetailController!.text,
-            summary: productSummaryController!.text,
-            price: double.parse(productPriceController!.text),
-            productId: productId,
-            shopId: shopId,
-            lastSeenDate:
-                DateFormat('d/M/y').parse(productLastSeenDateController!.text),
-            imageUrlList: imageList,
-            categoryId: returnGroupId,
-            imageStoreNameList: imageStoreNameList
-          );
+              name: productNameController!.text,
+              detail: productDetailController!.text,
+              summary: productSummaryController!.text,
+              price: double.parse(productPriceController!.text),
+              productId: productId,
+              shopId: shopId,
+              lastSeenDate: DateFormat('d/M/y')
+                  .parse(productLastSeenDateController!.text),
+              imageUrlList: imageList,
+              categoryId: returnGroupId,
+              imageStoreNameList:
+                  shopOwnerAddProductService.imageStoreNameList);
 
           if (isUpdate) {
-            await ShopOwnerAddProductService.instance
-                .updateProduct(productData);
+            await shopOwnerAddProductService.updateProduct(productData);
             await removeOldImage(productModel!.imageStoreNameList!);
           } else {
-            await ShopOwnerAddProductService.instance.addProduct(productData);
+            await shopOwnerAddProductService.addProduct(productData);
           }
         }
       }
+      clearTextController();
     } catch (e) {
       showSnackBar(message: e.toString());
       isLoadingChange();
@@ -177,35 +186,11 @@ abstract class _AddProductViewModelBase with Store, BaseViewModel {
 
   void showSnackBar({required String message}) {
     if (scaffoldState.currentState != null) {
-      scaffoldState.currentState!
-          .showSnackBar(SnackBar(content: Text(message)));
+      SnackBar(
+        content: Text(message),
+        duration: context!.durationNormal,
+      );
     }
-  }
-
-  Future<List<String>> uploadImage(
-      List<File> pickedFileList, String productId) async {
-    int _currentIndex = 1;
-    List<String> productImageUrlList = [];
-
-    productImageUrlList = await Future.wait(pickedFileList.map((pickedFile) =>
-        uploadFile(File(pickedFile.path), _currentIndex++, productId)));
-
-    return productImageUrlList;
-  }
-
-  Future<String> uploadFile(
-      File _image, int imageIndex, String productId) async {
-    String storageName = "${productId} -> ${imageIndex} -> ${DateTime.now().millisecondsSinceEpoch.toString()}";
-    imageStoreNameList.add(storageName);
-
-    TaskSnapshot uploadImageSnapshot = await FirebaseStorageInitalize
-        .instance.firabaseStorage
-        .ref()
-        .child("content")
-        .child(storageName)
-        .putFile(_image);
-
-    return await uploadImageSnapshot.ref.getDownloadURL();
   }
 
   Future<void> removeOldImage(List<String> imageUrlList) async {

@@ -5,6 +5,7 @@ import 'package:kartal/kartal.dart';
 import '../../home/dashboard/model/dashboard_model.dart';
 import '../../home/dashboard/viewmodel/dashboard_view_model.dart';
 import '../../home/product_detail/model/product_detail_model.dart';
+import '../../home/product_detail/view/product_detail_view.dart';
 import '../contstants/image_path.dart';
 
 class ProductGrid extends StatelessWidget {
@@ -18,6 +19,7 @@ class ProductGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
+      padding: EdgeInsets.zero,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         childAspectRatio: 0.7,
@@ -32,29 +34,34 @@ class ProductGrid extends StatelessWidget {
     );
   }
 
-  Card buildProductCard(BuildContext context, int index) {
-    return Card(
-      /// color: context.colorScheme.onInverseSurface,
-      shadowColor: Colors.white,
-      elevation: 1,
-      shape: RoundedRectangleBorder(
-        side:
-            BorderSide(color: context.colorScheme.onInverseSurface, width: 0.5),
-        borderRadius: BorderRadius.circular(context.normalValue),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(
-            flex: 9,
-            child: buildProductImage(index, context),
-          ),
-          Expanded(
-            flex: 5,
-            child: buildProductDetail(context, index),
-          ),
-        ],
+  Widget buildProductCard(BuildContext context, int index) {
+    return GestureDetector(
+      onTap: () => context.navigateToPage(ProductDetailView(
+        productDetailModel: productList[index],
+      )),
+      child: Card(
+        /// color: context.colorScheme.onInverseSurface,
+        shadowColor: Colors.white,
+        elevation: 1,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(
+              color: context.colorScheme.onInverseSurface, width: 0.5),
+          borderRadius: BorderRadius.circular(context.normalValue),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              flex: 9,
+              child: buildProductImage(index, context),
+            ),
+            Expanded(
+              flex: 5,
+              child: buildProductDetail(context, index),
+            ),
+          ],
+        ),
       ),
     );
   }

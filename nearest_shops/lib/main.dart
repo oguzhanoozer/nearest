@@ -16,7 +16,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 Future<void> main() async {
   await _init();
-  
+
   await dotenv.load(fileName: '.env');
   runApp(
     MultiProvider(
@@ -25,7 +25,7 @@ Future<void> main() async {
         path: ApplicationConstants.LANG_ASSET_PATH,
         supportedLocales: LanguageManager.instance.supportedLocales,
         fallbackLocale: LanguageManager.instance.trLocale,
-        assetLoader:  CodegenLoader(),
+        assetLoader: CodegenLoader(),
         saveLocale: true,
         startLocale: LanguageManager.instance.trLocale,
         child: MainHome(),

@@ -2,13 +2,20 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:nearest_shops/view/home/product_detail/model/product_detail_model.dart';
+import 'package:nearest_shops/view/utility/error_helper.dart';
 
 import '../../../../core/init/service/authenticaion/firebase_authentication.dart';
 import '../../../../core/init/service/authenticaion/user_id_initialize.dart';
 import '../../../../core/init/service/firestorage/firestorage_initialize.dart';
 
 abstract class IDashboardService {
+  final GlobalKey<ScaffoldState> scaffoldState;
+  final BuildContext context;
+
+  IDashboardService(this.scaffoldState, this.context);
   Future<List<ProductDetailModel>?> fetchDashboardProductFirstList(
       {bool isFiltered});
   Future<List<ProductDetailModel>?> fetchDashboardProductMoreList(
@@ -20,48 +27,57 @@ abstract class IDashboardService {
   late DocumentSnapshot lastDocument;
 }
 
-class DashboardService extends IDashboardService {
+class DashboardService extends IDashboardService with ErrorHelper {
+  DashboardService(GlobalKey<ScaffoldState> scaffoldState, BuildContext context)
+      : super(scaffoldState, context);
+
   @override
   Future<List<ProductDetailModel>?> fetchDashboardSliderList() async {
     List<ProductDetailModel> productList = [];
 
-    final productListQuery = await FirebaseCollectionRefInitialize
-        .instance.productsCollectionReference
-        .limit(5)
-        .get();
+    try {
+      final productListQuery = await FirebaseCollectionRefInitialize
+          .instance.productsCollectionReference
+          .limit(5)
+          .get();
 
-    List<DocumentSnapshot> docsInShops = productListQuery.docs;
-    for (var element in docsInShops) {
-      productList.add(ProductDetailModel.fromJson(element.data() as Map));
+      List<DocumentSnapshot> docsInShops = productListQuery.docs;
+      for (var element in docsInShops) {
+        productList.add(ProductDetailModel.fromJson(element.data() as Map));
+      }
+      return productList;
+    } on FirebaseException catch (e) {
+      showSnackBar(scaffoldState, context, e.message.toString());
+      return null;
     }
-    return productList;
   }
 
   @override
   Future<List<ProductDetailModel>?> fetchDashboardProductFirstList(
       {bool isFiltered = false}) async {
     List<ProductDetailModel> productList = [];
+    try {
+      final productListQuery = await FirebaseCollectionRefInitialize
+          .instance.productsCollectionReference
+          .limit(15)
+          .get();
 
-    final productListQuery = await FirebaseCollectionRefInitialize
-        .instance.productsCollectionReference
-
-        /// .where("categoryId", isEqualTo: 3)
-        .limit(15)
-        .get();
-
-    List<DocumentSnapshot> docsInShops = productListQuery.docs;
-    if (docsInShops.length > 5) {
-      docsInShops.removeRange(0, 5);
-    } else {
-      docsInShops.removeRange(0, docsInShops.length);
-    }
-    if (docsInShops.isNotEmpty) {
-      for (var element in docsInShops) {
-        productList.add(ProductDetailModel.fromJson(element.data() as Map));
+      List<DocumentSnapshot> docsInShops = productListQuery.docs;
+      if (docsInShops.length > 5) {
+        docsInShops.removeRange(0, 5);
+      } else {
+        docsInShops.removeRange(0, docsInShops.length);
       }
-      lastDocument = docsInShops.last;
+      if (docsInShops.isNotEmpty) {
+        for (var element in docsInShops) {
+          productList.add(ProductDetailModel.fromJson(element.data() as Map));
+        }
+        lastDocument = docsInShops.last;
+      }
+      return productList;
+    } on FirebaseException catch (e) {
+      showSnackBar(scaffoldState, context, e.message.toString());
     }
-    return productList;
   }
 
   @override
@@ -69,44 +85,55 @@ class DashboardService extends IDashboardService {
       {bool isFiltered = false}) async {
     List<ProductDetailModel> productList = [];
 
-    final productListQuery = await FirebaseCollectionRefInitialize
-        .instance.productsCollectionReference
-        .limit(10)
-        .startAfterDocument(lastDocument)
-        .get();
+    try {
+      final productListQuery = await FirebaseCollectionRefInitialize
+          .instance.productsCollectionReference
+          .limit(10)
+          .startAfterDocument(lastDocument)
+          .get();
 
-    List<DocumentSnapshot> docsInShops = productListQuery.docs;
-    if (docsInShops.isNotEmpty) {
-      for (var element in docsInShops) {
-        productList.add(ProductDetailModel.fromJson(element.data() as Map));
+      List<DocumentSnapshot> docsInShops = productListQuery.docs;
+      if (docsInShops.isNotEmpty) {
+        for (var element in docsInShops) {
+          productList.add(ProductDetailModel.fromJson(element.data() as Map));
+        }
+        lastDocument = docsInShops.last;
       }
-      lastDocument = docsInShops.last;
+      return productList;
+    } on FirebaseException catch (e) {
+      showSnackBar(scaffoldState, context, e.message.toString());
     }
-    return productList;
   }
 
   @override
   Future<void> removeItemToFavouriteList(String favouriteItem) async {
-    final userId = await UserIdInitalize.instance.returnUserId();
+    try {
+      final userId = await UserIdInitalize.instance.returnUserId();
+      Map<String, dynamic> removeItemMap = {
+        "favouriteList": FieldValue.arrayRemove([favouriteItem]),
+      };
 
-    Map<String, dynamic> removeItemMap = {
-      "favouriteList": FieldValue.arrayRemove([favouriteItem]),
-    };
-
-    await FirebaseCollectionRefInitialize.instance.usersCollectionReference
-        .doc(userId)
-        .update(removeItemMap);
+      await FirebaseCollectionRefInitialize.instance.usersCollectionReference
+          .doc(userId)
+          .update(removeItemMap);
+    } on FirebaseException catch (e) {
+      showSnackBar(scaffoldState, context, e.message.toString());
+    }
   }
 
   @override
   Future<void> addItemToFavouriteList(String favouriteItem) async {
-    final userId = await UserIdInitalize.instance.returnUserId();
+    try {
+      final userId = await UserIdInitalize.instance.returnUserId();
 
-    Map<String, dynamic> addItemMap = {
-      "favouriteList": FieldValue.arrayUnion([favouriteItem]),
-    };
-    await FirebaseCollectionRefInitialize.instance.usersCollectionReference
-        .doc(userId)
-        .update(addItemMap);
+      Map<String, dynamic> addItemMap = {
+        "favouriteList": FieldValue.arrayUnion([favouriteItem]),
+      };
+      await FirebaseCollectionRefInitialize.instance.usersCollectionReference
+          .doc(userId)
+          .update(addItemMap);
+    } on FirebaseException catch (e) {
+      showSnackBar(scaffoldState, context, e.message.toString());
+    }
   }
 }

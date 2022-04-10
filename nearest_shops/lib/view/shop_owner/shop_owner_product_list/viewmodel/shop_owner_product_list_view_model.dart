@@ -1,19 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:kartal/kartal.dart';
 import 'package:mobx/mobx.dart';
 import 'package:nearest_shops/core/base/model/base_view_model.dart';
 import 'package:nearest_shops/view/home/product_detail/model/product_detail_model.dart';
-import 'package:nearest_shops/view/shop_owner/owner_product_list/service/IOwner_product_service.dart';
-
-import '../../../../core/init/service/authenticaion/firebase_authentication.dart';
 import '../../../../core/init/service/authenticaion/user_id_initialize.dart';
-part 'owner_product_list_view_model.g.dart';
+import '../service/IShop_owner_product_service.dart';
+part 'shop_owner_product_list_view_model.g.dart';
 
-class OwnerProductListViewModel = _OwnerProductListViewModelBase
-    with _$OwnerProductListViewModel;
+class ShopOwnerProductListViewModel = _ShopOwnerProductListViewModelBase
+    with _$ShopOwnerProductListViewModel;
 
-abstract class _OwnerProductListViewModelBase with Store, BaseViewModel {
+abstract class _ShopOwnerProductListViewModelBase with Store, BaseViewModel {
   GlobalKey<FormState> formState = GlobalKey();
   GlobalKey<ScaffoldState> scaffoldState = GlobalKey();
   late ScrollController controller;
@@ -27,27 +26,23 @@ abstract class _OwnerProductListViewModelBase with Store, BaseViewModel {
   @observable
   bool isDeleting = false;
 
-  IOwnerProductListService ownerProductListService = OwnerProductListService();
+  late IShopOwnerProductListService ownerProductListService;
 
   @observable
   ObservableList<ProductDetailModel> productList =
       ObservableList<ProductDetailModel>();
 
-  late final String shopId; //// *************** //////////
-
   @override
   void setContext(BuildContext context) {
     this.context = context;
+    ownerProductListService =
+        ShopOwnerProductListService(scaffoldState, context);
   }
 
   @override
   void init() {
     controller = ScrollController()
       ..addListener(() {
-        // double maxScroll = controller.position.maxScrollExtent;
-        //double currentScroll = controller.position.pixels;
-        // double delta = MediaQuery.of(context!).size.height * 0.20;
-        // if (maxScroll - currentScroll <= delta) {
         if (controller.position.extentAfter < 300) {
           getProductLastList();
         }
@@ -109,8 +104,10 @@ abstract class _OwnerProductListViewModelBase with Store, BaseViewModel {
 
   void showSnackBar({required String message}) {
     if (scaffoldState.currentState != null) {
-      scaffoldState.currentState!
-          .showSnackBar(SnackBar(content: Text(message)));
+      SnackBar(
+        content: Text(message),
+        duration: context!.durationNormal,
+      );
     }
   }
 }

@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
+import 'package:nearest_shops/view/home/product_detail/model/product_detail_model.dart';
 
 import '../../../../core/base/view/base_view.dart';
 import '../../../../core/components/button/normal_button.dart';
@@ -8,7 +9,9 @@ import '../../../product/slider/dashboard_ads_slider.dart';
 import '../viewmodel/product_detail_view_model.dart';
 
 class ProductDetailView extends StatelessWidget {
-  const ProductDetailView({Key? key}) : super(key: key);
+  final ProductDetailModel productDetailModel;
+  const ProductDetailView({Key? key, required this.productDetailModel})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -36,11 +39,31 @@ class ProductDetailView extends StatelessWidget {
         children: [
           Expanded(
             flex: 2,
-            child: Container(),
-            /*  child: DashboardAdsSlider(
-                productSliderList:  viewModel
-                onlyImage: true,
-              )),*/
+            child: Container(
+              child: PageView.builder(
+                controller: PageController(),
+                itemCount: productDetailModel.imageUrlList!.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20.0, vertical: 10),
+                    child: Card(
+                        clipBehavior: Clip.antiAliasWithSaveLayer,
+                        shape: RoundedRectangleBorder(
+                          side: BorderSide(
+                              color: context.colorScheme.onInverseSurface,
+                              width: 0.5),
+                          borderRadius:
+                              BorderRadius.circular(context.normalValue),
+                        ),
+                        child: Image.network(
+                          productDetailModel.imageUrlList![index],
+                          fit: BoxFit.fill,
+                        )),
+                  );
+                },
+              ),
+            ),
           ),
           Expanded(
             flex: 2,
@@ -79,12 +102,7 @@ class ProductDetailView extends StatelessWidget {
     return Column(
       children: [
         Expanded(
-          child: AutoSizeText(
-              "Lorem Ipsum is simply dummy text of the printing and typesetting industry." +
-                  " Lorem Ipsum has been the industry's standard dummy text ever since the 1500s," +
-                  " when an unknown printer took a galley of type and scrambled it to make a type specimen book." +
-                  "It has survived not only five centuries, but also the leap into electronic typesetting, " +
-                  "remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+          child: AutoSizeText(productDetailModel.detail.toString(),
               style: context.textTheme.headline6!),
         ),
         NormalButton(
@@ -117,7 +135,7 @@ class ProductDetailView extends StatelessWidget {
 
   Text buildProductPrice(BuildContext context) {
     return Text(
-      "\$250",
+      productDetailModel.price.toString(),
       style: context.textTheme.headline5!.copyWith(
           color: context.colorScheme.primary, fontWeight: FontWeight.bold),
     );
@@ -125,7 +143,7 @@ class ProductDetailView extends StatelessWidget {
 
   Text buildProductTitle(BuildContext context) {
     return Text(
-      "Car Cleaner",
+      productDetailModel.name.toString(),
       style: context.textTheme.headline6!.copyWith(
           color: context.colorScheme.primary, fontWeight: FontWeight.bold),
     );
@@ -135,19 +153,23 @@ class ProductDetailView extends StatelessWidget {
     return AppBar(
       leading: Padding(
         padding: context.horizontalPaddingLow,
-        child: Icon(
-          Icons.cancel,
+        child: IconButton(
+          icon: Icon(Icons.cancel),
           color: context.colorScheme.onPrimary,
-          size: context.dynamicHeight(0.03),
+          iconSize: context.dynamicHeight(0.03),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
       ),
       actions: [
         Padding(
           padding: context.horizontalPaddingLow,
-          child: Icon(
-            Icons.favorite,
+          child: IconButton(
+            icon: Icon(Icons.favorite),
             color: context.colorScheme.onPrimary,
-            size: context.dynamicHeight(0.03),
+            iconSize: context.dynamicHeight(0.03),
+            onPressed: () {},
           ),
         )
       ],

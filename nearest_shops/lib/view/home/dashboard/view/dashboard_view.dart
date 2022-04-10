@@ -37,7 +37,8 @@ class DashboardView extends StatelessWidget {
             child: CustomScrollView(
               controller: viewmodel.controller,
               slivers: [
-                buildSliverApp(context),
+                ///buildSliverApp(context),
+                appBarRow(context).toSliver,
                 SizedBox(
                   height: context.dynamicHeight(0.25),
                   child: viewmodel.isProductSliderListLoading
@@ -49,7 +50,8 @@ class DashboardView extends StatelessWidget {
                 ).toSliver,
                 buildCategoriesText(context).toSliver,
                 //buildCategoriesTabBar(context).toSliver,
-                buildCategoriesRow(context, viewmodel).toSliver,
+                //  buildCategoriesRow(context, viewmodel).toSliver,
+                buildCategoriesSliver(context, viewmodel),
                 viewmodel.isProductFirstListLoading
                     ? const Center(child: CircularProgressIndicator()).toSliver
                     : buildProductsGrid(
@@ -66,67 +68,18 @@ class DashboardView extends StatelessWidget {
             ),
           );
         }),
-        /*
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: FloatingActionButton(
-          elevation: 4.0,
-          onPressed: () async {
-            await viewmodel.callFirestore();
-          },
-        ),
-        bottomNavigationBar: BottomAppBar(
-          child: Container(
-            margin: EdgeInsets.only(left: 12.0, right: 12.0),
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                IconButton(
-                  //update the bottom app bar view each time an item is clicked
-                  onPressed: () {},
-                  iconSize: 27.0,
-                  icon: Icon(
-                    Icons.home,
-                    //darken the icon if it is selected or else give it a different color
-                    color: Colors.grey.shade400,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () {},
-                  iconSize: 27.0,
-                  icon: Icon(Icons.category_outlined,
-                      color: Colors.blue.shade900),
-                ),
-                //to leave space in between the bottom app bar items and below the FAB
-                SizedBox(
-                  width: 50.0,
-                ),
-                IconButton(
-                  onPressed: () {},
-                  iconSize: 27.0,
-                  icon: Icon(
-                    Icons.favorite,
-                    color: Colors.grey.shade400,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () {},
-                  iconSize: 27.0,
-                  icon: Icon(
-                    Icons.person,
-                    color: Colors.grey.shade400,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          //to add a space between the FAB and BottomAppBar
-          shape: CircularNotchedRectangle(),
-          //color of the BottomAppBar
-          color: Colors.white,
-        ),
-        */
       );
+
+  SliverAppBar buildCategoriesSliver(
+      BuildContext context, DashboardViewModel viewmodel) {
+    return SliverAppBar(
+      forceElevated: false,
+      expandedHeight: context.height * 0.12,
+      pinned: true,
+      title: buildCategoriesRow(context, viewmodel),
+      centerTitle: false,
+    );
+  }
 
   SliverAppBar buildSliverApp(BuildContext context) {
     return SliverAppBar(
@@ -142,6 +95,81 @@ class DashboardView extends StatelessWidget {
         flexibleSpace: buildFlexibleSpaceBar(context));
   }
 
+  Widget appBarRow(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+                onPressed: () async {
+                  await FirebaseAuthentication.instance.signOut();
+                },
+                icon: Icon(Icons.logout)),
+            buildAppBarTitle(context),
+            buildAppBarActionsContainer(context)
+          ],
+        ),
+        Center(
+          child: TextFormField(
+            textAlignVertical: TextAlignVertical.center,
+            //textAlign: TextAlign.center,
+            validator: (value) => null,
+            obscureText: false,
+            decoration: buildInputDecoration(context),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Container buildAppBarActionsContainer(BuildContext context) {
+    return Container(
+      height: context.mediumValue,
+      width: context.mediumValue,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        image: DecorationImage(
+            image: AssetImage(ImagePaths.instance.profile), fit: BoxFit.fill),
+      ),
+    );
+  }
+
+  Widget buildAppBarTitle(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          "The Nearest",
+          style: context.textTheme.headline5!.copyWith(
+              color: context.appTheme.colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.bold),
+        ),
+      ],
+    );
+  }
+
+  FlexibleSpaceBar buildFlexibleSpaceBar(BuildContext context) {
+    return FlexibleSpaceBar(
+      titlePadding: context.paddingLow,
+      title: SizedBox(
+        height: context.dynamicHeight(0.03),
+        child: Center(
+          child: TextFormField(
+            textAlignVertical: TextAlignVertical.center,
+            //textAlign: TextAlign.center,
+            validator: (value) => null,
+            obscureText: false,
+            decoration: buildInputDecoration(context),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget buildProductsGrid(
       BuildContext context,
       List<ProductDetailModel> productDetailList,
@@ -152,13 +180,7 @@ class DashboardView extends StatelessWidget {
   Widget buildCategoriesText(BuildContext context) {
     return Padding(
       padding: context.horizontalPaddingNormal,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          buildTopCetegoriesText(context),
-          buildSeeAllText(context),
-        ],
-      ),
+      child: buildTopCetegoriesText(context),
     );
   }
 
@@ -177,54 +199,6 @@ class DashboardView extends StatelessWidget {
       style: context.textTheme.headline6!.copyWith(
         fontWeight: FontWeight.bold,
         color: context.colorScheme.primary,
-      ),
-    );
-  }
-
-  Container buildAppBarActionsContainer(BuildContext context) {
-    return Container(
-      height: context.mediumValue,
-      width: context.mediumValue,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        image: DecorationImage(
-            image: AssetImage(ImagePaths.instance.profile), fit: BoxFit.fill),
-      ),
-    );
-  }
-
-  Widget buildAppBarTitle(BuildContext context) {
-    return SizedBox(
-      height: context.height * 0.1,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            "The Nearest",
-            style: context.textTheme.headline5!.copyWith(
-                color: context.appTheme.colorScheme.onSurfaceVariant,
-                fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-    );
-  }
-
-  FlexibleSpaceBar buildFlexibleSpaceBar(BuildContext context) {
-    return FlexibleSpaceBar(
-      titlePadding: context.paddingLow,
-      title: SizedBox(
-        height: context.dynamicHeight(0.03),
-        child: Center(
-          child: TextFormField(
-            textAlignVertical: TextAlignVertical.center,
-            //textAlign: TextAlign.center,
-            validator: (value) => null,
-            obscureText: false,
-            decoration: buildInputDecoration(context),
-          ),
-        ),
       ),
     );
   }

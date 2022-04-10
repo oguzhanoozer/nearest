@@ -10,6 +10,7 @@ import '../../../../core/init/service/firestorage/user_location_initialize_check
 import '../../../product/contstants/image_path.dart';
 import '../../dashboard/model/dashboard_model.dart';
 import '../../shop_list/model/shop_model.dart';
+import '../service/IOwner_product_list_service.dart';
 
 part 'owner_product_list_view_model.g.dart';
 
@@ -17,6 +18,9 @@ class OwnerProductListViewModel = _OwnerProductListViewModelBase
     with _$OwnerProductListViewModel;
 
 abstract class _OwnerProductListViewModelBase with Store, BaseViewModel {
+  GlobalKey<FormState> formState = GlobalKey();
+  GlobalKey<ScaffoldState> scaffoldState = GlobalKey();
+
   @observable
   bool isShopMapLoading = false;
 
@@ -34,8 +38,9 @@ abstract class _OwnerProductListViewModelBase with Store, BaseViewModel {
   final double _originLongitude = 30.30;
 
   late final GeoPoint _geoPoint;
-
   CameraPosition? initalCameraPosition;
+
+  late IOwnerProductListService ownerProductListService;
 
   @action
   void changeIsShopMapLoading() {
@@ -52,7 +57,11 @@ abstract class _OwnerProductListViewModelBase with Store, BaseViewModel {
     isShopProductLoaded = !isShopProductLoaded;
   }
 
-  void setContext(BuildContext context) {}
+  void setContext(BuildContext context) {
+    this.context = context;
+    ownerProductListService = OwnerProductlistService(scaffoldState, context);
+  }
+
   @override
   Future<void> init() async {
     _geoPoint =
@@ -67,17 +76,18 @@ abstract class _OwnerProductListViewModelBase with Store, BaseViewModel {
 
   Future<void> fetchShopsLocation() async {
     changeIsShopMapLoading();
-    final shopsListQuery = await FirebaseCollectionRefInitialize
-        .instance.shopsCollectionReference
-        .get();
 
-    List<DocumentSnapshot> docsInShops = shopsListQuery.docs;
-    for (var element in docsInShops) {
-      ShopModel shopModel = ShopModel.fromJson(element.data() as Map);
-      _shopModelList.add(shopModel);
+    List<DocumentSnapshot>? docsInShops =
+        await ownerProductListService.fetchDocsInShops();
+    if (docsInShops != null && docsInShops.isNotEmpty) {
+      for (var element in docsInShops) {
+        ShopModel shopModel = ShopModel.fromJson(element.data() as Map);
+        _shopModelList.add(shopModel);
 
-      addMarker(shopModel);
+        addMarker(shopModel);
+      }
     }
+
     changeIsShopMapLoading();
   }
 
@@ -101,18 +111,9 @@ abstract class _OwnerProductListViewModelBase with Store, BaseViewModel {
 
   Future<void> fetchShopProducts({required String shopId}) async {
     changeIsShopProductLoading();
-
-    final productListQuery = await FirebaseCollectionRefInitialize
-        .instance.productsCollectionReference
-        .where("shopId", isEqualTo: shopId)
-        .limit(10)
-        .get();
-
-    List<DocumentSnapshot> productDocsInShops = productListQuery.docs;
-    for (var element in productDocsInShops) {
-      _productsModelList
-          .add(ProductDetailModel.fromJson(element.data() as Map));
-    }
+    _productsModelList =
+        await ownerProductListService.fethcProductListModel(shopId: shopId) ??
+            [];
     changeIsShopProductLoaded();
     changeIsShopProductLoading();
   }

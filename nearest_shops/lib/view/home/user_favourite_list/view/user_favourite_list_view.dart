@@ -42,15 +42,6 @@ class UserFavouriteProductListView extends StatelessWidget {
                   Expanded(
                       child: showProductList(
                           viewModel.favouriteProductList, viewModel)),
-                  /*
-                  if (viewModel.isProductMoreListLoading == true)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 10, bottom: 40),
-                      child: Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    ),
-                    */
                 ],
               );
       });
@@ -65,36 +56,14 @@ class UserFavouriteProductListView extends StatelessWidget {
             /// controller: viewModel.controller,
             itemCount: productList.length,
             itemBuilder: (context, index) {
-              return Card(
-                child: buildProductCard(
-                    context, productList[index], viewModel, index),
-              );
-              /*
-               Slidable(
-                closeOnScroll: true,
-                key: const ValueKey(0),
-                endActionPane: ActionPane(
-                  extentRatio: 0.5,
-                  dragDismissible: false,
-                  motion: const ScrollMotion(),
-                  dismissible: DismissiblePane(onDismissed: () {}),
-                  children: [
-                    SlidableAction(
-                      // ignore: avoid_print
-                      onPressed: (context) async {
-                        await viewModel.removeFavouriteItem(index);
-                      },
-                      backgroundColor: Color(0xFFFE4A49),
-                      foregroundColor: Colors.white,
-                      icon: Icons.delete,
-                      label: 'Delete',
-                    ),
-                  ],
-                ),
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
                 child: Card(
-                  child: buildProductCard(context, productList[index]),
+                  child: buildProductCard(
+                      context, productList[index], viewModel, index),
                 ),
-              );*/
+              );
+             
             },
           );
   }

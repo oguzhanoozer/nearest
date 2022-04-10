@@ -9,25 +9,25 @@ import '../../../home/product_detail/model/product_detail_model.dart';
 import '../../../product/contstants/image_path.dart';
 import '../../add_product/view/add_product_view.dart';
 import '../../add_product/viewmodel/add_product_view_model.dart';
-import '../viewmodel/owner_product_list_view_model.dart';
+import '../viewmodel/shop_owner_product_list_view_model.dart';
 
-class OwnerProductListView extends StatelessWidget {
-  OwnerProductListView({Key? key}) : super(key: key);
+class ShopOwnerProductListView extends StatelessWidget {
+  ShopOwnerProductListView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return BaseView<OwnerProductListViewModel>(
-      viewModel: OwnerProductListViewModel(),
+    return BaseView<ShopOwnerProductListViewModel>(
+      viewModel: ShopOwnerProductListViewModel(),
       onModelReady: (model) {
         model.setContext(context);
         model.init();
       },
-      onPageBuilder: (context, OwnerProductListViewModel viewModel) =>
+      onPageBuilder: (context, ShopOwnerProductListViewModel viewModel) =>
           buildScaffold(viewModel),
     );
   }
 
-  Scaffold buildScaffold(OwnerProductListViewModel viewModel) => Scaffold(
+  Scaffold buildScaffold(ShopOwnerProductListViewModel viewModel) => Scaffold(
         key: viewModel.scaffoldState,
         appBar: AppBar(
           centerTitle: true,
@@ -36,7 +36,7 @@ class OwnerProductListView extends StatelessWidget {
         body: buildBody(viewModel),
       );
 
-  Widget buildBody(OwnerProductListViewModel viewModel) =>
+  Widget buildBody(ShopOwnerProductListViewModel viewModel) =>
       Observer(builder: (_) {
         return viewModel.isProductFirstListLoading
             ? const Center(child: CircularProgressIndicator())
@@ -56,7 +56,7 @@ class OwnerProductListView extends StatelessWidget {
       });
 
   Widget showProductList(ObservableList<ProductDetailModel> productList,
-      OwnerProductListViewModel viewModel) {
+      ShopOwnerProductListViewModel viewModel) {
     return ListView.builder(
       controller: viewModel.controller,
       itemCount: productList.length,
@@ -65,47 +65,7 @@ class OwnerProductListView extends StatelessWidget {
           child:
               buildProductCard(context, productList[index], viewModel, index),
         );
-        /*Slidable(
-          closeOnScroll: true,
-          key: const ValueKey(0),
-          endActionPane: ActionPane(
-            extentRatio: 0.5,
-            dragDismissible: false,
-            motion: const ScrollMotion(),
-            dismissible: DismissiblePane(onDismissed: () {}),
-            children: [
-              SlidableAction(
-                onPressed: (context) {
-                  context.navigateToPage(AddProductView(
-                    isUpdate: true,
-                    productDetailModel: productList[index],
-                  ));
-                },
-                backgroundColor: Color(0xFF21B7CA),
-                foregroundColor: Colors.white,
-                icon: Icons.edit,
-                label: 'Update',
-              ),
-              SlidableAction(
-                // ignore: avoid_print
-                onPressed: (context) async {
-                  await viewModel.deleteProduct(
-                    productId: productList[index].productId.toString(),
-                    index: index,
-                  );
-                },
-                backgroundColor: Color(0xFFFE4A49),
-                foregroundColor: Colors.white,
-                icon: Icons.delete,
-                label: 'Delete',
-              ),
-            ],
-          ),
-          child: Card(
-            child:
-                buildProductCard(context, productList[index], viewModel, index),
-          ),
-        );*/
+       
       },
     );
   }
@@ -113,7 +73,7 @@ class OwnerProductListView extends StatelessWidget {
   Card buildProductCard(
       BuildContext context,
       ProductDetailModel productDetailModel,
-      OwnerProductListViewModel viewModel,
+      ShopOwnerProductListViewModel viewModel,
       int index) {
     return Card(
       elevation: 2,

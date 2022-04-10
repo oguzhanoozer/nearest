@@ -10,11 +10,9 @@ class UserFavouriteListViewModel = _UserFavouriteListViewModelBase
     with _$UserFavouriteListViewModel;
 
 abstract class _UserFavouriteListViewModelBase with Store, BaseViewModel {
-  GlobalKey<FormState> formState = GlobalKey();
   GlobalKey<ScaffoldState> scaffoldState = GlobalKey();
 
-  IUserFavouriteListService userFavouriteListService =
-      UserFavouriteListService();
+  late IUserFavouriteListService userFavouriteListService;
 
   @observable
   bool isProductListLoading = false;
@@ -22,6 +20,7 @@ abstract class _UserFavouriteListViewModelBase with Store, BaseViewModel {
   @override
   void setContext(BuildContext context) {
     this.context = context;
+    userFavouriteListService = UserFavouriteListService(scaffoldState, context);
   }
 
   @action
@@ -41,7 +40,10 @@ abstract class _UserFavouriteListViewModelBase with Store, BaseViewModel {
     changeIsProductListLoading();
     final favouriteDataList =
         await userFavouriteListService.fetchFavouriteProductList();
-    favouriteProductList = favouriteDataList.asObservable();
+    if (favouriteDataList != null) {
+      favouriteProductList = favouriteDataList.asObservable();
+    }
+
     changeIsProductListLoading();
   }
 

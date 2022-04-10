@@ -25,6 +25,7 @@ class ShopListView extends StatelessWidget {
 
   Widget buildScaffold(BuildContext context, ShopListViewModel viewmodel) {
     return Scaffold(
+        key: viewmodel.scaffoldState,
         appBar: buildAppBar(context),
         body: Observer(builder: (_) {
           return viewmodel.isShopMapListLoading

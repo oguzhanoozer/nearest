@@ -9,6 +9,21 @@ part of 'owner_home_view_model.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$OwnerHomeViewModel on _OwnerHomeViewModelBase, Store {
+  final _$locationAtom = Atom(name: '_OwnerHomeViewModelBase.location');
+
+  @override
+  String get location {
+    _$locationAtom.reportRead();
+    return super.location;
+  }
+
+  @override
+  set location(String value) {
+    _$locationAtom.reportWrite(value, super.location, () {
+      super.location = value;
+    });
+  }
+
   final _$markersAtom = Atom(name: '_OwnerHomeViewModelBase.markers');
 
   @override
@@ -57,23 +72,21 @@ mixin _$OwnerHomeViewModel on _OwnerHomeViewModelBase, Store {
     });
   }
 
-  final _$gerCurrentLocationPositionAsyncAction =
-      AsyncAction('_OwnerHomeViewModelBase.gerCurrentLocationPosition');
+  final _$displayPredictionAsyncAction =
+      AsyncAction('_OwnerHomeViewModelBase.displayPrediction');
 
   @override
-  Future<void> gerCurrentLocationPosition() {
-    return _$gerCurrentLocationPositionAsyncAction
-        .run(() => super.gerCurrentLocationPosition());
+  Future<void> displayPrediction(Prediction p) {
+    return _$displayPredictionAsyncAction.run(() => super.displayPrediction(p));
   }
 
-  final _$updateShopLocationAsyncAction =
-      AsyncAction('_OwnerHomeViewModelBase.updateShopLocation');
+  final _$getPlaceAutoCompleteAsyncAction =
+      AsyncAction('_OwnerHomeViewModelBase.getPlaceAutoComplete');
 
   @override
-  Future<void> updateShopLocation(
-      {required double latitude, required double longtitude}) {
-    return _$updateShopLocationAsyncAction.run(() =>
-        super.updateShopLocation(latitude: latitude, longtitude: longtitude));
+  Future<void> getPlaceAutoComplete(BuildContext context) {
+    return _$getPlaceAutoCompleteAsyncAction
+        .run(() => super.getPlaceAutoComplete(context));
   }
 
   final _$_OwnerHomeViewModelBaseActionController =
@@ -91,8 +104,31 @@ mixin _$OwnerHomeViewModel on _OwnerHomeViewModelBase, Store {
   }
 
   @override
+  void addMarker(LatLng pos) {
+    final _$actionInfo = _$_OwnerHomeViewModelBaseActionController.startAction(
+        name: '_OwnerHomeViewModelBase.addMarker');
+    try {
+      return super.addMarker(pos);
+    } finally {
+      _$_OwnerHomeViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setCameraLocation(LatLng newPosition) {
+    final _$actionInfo = _$_OwnerHomeViewModelBaseActionController.startAction(
+        name: '_OwnerHomeViewModelBase.setCameraLocation');
+    try {
+      return super.setCameraLocation(newPosition);
+    } finally {
+      _$_OwnerHomeViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
+location: ${location},
 markers: ${markers},
 newGoogleMapController: ${newGoogleMapController},
 isMapDataLoading: ${isMapDataLoading}

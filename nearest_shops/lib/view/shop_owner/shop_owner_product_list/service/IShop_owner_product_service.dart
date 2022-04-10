@@ -1,12 +1,18 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
 import 'package:nearest_shops/view/home/product_detail/model/product_detail_model.dart';
+import 'package:nearest_shops/view/utility/error_helper.dart';
 
 import '../../../../core/init/service/firestorage/firestorage_initialize.dart';
 
-abstract class IOwnerProductListService {
+abstract class IShopOwnerProductListService {
+  final GlobalKey<ScaffoldState> scaffoldState;
+  final BuildContext context;
+
+  IShopOwnerProductListService(this.scaffoldState, this.context);
   Future<ObservableList<ProductDetailModel>?> fetchProductFirstList(
       String shopId);
   Future<ObservableList<ProductDetailModel>?> fetchProductMoreList(
@@ -17,13 +23,18 @@ abstract class IOwnerProductListService {
   late DocumentSnapshot lastDocument;
 }
 
-class OwnerProductListService extends IOwnerProductListService {
+class ShopOwnerProductListService extends IShopOwnerProductListService with ErrorHelper {
+  ShopOwnerProductListService(
+      GlobalKey<ScaffoldState> scaffoldState, BuildContext context)
+      : super(scaffoldState, context);
+
   @override
   Future<ObservableList<ProductDetailModel>?> fetchProductFirstList(
       String shopId) async {
     ObservableList<ProductDetailModel> productList =
         ObservableList<ProductDetailModel>();
-
+try{
+  
     final productListQuery = await FirebaseCollectionRefInitialize
         .instance.productsCollectionReference
         .where("shopId", isEqualTo: shopId)
@@ -36,6 +47,10 @@ class OwnerProductListService extends IOwnerProductListService {
     }
     lastDocument = docsInShops.last;
     return productList;
+    } on FirebaseException catch (e) {
+      showSnackBar(scaffoldState, context, e.message.toString());
+      return null;
+    }
   }
 
   @override
@@ -44,7 +59,7 @@ class OwnerProductListService extends IOwnerProductListService {
   ) async {
     ObservableList<ProductDetailModel> productList =
         ObservableList<ProductDetailModel>();
-
+try{
     final productListQuery = await FirebaseCollectionRefInitialize
         .instance.productsCollectionReference
         .where("shopId", isEqualTo: shopId)
@@ -60,6 +75,10 @@ class OwnerProductListService extends IOwnerProductListService {
       lastDocument = docsInShops.last;
     }
     return productList;
+    } on FirebaseException catch (e) {
+      showSnackBar(scaffoldState, context, e.message.toString());
+      return null;
+    }
   }
 
   @override
@@ -69,41 +88,3 @@ class OwnerProductListService extends IOwnerProductListService {
         .delete();
   }
 }
-
-/*
-class OwnerProductListService extends IOwnerProductListService {
-  @override
-  Future<List<ProductDetailModel>?> fetchProductList(String shopId) async {
-    List<ProductDetailModel> productList = [];
-    final completer = Completer<List<ProductDetailModel>>();
-      
-    Query productListQuery = FirebaseCollectionRefInitialize
-        .instance.productsCollectionReference
-        .where("shopId", isEqualTo: "123456");
-    final stream = productListQuery.snapshots().listen((event) {
-      List<DocumentSnapshot> productDoctSnapshot = event.docs;
-      for (var element in productDoctSnapshot) {
-        productList.add(ProductDetailModel.fromJson(element.data() as Map));
-      }
-      completer.complete(productList);
-    });
-    return completer.future;
-  }
-}
-
-*/
-
-/*
-
-Query query = productsCollectionReference.where("name", isEqualTo: "Kalem");
-  query.snapshots().listen((event) {
-    DocumentSnapshot x = event.docs.first;
-    ProductDetailModel productDetailModel =
-        ProductDetailModel.fromJson(x.data() as Map);
-    print("***"+productDetailModel.name.toString());
-  });
-
-  */
-    
-
- 

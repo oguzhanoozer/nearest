@@ -114,22 +114,33 @@ class LoginView extends StatelessWidget {
   Widget buildWelcomeTextColumnBuild(BuildContext context) {
     return Column(
       children: [
-        Align(
-          alignment: AlignmentDirectional.centerStart,
-          child: Text(
-            LocaleKeys.login.locale,
-            style: context.textTheme.headline2!
-                .copyWith(color: context.colorScheme.onPrimary),
+        Container(
+            //height: 300,
+            //width: 300,
+            child: CircleAvatar(
+          radius: 150,
+          backgroundColor: Colors.white,
+          child: Image.asset(
+            "asset/image/shop_orange.png",
+            fit: BoxFit.fill,
           ),
-        ),
-        Align(
-          alignment: AlignmentDirectional.centerStart,
-          child: Text(
-            LocaleKeys.welcomeBack.locale,
-            style: context.textTheme.headline5!
-                .copyWith(color: context.colorScheme.onPrimary),
-          ),
-        ),
+        )),
+        // Align(
+        //   alignment: AlignmentDirectional.centerStart,
+        //   child: Text(
+        //     LocaleKeys.login.locale,
+        //     style: context.textTheme.headline2!
+        //         .copyWith(color: context.colorScheme.onPrimary),
+        //   ),
+        // ),
+        // Align(
+        //   alignment: AlignmentDirectional.centerStart,
+        //   child: Text(
+        //     LocaleKeys.welcomeBack.locale,
+        //     style: context.textTheme.headline5!
+        //         .copyWith(color: context.colorScheme.onPrimary),
+        //   ),
+        // ),
       ],
     );
   }

@@ -37,7 +37,7 @@ abstract class _DashboardViewModelBase with Store, BaseViewModel {
   @observable
   bool isProductSliderListLoading = false;
 
-  IDashboardService dashboardService = DashboardService();
+  late IDashboardService dashboardService;
 
   @observable
   List<ProductDetailModel> _productList = [];
@@ -47,8 +47,7 @@ abstract class _DashboardViewModelBase with Store, BaseViewModel {
 
   ObservableList<String> userFavouriteList = ObservableList<String>();
 
-  late final String
-      shopId; //// *************** ////////// shopıdServicede cağır
+  late final String shopId;
 
   @observable
   int categoryId = 0;
@@ -65,11 +64,11 @@ abstract class _DashboardViewModelBase with Store, BaseViewModel {
   @override
   void setContext(BuildContext context) {
     this.context = context;
+    dashboardService = DashboardService(scaffoldState, context);
   }
 
   @override
   void init() {
-    /// tasks = alist.asObservable();
     checkUserLocation();
   }
 
@@ -167,49 +166,49 @@ abstract class _DashboardViewModelBase with Store, BaseViewModel {
     return _productSliderList;
   }
 
-  Future<void> callFirestore() async {
-    // final shopsCollectionReference = _firebaseFiresore.collection("shops");
-    // QuerySnapshot shopsCollectionSnapshot =
-    //     await shopsCollectionReference.get();
-    // List<DocumentSnapshot> docsInShops = shopsCollectionSnapshot.docs;
-    // print(docsInShops.length);
-    // print(docsInShops[0].get("location").latitude);
-    // print(docsInShops[0].data());
-    // GeoPoint geoPoint = docsInShops[0].get("location");
-    // print(geoPoint.latitude);
+  //Future<void> callFirestore() async {
+  // final shopsCollectionReference = _firebaseFiresore.collection("shops");
+  // QuerySnapshot shopsCollectionSnapshot =
+  //     await shopsCollectionReference.get();
+  // List<DocumentSnapshot> docsInShops = shopsCollectionSnapshot.docs;
+  // print(docsInShops.length);
+  // print(docsInShops[0].get("location").latitude);
+  // print(docsInShops[0].data());
+  // GeoPoint geoPoint = docsInShops[0].get("location");
+  // print(geoPoint.latitude);
 
-    // ShopModel shopModel = ShopModel.fromJson(docsInShops[0].data() as Map);
-    // print(shopModel.location!.latitude);
+  // ShopModel shopModel = ShopModel.fromJson(docsInShops[0].data() as Map);
+  // print(shopModel.location!.latitude);
 
-    // CollectionReference productsCollectionReference =
-    //     _firebaseFiresore.collection("products");
-    // QuerySnapshot productCollectionSnapshot =
-    //     await productsCollectionReference.get();
-    // List<DocumentSnapshot> docsInproducts = productCollectionSnapshot.docs;
+  // CollectionReference productsCollectionReference =
+  //     _firebaseFiresore.collection("products");
+  // QuerySnapshot productCollectionSnapshot =
+  //     await productsCollectionReference.get();
+  // List<DocumentSnapshot> docsInproducts = productCollectionSnapshot.docs;
 
-    // Query query = productsCollectionReference.where("name", isEqualTo: "Kalem");
-    // query.snapshots().listen((event) {
-    //   DocumentSnapshot x = event.docs.first;
+  // Query query = productsCollectionReference.where("name", isEqualTo: "Kalem");
+  // query.snapshots().listen((event) {
+  //   DocumentSnapshot x = event.docs.first;
 
-    //   ProductDetailModel productDetailModel =
-    //       ProductDetailModel.fromJson(x.data() as Map);
-    //   print("***" + productDetailModel.name.toString());
-    // });
+  //   ProductDetailModel productDetailModel =
+  //       ProductDetailModel.fromJson(x.data() as Map);
+  //   print("***" + productDetailModel.name.toString());
+  // });
 
-    // ProductDetailModel productDetailModel =
-    //     ProductDetailModel.fromJson(docsInproducts.first.data() as Map);
-    // print(DateFormat('dd/MM/yyyy').format(productDetailModel.lastSeenDate!));
+  // ProductDetailModel productDetailModel =
+  //     ProductDetailModel.fromJson(docsInproducts.first.data() as Map);
+  // print(DateFormat('dd/MM/yyyy').format(productDetailModel.lastSeenDate!));
 
-    Map<String, dynamic> xx = {
-      "imageUrlList": FieldValue.arrayUnion(["aaa", "bbbb", "cccs"]),
-    };
+  //   Map<String, dynamic> xx = {
+  //     "imageUrlList": FieldValue.arrayUnion(["aaa", "bbbb", "cccs"]),
+  //   };
 
-    Map<String, dynamic> bb = {
-      "imageUrlList": FieldValue.arrayRemove(["aaa"]),
-    };
+  //   Map<String, dynamic> bb = {
+  //     "imageUrlList": FieldValue.arrayRemove(["aaa"]),
+  //   };
 
-    await FirebaseCollectionRefInitialize.instance.productsCollectionReference
-        .doc("1648329304018")
-        .update(bb);
-  }
+  //   await FirebaseCollectionRefInitialize.instance.productsCollectionReference
+  //       .doc("1648329304018")
+  //       .update(bb);
+  // }
 }

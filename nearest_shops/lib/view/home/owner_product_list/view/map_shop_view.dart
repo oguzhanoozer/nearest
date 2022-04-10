@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
 import '../viewmodel/owner_product_list_view_model.dart';
 
 class MapShopView extends StatelessWidget {
@@ -8,7 +7,6 @@ class MapShopView extends StatelessWidget {
 
   MapShopView({Key? key, required this.viewModel}) : super(key: key);
 
-  GoogleMapController? _controller;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +21,6 @@ class MapShopView extends StatelessWidget {
         zoomGesturesEnabled: true,
         markers: viewModel.getListMarkerList(),
         onMapCreated: (GoogleMapController controller) {
-          _controller = controller;
         },
       ),
     );

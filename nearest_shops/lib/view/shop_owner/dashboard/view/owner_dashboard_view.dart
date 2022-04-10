@@ -7,7 +7,7 @@ import '../../../home/owner_product_list/view/map_shop_view.dart';
 import '../../add_product/viewmodel/add_product_view_model.dart';
 import '../../home/view/map_shop_view.dart';
 import '../../home/view/owner_home_view.dart';
-import '../../owner_product_list/view/owner_product_list_view.dart';
+import '../../shop_owner_product_list/view/shop_owner_product_list_view.dart';
 import '../viewmodel/owner_dashboard_view_model.dart';
 
 class OwnerDashboardView extends StatefulWidget {
@@ -18,7 +18,6 @@ class OwnerDashboardView extends StatefulWidget {
 }
 
 class _OwnerDashboardViewState extends State<OwnerDashboardView> {
-  ///AddProductViewModel _addProductViewModel = AddProductViewModel();
 
   late final List<Widget> _widgetList;
 
@@ -29,10 +28,9 @@ class _OwnerDashboardViewState extends State<OwnerDashboardView> {
     super.initState();
     _widgetList = [
       MapShowView(),
-      OwnerProductListView(),
+      ShopOwnerProductListView(),
       AddProductView(
-
-          ///   addProductViewModel: _addProductViewModel,
+        
           )
     ];
   }
@@ -53,7 +51,6 @@ class _OwnerDashboardViewState extends State<OwnerDashboardView> {
   Scaffold buildScaffold() => Scaffold(
         body: _widgetList[_currentWidgetIndex],
         bottomNavigationBar: BottomNavigationBar(
-          /// fixedColor: context.appTheme.colorScheme.onSurfaceVariant,
           selectedItemColor: context.appTheme.colorScheme.onSurfaceVariant,
           onTap: ((value) => changePage(value)),
           elevation: 0,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
+import '../../../product/bottom_navigation/bottom_navigation.dart';
 import '../../owner_product_list/view/owner_product_list_view.dart';
 import '../../shop_list/view/shop_list_view.dart';
 import '../../user_favourite_list/view/user_favourite_list_view.dart';
@@ -44,24 +45,7 @@ class _HomeDashboardNavigationViewState
         onTap: ((value) => changePage(value)),
         elevation: 0,
         // ignore: prefer_const_literals_to_create_immutables
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: "Home",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.location_on),
-            label: "Shops Map",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart_checkout_sharp),
-            label: "Shops List",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite_outline_sharp),
-            label: "Favorite",
-          ),
-        ],
+        items: BottomNavigatorDashboardListModel().modelToBarItemWidgets(),
       ),
     );
   }

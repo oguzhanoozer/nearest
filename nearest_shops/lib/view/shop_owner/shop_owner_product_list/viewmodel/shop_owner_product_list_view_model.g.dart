@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'owner_product_list_view_model.dart';
+part of 'shop_owner_product_list_view_model.dart';
 
 // **************************************************************************
 // StoreGenerator
@@ -8,9 +8,10 @@ part of 'owner_product_list_view_model.dart';
 
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
-mixin _$OwnerProductListViewModel on _OwnerProductListViewModelBase, Store {
-  final _$isProductFirstListLoadingAtom =
-      Atom(name: '_OwnerProductListViewModelBase.isProductFirstListLoading');
+mixin _$ShopOwnerProductListViewModel
+    on _ShopOwnerProductListViewModelBase, Store {
+  final _$isProductFirstListLoadingAtom = Atom(
+      name: '_ShopOwnerProductListViewModelBase.isProductFirstListLoading');
 
   @override
   bool get isProductFirstListLoading {
@@ -27,7 +28,7 @@ mixin _$OwnerProductListViewModel on _OwnerProductListViewModelBase, Store {
   }
 
   final _$isProductMoreListLoadingAtom =
-      Atom(name: '_OwnerProductListViewModelBase.isProductMoreListLoading');
+      Atom(name: '_ShopOwnerProductListViewModelBase.isProductMoreListLoading');
 
   @override
   bool get isProductMoreListLoading {
@@ -44,7 +45,7 @@ mixin _$OwnerProductListViewModel on _OwnerProductListViewModelBase, Store {
   }
 
   final _$isDeletingAtom =
-      Atom(name: '_OwnerProductListViewModelBase.isDeleting');
+      Atom(name: '_ShopOwnerProductListViewModelBase.isDeleting');
 
   @override
   bool get isDeleting {
@@ -60,7 +61,7 @@ mixin _$OwnerProductListViewModel on _OwnerProductListViewModelBase, Store {
   }
 
   final _$productListAtom =
-      Atom(name: '_OwnerProductListViewModelBase.productList');
+      Atom(name: '_ShopOwnerProductListViewModelBase.productList');
 
   @override
   ObservableList<ProductDetailModel> get productList {
@@ -76,7 +77,7 @@ mixin _$OwnerProductListViewModel on _OwnerProductListViewModelBase, Store {
   }
 
   final _$getProductFirstListAsyncAction =
-      AsyncAction('_OwnerProductListViewModelBase.getProductFirstList');
+      AsyncAction('_ShopOwnerProductListViewModelBase.getProductFirstList');
 
   @override
   Future<void> getProductFirstList() {
@@ -85,7 +86,7 @@ mixin _$OwnerProductListViewModel on _OwnerProductListViewModelBase, Store {
   }
 
   final _$getProductLastListAsyncAction =
-      AsyncAction('_OwnerProductListViewModelBase.getProductLastList');
+      AsyncAction('_ShopOwnerProductListViewModelBase.getProductLastList');
 
   @override
   Future<void> getProductLastList() {
@@ -94,7 +95,7 @@ mixin _$OwnerProductListViewModel on _OwnerProductListViewModelBase, Store {
   }
 
   final _$deleteProductAsyncAction =
-      AsyncAction('_OwnerProductListViewModelBase.deleteProduct');
+      AsyncAction('_ShopOwnerProductListViewModelBase.deleteProduct');
 
   @override
   Future<void> deleteProduct({required String productId, required int index}) {
@@ -102,43 +103,47 @@ mixin _$OwnerProductListViewModel on _OwnerProductListViewModelBase, Store {
         .run(() => super.deleteProduct(productId: productId, index: index));
   }
 
-  final _$_OwnerProductListViewModelBaseActionController =
-      ActionController(name: '_OwnerProductListViewModelBase');
+  final _$_ShopOwnerProductListViewModelBaseActionController =
+      ActionController(name: '_ShopOwnerProductListViewModelBase');
 
   @override
   void changeIsProductFirstListLoading() {
     final _$actionInfo =
-        _$_OwnerProductListViewModelBaseActionController.startAction(
+        _$_ShopOwnerProductListViewModelBaseActionController.startAction(
             name:
-                '_OwnerProductListViewModelBase.changeIsProductFirstListLoading');
+                '_ShopOwnerProductListViewModelBase.changeIsProductFirstListLoading');
     try {
       return super.changeIsProductFirstListLoading();
     } finally {
-      _$_OwnerProductListViewModelBaseActionController.endAction(_$actionInfo);
+      _$_ShopOwnerProductListViewModelBaseActionController
+          .endAction(_$actionInfo);
     }
   }
 
   @override
   void changeIsProductMoreListLoading() {
     final _$actionInfo =
-        _$_OwnerProductListViewModelBaseActionController.startAction(
+        _$_ShopOwnerProductListViewModelBaseActionController.startAction(
             name:
-                '_OwnerProductListViewModelBase.changeIsProductMoreListLoading');
+                '_ShopOwnerProductListViewModelBase.changeIsProductMoreListLoading');
     try {
       return super.changeIsProductMoreListLoading();
     } finally {
-      _$_OwnerProductListViewModelBaseActionController.endAction(_$actionInfo);
+      _$_ShopOwnerProductListViewModelBaseActionController
+          .endAction(_$actionInfo);
     }
   }
 
   @override
   void changeIsDeleting() {
-    final _$actionInfo = _$_OwnerProductListViewModelBaseActionController
-        .startAction(name: '_OwnerProductListViewModelBase.changeIsDeleting');
+    final _$actionInfo =
+        _$_ShopOwnerProductListViewModelBaseActionController.startAction(
+            name: '_ShopOwnerProductListViewModelBase.changeIsDeleting');
     try {
       return super.changeIsDeleting();
     } finally {
-      _$_OwnerProductListViewModelBaseActionController.endAction(_$actionInfo);
+      _$_ShopOwnerProductListViewModelBaseActionController
+          .endAction(_$actionInfo);
     }
   }
 

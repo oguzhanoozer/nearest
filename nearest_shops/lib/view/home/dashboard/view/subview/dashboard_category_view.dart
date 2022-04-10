@@ -1,25 +1,7 @@
 part of '../dashboard_view.dart';
 
 extension _DashboardProductsWidgets on DashboardView {
-  /*Widget buildCategoriesTabBar(BuildContext context,DashboardViewModel viewModel) {
-   return TabBar(
-      labelColor: context.colorScheme.onError,
-      //unselectedLabelColor: context.colorScheme.onError,
-      indicatorColor: context.colorScheme.onSecondary,
-      labelPadding: EdgeInsets.zero,
-      indicatorWeight: 1,
-      isScrollable: true,
-      tabs: [
-        buildCategoryContainer(context, "Shoes", ImagePaths.instance.shoes),
-        buildCategoryContainer(context, "Gift", ImagePaths.instance.gift),
-        buildCategoryContainer(context, "Kitchen", ImagePaths.instance.kitchen),
-        buildCategoryContainer(context, "Cars", ImagePaths.instance.cars),
-        buildCategoryContainer(
-            context, "Technology", ImagePaths.instance.technology),
-      ],
-    );
-  }
-*/
+
 
   Widget buildCategoriesRow(
       BuildContext context, DashboardViewModel viewModel) {
@@ -45,22 +27,12 @@ extension _DashboardProductsWidgets on DashboardView {
         height: context.dynamicHeight(0.05),
         child: ListView(
             // shrinkWrap: true,
-            padding: const EdgeInsets.all(0.0),
+            padding: EdgeInsets.zero,
             scrollDirection: Axis.horizontal,
             children: categoriesItem),
       );
     });
 
-    /* 
-  return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      buildCategoryContainer(context, "Shoes", ImagePaths.instance.shoes),
-      buildCategoryContainer(context, "Gift", ImagePaths.instance.gift),
-      buildCategoryContainer(context, "Kitchen", ImagePaths.instance.kitchen),
-      buildCategoryContainer(context, "Cars", ImagePaths.instance.cars),
-      buildCategoryContainer(
-          context, "Technology", ImagePaths.instance.technology)
-    ]);
-    */
   }
 
   Widget buildCategoryContainer(BuildContext context, String title,
@@ -70,7 +42,7 @@ extension _DashboardProductsWidgets on DashboardView {
         viewModel.changeCategoryId(categoryId);
       },
       child: Padding(
-        padding: context.horizontalPaddingLow,
+        padding: EdgeInsets.only(right: context.lowValue),
         child: Card(
           shape: RoundedRectangleBorder(
             side: BorderSide(
@@ -80,21 +52,17 @@ extension _DashboardProductsWidgets on DashboardView {
           color: viewModel.categoryId == categoryId
               ? Colors.grey[200]
               : Colors.white,
-          //height: context.dynamicHeight(0.08),
-          //width: context.dynamicHeight(0.08),
           child: Padding(
-            padding: const EdgeInsets.all(8),
+            padding: context.paddingLow,
             child: Row(
               children: [
                 Center(
                   child: Image.asset(
                     iconUrl,
-                    //   width: 30,
-                    //  height: 30,
                     fit: BoxFit.fill,
                   ),
                 ),
-                SizedBox(width: 10),
+                context.emptySizedWidthBoxLow,
                 Text(
                   title,
                   style: context.textTheme.bodyText2!
@@ -117,19 +85,19 @@ extension _DashboardProductsWidgets on DashboardView {
           width: 0.5,
           color: context.colorScheme.surface.withOpacity(0.3),
         ),
-        borderRadius: BorderRadius.circular(5),
+        borderRadius: BorderRadius.circular(15),
       ),
       enabledBorder: OutlineInputBorder(
         borderSide: BorderSide(color: context.colorScheme.onSecondary),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(15),
       ),
       disabledBorder: OutlineInputBorder(
         borderSide: BorderSide(color: context.colorScheme.onSecondary),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(15),
       ),
       errorBorder: OutlineInputBorder(
         borderSide: BorderSide(color: context.colorScheme.onSecondary),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(15),
       ),
       prefixIcon:
           Icon(Icons.search, color: context.colorScheme.surface, size: 20),

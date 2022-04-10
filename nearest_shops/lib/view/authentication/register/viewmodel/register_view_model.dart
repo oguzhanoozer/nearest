@@ -2,24 +2,28 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
 import 'package:mobx/mobx.dart';
+import 'package:nearest_shops/view/authentication/register/service/IRegister_service.dart';
+import 'package:nearest_shops/view/utility/error_helper.dart';
 
 import '../../../../core/base/model/base_view_model.dart';
 import '../../../../core/init/service/authenticaion/firebase_authentication.dart';
 import '../../../../core/init/service/firestorage/enum/document_collection_enums.dart';
-import '../../../product/showdialog/show_dialog.dart';
+
 import '../../login/view/login_view.dart';
 
 part 'register_view_model.g.dart';
 
 class RegisterViewModel = _RegisterViewModelBase with _$RegisterViewModel;
 
-abstract class _RegisterViewModelBase with Store, BaseViewModel {
+abstract class _RegisterViewModelBase with Store, BaseViewModel, ErrorHelper {
   GlobalKey<FormState> formState = GlobalKey();
   GlobalKey<ScaffoldState> scaffoldState = GlobalKey();
 
   TextEditingController? emailController;
   TextEditingController? passwordFirstController;
   TextEditingController? passwordLaterController;
+
+  late IRegisterService registerService;
 
   @observable
   bool isLoading = false;
@@ -30,7 +34,11 @@ abstract class _RegisterViewModelBase with Store, BaseViewModel {
   @observable
   bool isLaterLockOpen = false;
 
-  void setContext(BuildContext context) => this.context = context;
+  void setContext(BuildContext context) {
+    this.context = context;
+    registerService = RegisterService(scaffoldState,context);
+  }
+
   void init() {
     emailController = TextEditingController();
     passwordFirstController = TextEditingController();
@@ -43,29 +51,9 @@ abstract class _RegisterViewModelBase with Store, BaseViewModel {
   Future<void> checkUserData() async {
     isLoadingChange();
     if (formState.currentState!.validate()) {
-      try {
-        final user = await FirebaseAuthentication.instance
-            .createUserWithEmailandPassword(
-                email: emailController!.text,
-                password: passwordLaterController!.text);
-        if (user != null) {
-          if (!user.emailVerified) {
-            await user.sendEmailVerification();
-          }
-          await FirebaseAuthentication.instance
-              .setUserRole(UserRole.USER.roleRawValue, user.uid);
-          await FirebaseAuthentication.instance.signOut();
-          await ShowRegisterAlertDialog.instance.getAlertDialog(context!);
-          context!.navigateToPage(LoginView());
-        }
-      } on FirebaseAuthException catch (e) {
-        if (scaffoldState.currentState != null) {
-          scaffoldState.currentState!
-              .showSnackBar(SnackBar(content: Text(e.message.toString())));
-
-          /// Navigator.pop(context);
-        }
-      }
+      await registerService.registerUser(
+          email: emailController!.text,
+          password: passwordLaterController!.text);
     }
     isLoadingChange();
   }
