@@ -1,22 +1,20 @@
 import 'dart:io';
-import 'package:http/http.dart' as http;
-import 'package:kartal/kartal.dart';
-import 'package:path_provider/path_provider.dart';
 import 'dart:math';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:kartal/kartal.dart';
 import 'package:mobx/mobx.dart';
-import 'package:nearest_shops/core/base/model/base_view_model.dart';
+import 'package:path_provider/path_provider.dart';
 
-import '../../../../core/init/service/firestorage/firestorage_initialize.dart';
+import '../../../../core/base/model/base_view_model.dart';
 import '../../../../core/init/service/authenticaion/user_id_initialize.dart';
+import '../../../../core/init/service/firestorage/firestorage_initialize.dart';
 import '../../../home/product_detail/model/product_detail_model.dart';
 import '../service/shop_owner_add_product_service.dart';
+
 part 'add_product_view_model.g.dart';
 
 class AddProductViewModel = _AddProductViewModelBase with _$AddProductViewModel;

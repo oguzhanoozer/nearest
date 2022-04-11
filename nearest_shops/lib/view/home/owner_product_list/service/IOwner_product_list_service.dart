@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:nearest_shops/view/utility/error_helper.dart';
 
 import '../../../../core/init/service/firestorage/firestorage_initialize.dart';
+import '../../../utility/error_helper.dart';
 import '../../product_detail/model/product_detail_model.dart';
 
 abstract class IOwnerProductListService {

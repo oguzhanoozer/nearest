@@ -1,11 +1,11 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
-import 'package:nearest_shops/view/home/product_detail/model/product_detail_model.dart';
 
 import '../../../../core/base/view/base_view.dart';
 import '../../../../core/components/button/normal_button.dart';
-import '../../../product/slider/dashboard_ads_slider.dart';
+import '../../../../core/components/card/list_item_card.dart';
+import '../model/product_detail_model.dart';
 import '../viewmodel/product_detail_view_model.dart';
 
 class ProductDetailView extends StatelessWidget {
@@ -47,19 +47,17 @@ class ProductDetailView extends StatelessWidget {
                   return Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20.0, vertical: 10),
-                    child: Card(
-                        clipBehavior: Clip.antiAliasWithSaveLayer,
-                        shape: RoundedRectangleBorder(
-                          side: BorderSide(
-                              color: context.colorScheme.onInverseSurface,
-                              width: 0.5),
-                          borderRadius:
-                              BorderRadius.circular(context.normalValue),
-                        ),
-                        child: Image.network(
-                          productDetailModel.imageUrlList![index],
-                          fit: BoxFit.fill,
-                        )),
+                    child: ListItemCard(
+                      child: Image.network(
+                        productDetailModel.imageUrlList![index],
+                        fit: BoxFit.fill,
+                      ),
+                      radius: context.normalValue,
+                      borderSide: BorderSide(
+                          color: context.colorScheme.onInverseSurface,
+                          width: 0.5),
+                      clipBehavior: Clip.antiAliasWithSaveLayer,
+                    ),
                   );
                 },
               ),

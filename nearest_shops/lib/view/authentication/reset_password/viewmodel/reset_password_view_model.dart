@@ -1,10 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
-import 'package:nearest_shops/core/base/model/base_view_model.dart';
+import '../../../../core/base/model/base_view_model.dart';
 import 'package:kartal/kartal.dart';
-import 'package:nearest_shops/view/authentication/login/view/login_view.dart';
-import 'package:nearest_shops/view/utility/error_helper.dart';
+import '../../login/view/login_view.dart';
+import '../../../utility/error_helper.dart';
 
 import '../../../../core/init/service/authenticaion/firebase_authentication.dart';
 import '../service/IReset_password_service.dart';

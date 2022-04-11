@@ -1,24 +1,18 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:intl/intl.dart';
 import 'package:mobx/mobx.dart';
-import 'package:nearest_shops/core/base/model/base_view_model.dart';
 
+import '../../../../core/base/model/base_view_model.dart';
 import '../../../../core/init/service/authenticaion/user_id_initialize.dart';
-import '../../../../core/init/service/firestorage/firestorage_initialize.dart';
 import '../../../../core/init/service/firestorage/user_location_initialize_check.dart';
-import '../../../product/contstants/image_path.dart';
 import '../../product_detail/model/product_detail_model.dart';
-import '../../shop_list/model/shop_model.dart';
-import '../model/dashboard_model.dart';
 import '../service/IDashboard_service.dart';
 
 part 'dashboard_view_model.g.dart';
 
 class DashboardViewModel = _DashboardViewModelBase with _$DashboardViewModel;
 
-abstract class _DashboardViewModelBase with Store, BaseViewModel {
+abstract class _DashboardViewModelBase with Store, BaseViewModel{
   GlobalKey<FormState> formState = GlobalKey();
   GlobalKey<ScaffoldState> scaffoldState = GlobalKey();
   ScrollController? controller;

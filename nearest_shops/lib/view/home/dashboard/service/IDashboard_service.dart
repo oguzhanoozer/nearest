@@ -4,12 +4,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:nearest_shops/view/home/product_detail/model/product_detail_model.dart';
-import 'package:nearest_shops/view/utility/error_helper.dart';
 
-import '../../../../core/init/service/authenticaion/firebase_authentication.dart';
 import '../../../../core/init/service/authenticaion/user_id_initialize.dart';
 import '../../../../core/init/service/firestorage/firestorage_initialize.dart';
+import '../../../utility/error_helper.dart';
+import '../../product_detail/model/product_detail_model.dart';
 
 abstract class IDashboardService {
   final GlobalKey<ScaffoldState> scaffoldState;

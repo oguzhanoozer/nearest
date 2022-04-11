@@ -7,21 +7,19 @@ class MapShopView extends StatelessWidget {
 
   MapShopView({Key? key, required this.viewModel}) : super(key: key);
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: GoogleMap(
         myLocationButtonEnabled: true,
         mapType: MapType.normal,
-        initialCameraPosition: viewModel.initalCameraPosition!,
+        initialCameraPosition: viewModel.initalCameraPosition,
         tiltGesturesEnabled: true,
         compassEnabled: true,
         scrollGesturesEnabled: true,
         zoomGesturesEnabled: true,
         markers: viewModel.getListMarkerList(),
-        onMapCreated: (GoogleMapController controller) {
-        },
+        onMapCreated: (GoogleMapController controller) {},
       ),
     );
   }

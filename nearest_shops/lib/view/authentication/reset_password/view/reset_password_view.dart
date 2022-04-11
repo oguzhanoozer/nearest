@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:kartal/kartal.dart';
-import 'package:nearest_shops/core/base/view/base_view.dart';
 
+import '../../../../core/base/view/base_view.dart';
 import '../../../../core/components/button/normal_button.dart';
 import '../../../../core/components/column/form_column.dart';
 import '../viewmodel/reset_password_view_model.dart';

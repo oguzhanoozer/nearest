@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mobx/mobx.dart';
-import 'package:nearest_shops/view/authentication/login/model/user_model.dart';
-import 'package:nearest_shops/view/home/shop_list/model/shop_model.dart';
+import '../../../../view/authentication/login/model/user_model.dart';
+import '../../../../view/home/shop_list/model/shop_model.dart';
 
 import '../authenticaion/user_id_initialize.dart';
 import 'firestorage_initialize.dart';

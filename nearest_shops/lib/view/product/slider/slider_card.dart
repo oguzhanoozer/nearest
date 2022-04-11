@@ -1,45 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:kartal/kartal.dart';
-import 'package:nearest_shops/view/home/product_detail/model/product_detail_model.dart';
 
-import '../../home/dashboard/model/dashboard_model.dart';
+import '../../../core/components/card/list_item_card.dart';
 import '../../home/dashboard/viewmodel/dashboard_view_model.dart';
+import '../../home/product_detail/model/product_detail_model.dart';
 import '../contstants/image_path.dart';
 
-class SliderCard extends Card {
+class SliderCard extends StatelessWidget {
   final BuildContext context;
   final ProductDetailModel productDetailModel;
   final bool onlyImage;
   final DashboardViewModel viewmodel;
+  const SliderCard(
+      {Key? key,
+      required this.context,
+      required this.productDetailModel,
+      required this.onlyImage,
+      required this.viewmodel})
+      : super(key: key);
 
-  SliderCard({
-    required this.productDetailModel,
-    required this.context,
-    required this.onlyImage,
-    required this.viewmodel,
-  }) : super(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-              side: BorderSide(width: 1, color: Colors.orange[100]!)),
-          child: Padding(
-            padding: context.paddingLow,
-            child: Row(
-              children: [
-                Expanded(
-                  //child: Image.network(widget.dashboardModelList![index].url ?? "",
-                  child: buildProductImage(productDetailModel),
-                ),
-                onlyImage
-                    ? Container()
-                    : Expanded(
-                        child: buildProductDetail(
-                            productDetailModel, context, viewmodel),
-                      ),
-              ],
+  @override
+  Widget build(BuildContext context) {
+    return ListItemCard(
+      radius: context.normalValue,
+
+      ///borderSide: BorderSide(              color: context.colorScheme.onInverseSurface, width: 0.5),
+      elevation: 0.3,
+      child: Padding(
+        padding: context.paddingLow,
+        child: Row(
+          children: [
+            Expanded(
+              child: buildProductImage(context, productDetailModel),
             ),
-          ),
-        );
+            onlyImage
+                ? Container()
+                : Expanded(
+                    child: buildProductDetail(
+                        productDetailModel, context, viewmodel),
+                  ),
+          ],
+        ),
+      ),
+    );
+  }
 
   static Column buildProductDetail(ProductDetailModel productDetailModel,
       BuildContext context, DashboardViewModel viewmodel) {
@@ -64,7 +69,6 @@ class SliderCard extends Card {
             style: context.textTheme.bodyText2!
                 .copyWith(fontWeight: FontWeight.bold),
           ),
-          Icon(Icons.shopping_bag),
           IconButton(
               onPressed: () {
                 viewmodel.changeFavouriteList(
@@ -94,16 +98,15 @@ class SliderCard extends Card {
     );
   }
 
-  static Widget buildProductImage(ProductDetailModel productDetailModel) {
-    return Card(
+  static Widget buildProductImage(
+      BuildContext context, ProductDetailModel productDetailModel) {
+    return ListItemCard(
+      radius: context.normalValue,
+      elevation: 0,
       clipBehavior: Clip.antiAliasWithSaveLayer,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
       child: productDetailModel.imageUrlList!.isEmpty
           ? Image.asset(
               ImagePaths.instance.hazelnut,
-              //  height: context.dynamicHeight(0.1),
               fit: BoxFit.fill,
             )
           : Image.network(
@@ -111,7 +114,5 @@ class SliderCard extends Card {
               fit: BoxFit.fill,
             ),
     );
-
-    ///Image.asset(dashboardModel.imageUrlList.first ?? "", fit: BoxFit.fill);
   }
 }

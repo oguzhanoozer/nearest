@@ -1,18 +1,17 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
-import 'package:kartal/kartal.dart';
 import 'package:mobx/mobx.dart';
-import 'package:nearest_shops/core/base/model/base_view_model.dart';
-import 'package:nearest_shops/view/utility/error_helper.dart';
 
+import '../../../../core/base/model/base_view_model.dart';
 import '../../../../core/constants/env_connect/env_connection.dart';
+import '../../../utility/error_helper.dart';
 import '../service/shop_owner_home_service.dart';
+
 part 'owner_home_view_model.g.dart';
 
 class OwnerHomeViewModel = _OwnerHomeViewModelBase with _$OwnerHomeViewModel;

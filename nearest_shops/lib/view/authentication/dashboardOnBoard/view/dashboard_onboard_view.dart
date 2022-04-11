@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:nearest_shops/view/authentication/dashboardOnBoard/viewModel/dashboard_onboard_view_model.dart';
+import '../viewModel/dashboard_onboard_view_model.dart';
 
 import '../../../../core/base/view/base_view.dart';
 

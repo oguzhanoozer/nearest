@@ -1,17 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:kartal/kartal.dart';
 import 'package:mobx/mobx.dart';
-import 'package:nearest_shops/view/home/dashboard/view/dashboard_view.dart';
-import 'package:nearest_shops/view/shop_owner/dashboard/view/owner_dashboard_view.dart';
-import 'package:nearest_shops/view/utility/error_helper.dart';
 
 import '../../../../core/base/model/base_view_model.dart';
 import '../../../../core/init/service/authenticaion/firebase_authentication.dart';
 import '../../../../core/init/service/authenticaion/user_id_initialize.dart';
 import '../../../../core/init/service/firestorage/enum/document_collection_enums.dart';
 import '../../../home/dashboard/view/home_dashboard_navigation_view.dart';
+import '../../../shop_owner/dashboard/view/owner_dashboard_view.dart';
+import '../../../utility/error_helper.dart';
+
 part 'dashboard_onboard_view_model.g.dart';
 
 class DashboardOnBoardViewModel = _DashboardOnBoardViewModelBase

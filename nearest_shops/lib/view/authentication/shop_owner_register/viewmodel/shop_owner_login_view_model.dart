@@ -1,16 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:kartal/kartal.dart';
 import 'package:mobx/mobx.dart';
-import 'package:nearest_shops/view/shop_owner/shop_owner_product_list/view/shop_owner_product_list_view.dart';
-import 'package:nearest_shops/view/utility/error_helper.dart';
 
 import '../../../../core/base/model/base_view_model.dart';
-import '../../../../core/init/service/authenticaion/firebase_authentication.dart';
-import '../../../../core/init/service/firestorage/enum/document_collection_enums.dart';
-import '../../../../core/init/service/firestorage/firestore_service.dart';
-import '../../login/view/login_view.dart';
+import '../../../utility/error_helper.dart';
 import '../service/IShop_owner_register_service.dart';
 
 part 'shop_owner_login_view_model.g.dart';

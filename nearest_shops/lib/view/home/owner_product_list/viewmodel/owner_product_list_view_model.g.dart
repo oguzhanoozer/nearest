@@ -42,19 +42,20 @@ mixin _$OwnerProductListViewModel on _OwnerProductListViewModelBase, Store {
     });
   }
 
-  final _$isShopProductLoadedAtom =
-      Atom(name: '_OwnerProductListViewModelBase.isShopProductLoaded');
+  final _$isShopProductDraggleLoadedAtom =
+      Atom(name: '_OwnerProductListViewModelBase.isShopProductDraggleLoaded');
 
   @override
-  bool get isShopProductLoaded {
-    _$isShopProductLoadedAtom.reportRead();
-    return super.isShopProductLoaded;
+  bool get isShopProductDraggleLoaded {
+    _$isShopProductDraggleLoadedAtom.reportRead();
+    return super.isShopProductDraggleLoaded;
   }
 
   @override
-  set isShopProductLoaded(bool value) {
-    _$isShopProductLoadedAtom.reportWrite(value, super.isShopProductLoaded, () {
-      super.isShopProductLoaded = value;
+  set isShopProductDraggleLoaded(bool value) {
+    _$isShopProductDraggleLoadedAtom
+        .reportWrite(value, super.isShopProductDraggleLoaded, () {
+      super.isShopProductDraggleLoaded = value;
     });
   }
 
@@ -86,12 +87,12 @@ mixin _$OwnerProductListViewModel on _OwnerProductListViewModelBase, Store {
   }
 
   @override
-  void changeIsShopProductLoaded() {
+  void changeIsShopProductLoaded(bool value) {
     final _$actionInfo =
         _$_OwnerProductListViewModelBaseActionController.startAction(
             name: '_OwnerProductListViewModelBase.changeIsShopProductLoaded');
     try {
-      return super.changeIsShopProductLoaded();
+      return super.changeIsShopProductLoaded(value);
     } finally {
       _$_OwnerProductListViewModelBaseActionController.endAction(_$actionInfo);
     }
@@ -102,7 +103,7 @@ mixin _$OwnerProductListViewModel on _OwnerProductListViewModelBase, Store {
     return '''
 isShopMapLoading: ${isShopMapLoading},
 isShopProductLoading: ${isShopProductLoading},
-isShopProductLoaded: ${isShopProductLoaded}
+isShopProductDraggleLoaded: ${isShopProductDraggleLoaded}
     ''';
   }
 }

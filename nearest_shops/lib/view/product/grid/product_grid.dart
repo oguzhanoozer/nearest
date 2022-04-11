@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:kartal/kartal.dart';
 
-import '../../home/dashboard/model/dashboard_model.dart';
+import '../../../core/components/card/list_item_card.dart';
 import '../../home/dashboard/viewmodel/dashboard_view_model.dart';
 import '../../home/product_detail/model/product_detail_model.dart';
 import '../../home/product_detail/view/product_detail_view.dart';
@@ -36,34 +36,29 @@ class ProductGrid extends StatelessWidget {
 
   Widget buildProductCard(BuildContext context, int index) {
     return GestureDetector(
-      onTap: () => context.navigateToPage(ProductDetailView(
-        productDetailModel: productList[index],
-      )),
-      child: Card(
-        /// color: context.colorScheme.onInverseSurface,
-        shadowColor: Colors.white,
-        elevation: 1,
-        shape: RoundedRectangleBorder(
-          side: BorderSide(
-              color: context.colorScheme.onInverseSurface, width: 0.5),
-          borderRadius: BorderRadius.circular(context.normalValue),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              flex: 9,
-              child: buildProductImage(index, context),
-            ),
-            Expanded(
-              flex: 5,
-              child: buildProductDetail(context, index),
-            ),
-          ],
-        ),
-      ),
-    );
+        onTap: () => context.navigateToPage(ProductDetailView(
+              productDetailModel: productList[index],
+            )),
+        child: ListItemCard(
+          radius: context.normalValue,
+
+          ///borderSide: BorderSide(              color: context.colorScheme.onInverseSurface, width: 0.5),
+          elevation: 0.05,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                flex: 9,
+                child: buildProductImage(index, context),
+              ),
+              Expanded(
+                flex: 5,
+                child: buildProductDetail(context, index),
+              ),
+            ],
+          ),
+        ));
   }
 
   Widget buildProductDetail(BuildContext context, int index) {
@@ -77,7 +72,6 @@ class ProductGrid extends StatelessWidget {
                   bottomLeft: Radius.circular(context.normalValue),
                   bottomRight: Radius.circular(context.normalValue))),
           child: Column(
-            ///  mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Text(
                 productList[index].name ?? "",
@@ -98,7 +92,6 @@ class ProductGrid extends StatelessWidget {
                       style: context.textTheme.bodyLarge!
                           .copyWith(fontWeight: FontWeight.bold),
                     ),
-                    Icon(Icons.shopping_bag),
                     IconButton(
                         onPressed: () async {
                           await viewModel.changeFavouriteList(
@@ -121,15 +114,10 @@ class ProductGrid extends StatelessWidget {
 
   Center buildProductImage(int index, BuildContext context) {
     return Center(
-      child: Card(
+      child: ListItemCard(
         elevation: 0,
         clipBehavior: Clip.antiAliasWithSaveLayer,
-
-        /// borderOnForeground: true,
-        shape: RoundedRectangleBorder(
-          /// side: BorderSide(color: Colors.white70, width: 1),
-          borderRadius: BorderRadius.circular(10),
-        ),
+        radius: context.normalValue,
         child: productList[index].imageUrlList!.isEmpty
             ? Image.asset(ImagePaths.instance.hazelnut, fit: BoxFit.fill)
             : Image.network(productList[index].imageUrlList!.first.toString(),

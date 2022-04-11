@@ -1,12 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
 import 'package:mobx/mobx.dart';
-import 'package:nearest_shops/core/base/model/base_view_model.dart';
-import 'package:nearest_shops/view/home/product_detail/model/product_detail_model.dart';
+
+import '../../../../core/base/model/base_view_model.dart';
 import '../../../../core/init/service/authenticaion/user_id_initialize.dart';
+import '../../../home/product_detail/model/product_detail_model.dart';
 import '../service/IShop_owner_product_service.dart';
+
 part 'shop_owner_product_list_view_model.g.dart';
 
 class ShopOwnerProductListViewModel = _ShopOwnerProductListViewModelBase

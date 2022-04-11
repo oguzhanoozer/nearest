@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
-import 'package:nearest_shops/view/shop_owner/add_product/view/add_product_view.dart';
+import '../../add_product/view/add_product_view.dart';
 
 import '../../../../core/base/view/base_view.dart';
 import '../../../home/owner_product_list/view/map_shop_view.dart';

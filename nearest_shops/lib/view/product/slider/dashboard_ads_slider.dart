@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
 
-import '../../home/dashboard/model/dashboard_model.dart';
 import '../../home/dashboard/viewmodel/dashboard_view_model.dart';
 import '../../home/product_detail/model/product_detail_model.dart';
 import 'circle_indicator_list.dart';
@@ -50,16 +49,6 @@ class _DashboardAdsSliderState extends State<DashboardAdsSlider> {
       },
     );
   }
-/*
-  Widget buildImageListView() {
-    return ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: widget.productSliderList!.length,
-        itemBuilder: (context, index) {
-          return buildImageNetwork(context, index);
-        });
-  }
-  */
 
   void _onChanged(int index) {
     _selectedCurrentIndex = index;

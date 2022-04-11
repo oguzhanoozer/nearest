@@ -2,10 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
-import 'package:nearest_shops/view/utility/error_helper.dart';
 
 import '../../../../core/init/service/authenticaion/firebase_authentication.dart';
 import '../../../../core/init/service/firestorage/enum/document_collection_enums.dart';
+import '../../../utility/error_helper.dart';
 import '../../login/view/login_view.dart';
 
 abstract class IRegisterService {

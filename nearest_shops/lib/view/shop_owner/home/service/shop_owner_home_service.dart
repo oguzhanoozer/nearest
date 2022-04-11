@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:nearest_shops/view/utility/error_helper.dart';
+import '../../../utility/error_helper.dart';
 
 import '../../../../core/init/service/firestorage/firestorage_initialize.dart';
 

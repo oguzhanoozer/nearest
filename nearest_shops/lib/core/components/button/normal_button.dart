@@ -16,18 +16,18 @@ class NormalButton extends StatelessWidget {
       style: ButtonStyle(
           textStyle: MaterialStateProperty.all(context.textTheme.headline6!
               .copyWith(color: context.colorScheme.primary)),
-          backgroundColor: MaterialStateProperty.all(this.color),
+          backgroundColor: MaterialStateProperty.all(color),
           padding: MaterialStateProperty.all(context.paddingLow),
           //minimumSize: MaterialStateProperty.all(Size(context.width * 0.4, 50)),
           fixedSize: fixedSize == null
               ? MaterialStateProperty.all(
-                  Size(context.width * 0.5, context.height * 0.06))
+                  Size(context.dynamicWidth(0.3), context.dynamicWidth(0.02)))
               : MaterialStateProperty.all(fixedSize),
-          shape: MaterialStateProperty.all(RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(20)))),
-          elevation: MaterialStateProperty.all(5)),
+          shape: MaterialStateProperty.all(
+              RoundedRectangleBorder(borderRadius: context.normalBorderRadius)),
+          elevation: MaterialStateProperty.all(1)),
       onPressed: onPressed,
-      child: child,
+      child: FittedBox(child: child),
     );
   }
 }

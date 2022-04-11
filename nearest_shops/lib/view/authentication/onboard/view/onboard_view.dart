@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
 
 import '../../../../core/init/service/authenticaion/firebase_authentication.dart';
-import '../../../home/dashboard/view/dashboard_view.dart';
 import '../../dashboardOnBoard/view/dashboard_onboard_view.dart';
 import '../../login/view/login_view.dart';
 

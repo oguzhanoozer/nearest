@@ -1,15 +1,13 @@
 import 'dart:math' show cos, sqrt, asin;
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:mobx/mobx.dart';
-import 'package:nearest_shops/core/base/model/base_view_model.dart';
-import 'package:nearest_shops/view/home/shop_list/service/IShop_list_service.dart';
 
-import '../../../../core/init/service/authenticaion/user_id_initialize.dart';
-import '../../../../core/init/service/firestorage/firestorage_initialize.dart';
+import '../../../../core/base/model/base_view_model.dart';
 import '../../../../core/init/service/firestorage/user_location_initialize_check.dart';
 import '../model/shop_model.dart';
+import '../service/IShop_list_service.dart';
 
 part 'shop_list_view_model.g.dart';
 

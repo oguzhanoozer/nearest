@@ -2,8 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
 import 'package:mobx/mobx.dart';
-import 'package:nearest_shops/view/authentication/register/service/IRegister_service.dart';
-import 'package:nearest_shops/view/utility/error_helper.dart';
+import '../service/IRegister_service.dart';
+import '../../../utility/error_helper.dart';
 
 import '../../../../core/base/model/base_view_model.dart';
 import '../../../../core/init/service/authenticaion/firebase_authentication.dart';

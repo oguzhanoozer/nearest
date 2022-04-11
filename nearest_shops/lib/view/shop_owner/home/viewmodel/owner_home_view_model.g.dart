@@ -76,8 +76,9 @@ mixin _$OwnerHomeViewModel on _OwnerHomeViewModelBase, Store {
       AsyncAction('_OwnerHomeViewModelBase.displayPrediction');
 
   @override
-  Future<void> displayPrediction(Prediction p) {
-    return _$displayPredictionAsyncAction.run(() => super.displayPrediction(p));
+  Future<void> displayPrediction(Prediction placePrediction) {
+    return _$displayPredictionAsyncAction
+        .run(() => super.displayPrediction(placePrediction));
   }
 
   final _$getPlaceAutoCompleteAsyncAction =

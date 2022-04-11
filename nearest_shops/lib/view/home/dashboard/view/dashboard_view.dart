@@ -3,6 +3,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:kartal/kartal.dart';
 
 import '../../../../core/base/view/base_view.dart';
+import '../../../../core/components/card/list_item_card.dart';
 import '../../../../core/extension/widget_extension.dart';
 import '../../../../core/init/service/authenticaion/firebase_authentication.dart';
 import '../../../product/contstants/image_path.dart';
@@ -29,7 +30,7 @@ class DashboardView extends StatelessWidget {
     );
   }
 
-  Scaffold buildScaffold(BuildContext context, DashboardViewModel viewmodel) =>
+  Widget buildScaffold(BuildContext context, DashboardViewModel viewmodel) =>
       Scaffold(
         body: Observer(builder: (_) {
           return Padding(
@@ -37,20 +38,20 @@ class DashboardView extends StatelessWidget {
             child: CustomScrollView(
               controller: viewmodel.controller,
               slivers: [
-                ///buildSliverApp(context),
                 appBarRow(context).toSliver,
                 SizedBox(
-                  height: context.dynamicHeight(0.25),
-                  child: viewmodel.isProductSliderListLoading
-                      ? const Center(child: CircularProgressIndicator())
-                      : DashboardAdsSlider(
-                          viewmodel: viewmodel,
-                          productSliderList: viewmodel.getProductSliderList(),
-                          onlyImage: false),
-                ).toSliver,
+                        height: context.dynamicHeight(0.25),
+                        child: viewmodel.isProductSliderListLoading
+                            ? const Center(child: CircularProgressIndicator())
+                            : DashboardAdsSlider(
+                                viewmodel: viewmodel,
+                                productSliderList:
+                                    viewmodel.getProductSliderList(),
+                                onlyImage: false))
+                    .toSliver,
                 buildCategoriesText(context).toSliver,
-                //buildCategoriesTabBar(context).toSliver,
-                //  buildCategoriesRow(context, viewmodel).toSliver,
+
+                ///buildCategoriesRow(context, viewmodel).toSliver,
                 buildCategoriesSliver(context, viewmodel),
                 viewmodel.isProductFirstListLoading
                     ? const Center(child: CircularProgressIndicator()).toSliver
@@ -73,26 +74,13 @@ class DashboardView extends StatelessWidget {
   SliverAppBar buildCategoriesSliver(
       BuildContext context, DashboardViewModel viewmodel) {
     return SliverAppBar(
+      automaticallyImplyLeading: false,
       forceElevated: false,
-      expandedHeight: context.height * 0.12,
+      //  expandedHeight: context.height * 0.12,
       pinned: true,
       title: buildCategoriesRow(context, viewmodel),
       centerTitle: false,
     );
-  }
-
-  SliverAppBar buildSliverApp(BuildContext context) {
-    return SliverAppBar(
-        expandedHeight: context.height * 0.12,
-        pinned: false,
-        actions: [buildAppBarActionsContainer(context)],
-        title: buildAppBarTitle(context),
-        leading: IconButton(
-            onPressed: () async {
-              await FirebaseAuthentication.instance.signOut();
-            },
-            icon: Icon(Icons.logout)),
-        flexibleSpace: buildFlexibleSpaceBar(context));
   }
 
   Widget appBarRow(BuildContext context) {
@@ -138,17 +126,11 @@ class DashboardView extends StatelessWidget {
   }
 
   Widget buildAppBarTitle(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          "The Nearest",
-          style: context.textTheme.headline5!.copyWith(
-              color: context.appTheme.colorScheme.onSurfaceVariant,
-              fontWeight: FontWeight.bold),
-        ),
-      ],
+    return Text(
+      "The Nearest",
+      style: context.textTheme.headline5!.copyWith(
+          color: context.appTheme.colorScheme.onSurfaceVariant,
+          fontWeight: FontWeight.bold),
     );
   }
 

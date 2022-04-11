@@ -3,10 +3,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:kartal/kartal.dart';
-import 'package:nearest_shops/core/components/column/form_column.dart';
-import 'package:nearest_shops/view/home/product_detail/model/product_detail_model.dart';
+import '../../../../core/components/column/form_column.dart';
+import '../../../home/product_detail/model/product_detail_model.dart';
 
-import 'package:nearest_shops/view/shop_owner/add_product/viewmodel/add_product_view_model.dart';
+import '../viewmodel/add_product_view_model.dart';
 
 import '../../../../core/base/view/base_view.dart';
 import '../../../../core/components/button/normal_button.dart';
@@ -40,15 +40,17 @@ class AddProductView extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         key: viewModel.scaffoldState,
+        appBar: AppBar(
+          centerTitle: true,
+          title: Text("Add new product"),
+          automaticallyImplyLeading: false,
+          elevation: 0.5,
+        ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               context.emptySizedHeightBoxLow,
-              Expanded(
-                flex: 1,
-                child: Text("Add new product"),
-              ),
               Expanded(
                 flex: 19,
                 child: SingleChildScrollView(
@@ -72,7 +74,8 @@ class AddProductView extends StatelessWidget {
                         buildSelectProductImageButton(viewModel, context),
                         context.emptySizedHeightBoxLow,
                         selectedImageSlider(viewModel, context),
-                       /// isUpdate ? updatedImageSlider(context) : Container(),
+
+                        /// isUpdate ? updatedImageSlider(context) : Container(),
                         buildAddProductButton(viewModel, context),
                       ],
                     ),
@@ -248,31 +251,32 @@ class AddProductView extends StatelessWidget {
             ? Center(
                 child: CircularProgressIndicator(),
               )
-            :  isUpdate?NormalButton(
-                child: Text(
-                  "Update Product",
-                  style: context.textTheme.headline6!
-                      .copyWith(color: context.colorScheme.onSecondary),
-                ),
-                onPressed: () async {
-                  await viewModel.addProduct(viewModel.tempFile,isUpdate,productModel: productDetailModel! );
-                },
-                color: context.appTheme.colorScheme.onSurfaceVariant,
-                //   fixedSize: Size(context.width * 0.7, context.height * 0.06),
-              ):
-            
-            NormalButton(
-                child: Text(
-                  "Add Product",
-                  style: context.textTheme.headline6!
-                      .copyWith(color: context.colorScheme.onSecondary),
-                ),
-                onPressed: () async {
-                  await viewModel.addProduct(viewModel.tempFile,isUpdate);
-                },
-                color: context.appTheme.colorScheme.onSurfaceVariant,
-                //   fixedSize: Size(context.width * 0.7, context.height * 0.06),
-              );
+            : isUpdate
+                ? NormalButton(
+                    child: Text(
+                      "Update Product",
+                      style: context.textTheme.headline6!
+                          .copyWith(color: context.colorScheme.onSecondary),
+                    ),
+                    onPressed: () async {
+                      await viewModel.addProduct(viewModel.tempFile, isUpdate,
+                          productModel: productDetailModel!);
+                    },
+                    color: context.appTheme.colorScheme.onSurfaceVariant,
+                    //   fixedSize: Size(context.width * 0.7, context.height * 0.06),
+                  )
+                : NormalButton(
+                    child: Text(
+                      "Add Product",
+                      style: context.textTheme.headline6!
+                          .copyWith(color: context.colorScheme.onSecondary),
+                    ),
+                    onPressed: () async {
+                      await viewModel.addProduct(viewModel.tempFile, isUpdate);
+                    },
+                    color: context.appTheme.colorScheme.onSurfaceVariant,
+                    //   fixedSize: Size(context.width * 0.7, context.height * 0.06),
+                  );
       },
     );
   }

@@ -1,8 +1,6 @@
 part of '../dashboard_view.dart';
 
 extension _DashboardProductsWidgets on DashboardView {
-
-
   Widget buildCategoriesRow(
       BuildContext context, DashboardViewModel viewModel) {
     List<Widget> categoriesItem = [
@@ -24,7 +22,7 @@ extension _DashboardProductsWidgets on DashboardView {
 
     return Observer(builder: (_) {
       return SizedBox(
-        height: context.dynamicHeight(0.05),
+        height: context.dynamicHeight(0.06),
         child: ListView(
             // shrinkWrap: true,
             padding: EdgeInsets.zero,
@@ -32,48 +30,43 @@ extension _DashboardProductsWidgets on DashboardView {
             children: categoriesItem),
       );
     });
-
   }
 
   Widget buildCategoryContainer(BuildContext context, String title,
       String iconUrl, DashboardViewModel viewModel, int categoryId) {
     return GestureDetector(
-      onTap: () {
-        viewModel.changeCategoryId(categoryId);
-      },
-      child: Padding(
-        padding: EdgeInsets.only(right: context.lowValue),
-        child: Card(
-          shape: RoundedRectangleBorder(
-            side: BorderSide(
-                color: context.colorScheme.onInverseSurface, width: 0.5),
-            borderRadius: BorderRadius.circular(context.normalValue),
-          ),
-          color: viewModel.categoryId == categoryId
-              ? Colors.grey[200]
-              : Colors.white,
-          child: Padding(
-            padding: context.paddingLow,
-            child: Row(
-              children: [
-                Center(
-                  child: Image.asset(
-                    iconUrl,
-                    fit: BoxFit.fill,
+        onTap: () {
+          viewModel.changeCategoryId(categoryId);
+        },
+        child: Padding(
+          padding: EdgeInsets.only(right: context.lowValue),
+          child: ListItemCard(
+            radius: context.normalValue,
+            elevation: 0,
+            color: viewModel.categoryId == categoryId
+                ? Colors.grey[200]!
+                : Colors.white,
+            child: Padding(
+              padding: context.paddingLow,
+              child: Row(
+                children: [
+                  Center(
+                    child: Image.asset(
+                      iconUrl,
+                      fit: BoxFit.fill,
+                    ),
                   ),
-                ),
-                context.emptySizedWidthBoxLow,
-                Text(
-                  title,
-                  style: context.textTheme.bodyText2!
-                      .copyWith(color: Colors.black),
-                ),
-              ],
+                  context.emptySizedWidthBoxLow,
+                  Text(
+                    title,
+                    style: context.textTheme.bodyText2!
+                        .copyWith(color: Colors.black),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 
   InputDecoration buildInputDecoration(BuildContext context) {

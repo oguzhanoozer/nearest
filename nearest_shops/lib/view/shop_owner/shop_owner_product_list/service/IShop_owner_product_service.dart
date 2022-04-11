@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
-import 'package:nearest_shops/view/home/product_detail/model/product_detail_model.dart';
-import 'package:nearest_shops/view/utility/error_helper.dart';
 
 import '../../../../core/init/service/firestorage/firestorage_initialize.dart';
+import '../../../home/product_detail/model/product_detail_model.dart';
+import '../../../utility/error_helper.dart';
 
 abstract class IShopOwnerProductListService {
   final GlobalKey<ScaffoldState> scaffoldState;

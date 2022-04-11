@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
-import 'package:nearest_shops/core/base/model/base_model.dart';
+import '../../../../core/base/model/base_model.dart';
 
 import '../../../../core/base/model/base_view_model.dart';
 part 'owner_dashboard_view_model.g.dart';
