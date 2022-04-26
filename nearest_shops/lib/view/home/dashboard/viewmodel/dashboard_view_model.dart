@@ -12,7 +12,7 @@ part 'dashboard_view_model.g.dart';
 
 class DashboardViewModel = _DashboardViewModelBase with _$DashboardViewModel;
 
-abstract class _DashboardViewModelBase with Store, BaseViewModel{
+abstract class _DashboardViewModelBase with Store, BaseViewModel {
   GlobalKey<FormState> formState = GlobalKey();
   GlobalKey<ScaffoldState> scaffoldState = GlobalKey();
   ScrollController? controller;
@@ -34,7 +34,23 @@ abstract class _DashboardViewModelBase with Store, BaseViewModel{
   late IDashboardService dashboardService;
 
   @observable
-  List<ProductDetailModel> _productList = [];
+  bool isSearching = false;
+
+  @action
+  void changeIsSearching(bool value) {
+    isSearching = value;
+    if (isSearching == false) {
+      productList = persistProductList;
+    }
+  }
+
+  @observable
+  ObservableList<ProductDetailModel> productList =
+      ObservableList<ProductDetailModel>();
+
+  @observable
+  ObservableList<ProductDetailModel> persistProductList =
+      ObservableList<ProductDetailModel>();
 
   @override
   List<ProductDetailModel> _productSliderList = [];
@@ -44,16 +60,7 @@ abstract class _DashboardViewModelBase with Store, BaseViewModel{
   late final String shopId;
 
   @observable
-  int categoryId = 0;
-
-  @observable
-  bool isFiltered = false;
-
-  @action
-  void changeCategoryId(int value) {
-    categoryId = value;
-    value == 0 ? isFiltered = false : isFiltered = true;
-  }
+  String filterText = "";
 
   @override
   void setContext(BuildContext context) {
@@ -104,9 +111,12 @@ abstract class _DashboardViewModelBase with Store, BaseViewModel{
   Future<void> fetchProductFirstList() async {
     changeIsProductFirstListLoading();
     String? shopId = await UserIdInitalize.instance.returnUserId();
-    _productList = shopId == null
+    List<ProductDetailModel> _productList = shopId == null
         ? []
         : await dashboardService.fetchDashboardProductFirstList() ?? [];
+
+    productList = _productList.asObservable();
+    persistProductList = productList;
 
     changeIsProductFirstListLoading();
   }
@@ -120,7 +130,10 @@ abstract class _DashboardViewModelBase with Store, BaseViewModel{
       List<ProductDetailModel> moreDataList = shopId == null
           ? []
           : await dashboardService.fetchDashboardProductMoreList() ?? [];
-      _productList.addAll(moreDataList);
+      productList.addAll(moreDataList);
+
+      persistProductList = productList;
+
       changeIsProductMoreListLoading();
     }
   }
@@ -146,63 +159,21 @@ abstract class _DashboardViewModelBase with Store, BaseViewModel{
     changeIsProductSliderListLoading();
   }
 
-  List<ProductDetailModel> getProductList() {
-    if (categoryId == 0) {
-      return _productList;
-    }
-    List<ProductDetailModel> _tempProductDetailList = _productList
-        .where((element) => element.categoryId == categoryId)
-        .toList();
-    return _tempProductDetailList;
-  }
-
   List<ProductDetailModel> getProductSliderList() {
     return _productSliderList;
   }
 
-  //Future<void> callFirestore() async {
-  // final shopsCollectionReference = _firebaseFiresore.collection("shops");
-  // QuerySnapshot shopsCollectionSnapshot =
-  //     await shopsCollectionReference.get();
-  // List<DocumentSnapshot> docsInShops = shopsCollectionSnapshot.docs;
-  // print(docsInShops.length);
-  // print(docsInShops[0].get("location").latitude);
-  // print(docsInShops[0].data());
-  // GeoPoint geoPoint = docsInShops[0].get("location");
-  // print(geoPoint.latitude);
-
-  // ShopModel shopModel = ShopModel.fromJson(docsInShops[0].data() as Map);
-  // print(shopModel.location!.latitude);
-
-  // CollectionReference productsCollectionReference =
-  //     _firebaseFiresore.collection("products");
-  // QuerySnapshot productCollectionSnapshot =
-  //     await productsCollectionReference.get();
-  // List<DocumentSnapshot> docsInproducts = productCollectionSnapshot.docs;
-
-  // Query query = productsCollectionReference.where("name", isEqualTo: "Kalem");
-  // query.snapshots().listen((event) {
-  //   DocumentSnapshot x = event.docs.first;
-
-  //   ProductDetailModel productDetailModel =
-  //       ProductDetailModel.fromJson(x.data() as Map);
-  //   print("***" + productDetailModel.name.toString());
-  // });
-
-  // ProductDetailModel productDetailModel =
-  //     ProductDetailModel.fromJson(docsInproducts.first.data() as Map);
-  // print(DateFormat('dd/MM/yyyy').format(productDetailModel.lastSeenDate!));
-
-  //   Map<String, dynamic> xx = {
-  //     "imageUrlList": FieldValue.arrayUnion(["aaa", "bbbb", "cccs"]),
-  //   };
-
-  //   Map<String, dynamic> bb = {
-  //     "imageUrlList": FieldValue.arrayRemove(["aaa"]),
-  //   };
-
-  //   await FirebaseCollectionRefInitialize.instance.productsCollectionReference
-  //       .doc("1648329304018")
-  //       .update(bb);
-  // }
+  @action
+  void filterProducts(String productName) {
+    if (productName.isEmpty) {
+      changeIsSearching(false);
+    } else {
+      changeIsSearching(true);
+      productList = productList
+          .where((item) =>
+              item.name!.toLowerCase().contains(productName..toLowerCase()))
+          .toList()
+          .asObservable();
+    }
+  }
 }

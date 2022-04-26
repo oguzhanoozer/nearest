@@ -5,6 +5,7 @@ import 'package:kartal/kartal.dart';
 import '../../../core/components/card/list_item_card.dart';
 import '../../home/dashboard/viewmodel/dashboard_view_model.dart';
 import '../../home/product_detail/model/product_detail_model.dart';
+import '../../home/product_detail/view/product_detail_view.dart';
 import '../contstants/image_path.dart';
 
 class SliderCard extends StatelessWidget {
@@ -22,25 +23,30 @@ class SliderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListItemCard(
-      radius: context.normalValue,
+    return GestureDetector(
+      onTap: (() => context.navigateToPage(ProductDetailView(
+            productDetailModel: productDetailModel,
+          ))),
+      child: ListItemCard(
+        radius: context.normalValue,
 
-      ///borderSide: BorderSide(              color: context.colorScheme.onInverseSurface, width: 0.5),
-      elevation: 0.3,
-      child: Padding(
-        padding: context.paddingLow,
-        child: Row(
-          children: [
-            Expanded(
-              child: buildProductImage(context, productDetailModel),
-            ),
-            onlyImage
-                ? Container()
-                : Expanded(
-                    child: buildProductDetail(
-                        productDetailModel, context, viewmodel),
-                  ),
-          ],
+        ///borderSide: BorderSide(              color: context.colorScheme.onInverseSurface, width: 0.5),
+        elevation: 0.3,
+        child: Padding(
+          padding: context.paddingLow,
+          child: Row(
+            children: [
+              Expanded(
+                child: buildProductImage(context, productDetailModel),
+              ),
+              onlyImage
+                  ? Container()
+                  : Expanded(
+                      child: buildProductDetail(
+                          productDetailModel, context, viewmodel),
+                    ),
+            ],
+          ),
         ),
       ),
     );
@@ -77,8 +83,8 @@ class SliderCard extends StatelessWidget {
               icon: Icon(Icons.favorite),
               color: viewmodel.userFavouriteList
                       .contains(productDetailModel.productId)
-                  ? Colors.red
-                  : Colors.grey),
+                  ? context.colorScheme.onPrimaryContainer
+                  : context.colorScheme.surface),
         ],
       );
     });
@@ -94,7 +100,7 @@ class SliderCard extends StatelessWidget {
     return Text(
       productDetailModel.name ?? "",
       style: context.textTheme.bodyLarge!
-          .copyWith(fontWeight: FontWeight.bold, color: Colors.black),
+          .copyWith(fontWeight: FontWeight.bold, color: context.colorScheme.primary),
     );
   }
 

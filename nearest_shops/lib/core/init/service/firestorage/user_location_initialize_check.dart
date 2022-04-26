@@ -2,9 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mobx/mobx.dart';
-import '../../../../view/authentication/login/model/user_model.dart';
-import '../../../../view/home/shop_list/model/shop_model.dart';
 
+import '../../../../view/authentication/login/model/user_model.dart';
 import '../authenticaion/user_id_initialize.dart';
 import 'firestorage_initialize.dart';
 
@@ -21,15 +20,6 @@ class UserLocationInitializeCheck {
 
   final GeolocatorPlatform _geolocatorPlatform = GeolocatorPlatform.instance;
 
-  Future<void> assignUserLocation() async {
-    if (_userLocation == null) {
-      final geoPoint = await _fetchUserLocation();
-      if (geoPoint == null) {
-        await gerCurrentLocationPosition();
-      }
-    }
-  }
-
   Future<ObservableList<String>?> getUserFavouriteList() async {
     ObservableList<String> _favouriteList = ObservableList<String>();
     final userId = await UserIdInitalize.instance.returnUserId();
@@ -45,6 +35,15 @@ class UserLocationInitializeCheck {
       UserModel userModel = UserModel.fromJson(userDocs.first.data() as Map);
       _favouriteList = userModel.favouriteList!.asObservable();
       return _favouriteList;
+    }
+  }
+
+  Future<void> assignUserLocation() async {
+    if (_userLocation == null) {
+      final geoPoint = await _fetchUserLocation();
+      if (geoPoint == null) {
+        await gerCurrentLocationPosition();
+      }
     }
   }
 

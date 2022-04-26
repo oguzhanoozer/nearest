@@ -1,14 +1,19 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
+import 'package:kartal/kartal.dart';
 import 'package:mobx/mobx.dart';
 
 import '../../../../core/base/model/base_view_model.dart';
 import '../../../../core/constants/env_connect/env_connection.dart';
+import '../../../../core/extension/string_extension.dart';
+import '../../../../core/init/lang/locale_keys.g.dart';
+import '../../../home/shop_list/model/shop_model.dart';
 import '../../../utility/error_helper.dart';
 import '../service/shop_owner_home_service.dart';
 
@@ -22,8 +27,7 @@ abstract class _OwnerHomeViewModelBase with Store, BaseViewModel, ErrorHelper {
 
   late IShopOwnerHomeService shopOwnerHomeService;
 
-  final CameraPosition initialCameraPosition =
-      CameraPosition(target: LatLng(38.9637, 35.2433), zoom: 4);
+  late CameraPosition initialCameraPosition;
 
   final GoogleMapsPlaces _places = GoogleMapsPlaces(
     apiKey: EnvConnection.instance.googleMapsApiKey,
@@ -35,6 +39,13 @@ abstract class _OwnerHomeViewModelBase with Store, BaseViewModel, ErrorHelper {
 
   @observable
   String location = "Click to search find address";
+
+  String shopName = "Your Shop";
+  @observable
+  bool isEnableUpdating = false;
+
+  @observable
+  GeoPoint? _updateGeoPoint;
 
   @observable
   Set<Marker> markers = <Marker>{};
@@ -53,7 +64,7 @@ abstract class _OwnerHomeViewModelBase with Store, BaseViewModel, ErrorHelper {
 
   @override
   void init() {
-    gerCurrentLocationPosition();
+    getCurrentLocationPosition();
   }
 
   @action
@@ -61,6 +72,26 @@ abstract class _OwnerHomeViewModelBase with Store, BaseViewModel, ErrorHelper {
     isMapDataLoading = !isMapDataLoading;
   }
 
+  @action
+  Future<LatLng?> checkShopLocation() async {
+    ShopModel? shopModel = await shopOwnerHomeService.fetchShopLocation();
+    if (shopModel != null) {
+      shopName = shopModel.name!;
+      if (shopModel.location != null) {
+        return LatLng(
+            shopModel.location!.latitude, shopModel.location!.longitude);
+      }
+    }
+    return null;
+  }
+
+  @action
+  void changeUpdateEnable() {
+    isEnableUpdating = true;
+    updateLocation();
+  }
+
+  @action
   Future<Position> getLocationPermission() async {
     serviceEnabled = await _geolocatorPlatform.isLocationServiceEnabled();
     if (!serviceEnabled) {}
@@ -74,31 +105,84 @@ abstract class _OwnerHomeViewModelBase with Store, BaseViewModel, ErrorHelper {
     return position;
   }
 
-  Future<void> gerCurrentLocationPosition() async {
+  @action
+  Future<void> getCurrentLocationPosition() async {
     changDataLoadingMap();
+    LatLng? savedLocation;
 
-    Position position = await getLocationPermission();
+    savedLocation = await checkShopLocation();
+    if (savedLocation == null) {
+      Position position = await getLocationPermission();
 
-    LatLng latlonPosition = LatLng(position.latitude, position.longitude);
-    setCameraLocation(latlonPosition);
-    addMarker(latlonPosition);
-    changDataLoadingMap();
+      savedLocation = LatLng(position.latitude, position.longitude);
+      await _updateShopLocation(
+          GeoPoint(savedLocation.latitude, savedLocation.longitude));
+    }
+
+    ///setCameraLocation(savedLocation);
+    initialCameraPosition = CameraPosition(target: savedLocation, zoom: 6);
+    addMarker(savedLocation,false);
+    changDataLoadingMap(); 
   }
 
   @action
-  void addMarker(LatLng pos) {
-    String markerIdVal = "Your Location";
+  Future<void> updateLocation() async {
+    if (isEnableUpdating) {
+      LatLng? savedLocation;
+
+      Position position = await getLocationPermission();
+
+      savedLocation = LatLng(position.latitude, position.longitude);
+
+      ///      await _updateGeoPointLocation(GeoPoint(position.latitude, position.longitude));
+      _updateGeoPoint = GeoPoint(position.latitude, position.longitude);
+
+      setCameraLocation(savedLocation);
+
+      ///      initialCameraPosition = CameraPosition(target: savedLocation, zoom: 6);
+      addMarker(savedLocation,true);
+    }
+  }
+
+  @action
+  Future<void> updateGeoPointLocation() async {
+    if (isEnableUpdating) {
+      if (_updateGeoPoint != null) {
+        await _updateShopLocation(_updateGeoPoint!);
+      } else {
+        showSnackBar(
+            scaffoldState, context!, LocaleKeys.locationWasNotUpdatedText.locale);
+      }
+
+      isEnableUpdating = false;
+    }
+  }
+
+  @action
+  Future<void> _updateShopLocation(GeoPoint currentLocation) async {
+    await shopOwnerHomeService.updateShopLocation(currentLocation);
+  }
+
+  @action
+  void addMarker(LatLng pos,bool isEnabled) {
+    String markerIdVal = shopName;
 
     final MarkerId markerId = MarkerId(markerIdVal);
 
+    markers.clear();
     Marker marker = Marker(
         markerId: markerId,
         position: pos,
-        draggable: true,
+        draggable: isEnabled,
         infoWindow: InfoWindow(title: markerIdVal),
         onTap: () {},
-        onDragEnd: ((newPosition) {
+        onDragEnd: ((newPosition) async {
           setCameraLocation(newPosition);
+          _updateGeoPoint =
+              GeoPoint(newPosition.latitude, newPosition.longitude);
+        //  isEnableUpdating = false;
+
+          ///await _updateGeoPointLocation(  GeoPoint(newPosition.latitude, newPosition.longitude));
         }));
 
     markers = <Marker>{marker};
@@ -107,7 +191,7 @@ abstract class _OwnerHomeViewModelBase with Store, BaseViewModel, ErrorHelper {
   @action
   void setCameraLocation(LatLng newPosition) {
     newGoogleMapController?.animateCamera(CameraUpdate.newCameraPosition(
-        CameraPosition(target: newPosition, zoom: 6)));
+        CameraPosition(target: newPosition, zoom: 8)));
   }
 
   @action
@@ -117,8 +201,11 @@ abstract class _OwnerHomeViewModelBase with Store, BaseViewModel, ErrorHelper {
     double lat = (detail.result.geometry?.location.lat)!;
     double lng = (detail.result.geometry?.location.lng)!;
 
-    addMarker(LatLng(lat, lng));
+    addMarker(LatLng(lat, lng),true);
     setCameraLocation(LatLng(lat, lng));
+    _updateGeoPoint = GeoPoint(lat, lng);
+
+    ///await _updateGeoPointLocation(GeoPoint(lat, lng));
   }
 
   @action
@@ -133,7 +220,7 @@ abstract class _OwnerHomeViewModelBase with Store, BaseViewModel, ErrorHelper {
         logo: const SizedBox(),
         components: [Component(Component.country, "tr")],
         context: context,
-        cursorColor: Colors.red,
+        cursorColor: context.colorScheme.onPrimaryContainer,
         apiKey: EnvConnection.instance.googleMapsApiKey);
 
     if (placePrediction != null && placePrediction.description != null) {
@@ -141,8 +228,8 @@ abstract class _OwnerHomeViewModelBase with Store, BaseViewModel, ErrorHelper {
 
       await displayPrediction(placePrediction);
     } else {
-      location = "Error not found";
-      showSnackBar(scaffoldState, context, "Error in finding place address");
+      location = LocaleKeys.errorLocationNotFoundText.locale;
+      showSnackBar(scaffoldState, context, LocaleKeys.errorOnFindingPlaceAddressText.locale);
     }
   }
 }

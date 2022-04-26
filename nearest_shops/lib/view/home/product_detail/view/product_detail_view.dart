@@ -5,6 +5,10 @@ import 'package:kartal/kartal.dart';
 import '../../../../core/base/view/base_view.dart';
 import '../../../../core/components/button/normal_button.dart';
 import '../../../../core/components/card/list_item_card.dart';
+import '../../../../core/extension/string_extension.dart';
+import '../../../../core/init/lang/locale_keys.g.dart';
+import '../../../product/contstants/image_path.dart';
+import '../../comment/view/product_comment_view.dart';
 import '../model/product_detail_model.dart';
 import '../viewmodel/product_detail_view_model.dart';
 
@@ -40,27 +44,31 @@ class ProductDetailView extends StatelessWidget {
           Expanded(
             flex: 2,
             child: Container(
-              child: PageView.builder(
-                controller: PageController(),
-                itemCount: productDetailModel.imageUrlList!.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20.0, vertical: 10),
-                    child: ListItemCard(
-                      child: Image.network(
-                        productDetailModel.imageUrlList![index],
-                        fit: BoxFit.fill,
-                      ),
-                      radius: context.normalValue,
-                      borderSide: BorderSide(
-                          color: context.colorScheme.onInverseSurface,
-                          width: 0.5),
-                      clipBehavior: Clip.antiAliasWithSaveLayer,
+              child: productDetailModel.imageUrlList!.isEmpty
+                  ? Image.asset(
+                      ImagePaths.instance.hazelnut,
+                      fit: BoxFit.fill,
+                    )
+                  : PageView.builder(
+                      controller: PageController(),
+                      itemCount: productDetailModel.imageUrlList!.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20.0, vertical: 10),
+                          child: ListItemCard(
+                            child: Image.network(
+                                productDetailModel.imageUrlList![index],
+                                fit: BoxFit.contain),
+                            radius: context.normalValue,
+                            borderSide: BorderSide(
+                                color: context.colorScheme.onInverseSurface,
+                                width: 0.5),
+                            clipBehavior: Clip.antiAliasWithSaveLayer,
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
           ),
           Expanded(
@@ -98,19 +106,41 @@ class ProductDetailView extends StatelessWidget {
 
   Column buildProductBody(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
           child: AutoSizeText(productDetailModel.detail.toString(),
               style: context.textTheme.headline6!),
         ),
-        NormalButton(
-          child: Text(
-            "See our other products",
-            style: context.textTheme.headline6!
-                .copyWith(color: context.colorScheme.onSecondary),
-          ),
-          onPressed: null,
-          color: context.appTheme.colorScheme.onSurfaceVariant,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            NormalButton(
+              child: Row(
+                children: [
+                  Icon(Icons.comment, color: context.colorScheme.onSecondary),
+                  Text(
+                   LocaleKeys.commentsText.locale,
+                    style: context.textTheme.headline6!
+                        .copyWith(color: context.colorScheme.onSecondary),
+                  ),
+                ],
+              ),
+              onPressed: () {
+                context.navigateToPage(ProductCommentView(productDetailModel: productDetailModel,));
+              },
+              color: context.appTheme.colorScheme.onSurfaceVariant,
+            ),
+            NormalButton(
+              child: Text(
+                LocaleKeys.seeOurOtherProductsText.locale,
+                style: context.textTheme.headline6!
+                    .copyWith(color: context.colorScheme.onSecondary),
+              ),
+              onPressed: null,
+              color: context.appTheme.colorScheme.onSurfaceVariant,
+            ),
+          ],
         ),
       ],
     );

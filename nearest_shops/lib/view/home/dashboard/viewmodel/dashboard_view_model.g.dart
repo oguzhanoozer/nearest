@@ -60,48 +60,64 @@ mixin _$DashboardViewModel on _DashboardViewModelBase, Store {
     });
   }
 
-  final _$_productListAtom = Atom(name: '_DashboardViewModelBase._productList');
+  final _$isSearchingAtom = Atom(name: '_DashboardViewModelBase.isSearching');
 
   @override
-  List<ProductDetailModel> get _productList {
-    _$_productListAtom.reportRead();
-    return super._productList;
+  bool get isSearching {
+    _$isSearchingAtom.reportRead();
+    return super.isSearching;
   }
 
   @override
-  set _productList(List<ProductDetailModel> value) {
-    _$_productListAtom.reportWrite(value, super._productList, () {
-      super._productList = value;
+  set isSearching(bool value) {
+    _$isSearchingAtom.reportWrite(value, super.isSearching, () {
+      super.isSearching = value;
     });
   }
 
-  final _$categoryIdAtom = Atom(name: '_DashboardViewModelBase.categoryId');
+  final _$productListAtom = Atom(name: '_DashboardViewModelBase.productList');
 
   @override
-  int get categoryId {
-    _$categoryIdAtom.reportRead();
-    return super.categoryId;
+  ObservableList<ProductDetailModel> get productList {
+    _$productListAtom.reportRead();
+    return super.productList;
   }
 
   @override
-  set categoryId(int value) {
-    _$categoryIdAtom.reportWrite(value, super.categoryId, () {
-      super.categoryId = value;
+  set productList(ObservableList<ProductDetailModel> value) {
+    _$productListAtom.reportWrite(value, super.productList, () {
+      super.productList = value;
     });
   }
 
-  final _$isFilteredAtom = Atom(name: '_DashboardViewModelBase.isFiltered');
+  final _$persistProductListAtom =
+      Atom(name: '_DashboardViewModelBase.persistProductList');
 
   @override
-  bool get isFiltered {
-    _$isFilteredAtom.reportRead();
-    return super.isFiltered;
+  ObservableList<ProductDetailModel> get persistProductList {
+    _$persistProductListAtom.reportRead();
+    return super.persistProductList;
   }
 
   @override
-  set isFiltered(bool value) {
-    _$isFilteredAtom.reportWrite(value, super.isFiltered, () {
-      super.isFiltered = value;
+  set persistProductList(ObservableList<ProductDetailModel> value) {
+    _$persistProductListAtom.reportWrite(value, super.persistProductList, () {
+      super.persistProductList = value;
+    });
+  }
+
+  final _$filterTextAtom = Atom(name: '_DashboardViewModelBase.filterText');
+
+  @override
+  String get filterText {
+    _$filterTextAtom.reportRead();
+    return super.filterText;
+  }
+
+  @override
+  set filterText(String value) {
+    _$filterTextAtom.reportWrite(value, super.filterText, () {
+      super.filterText = value;
     });
   }
 
@@ -145,11 +161,11 @@ mixin _$DashboardViewModel on _DashboardViewModelBase, Store {
       ActionController(name: '_DashboardViewModelBase');
 
   @override
-  void changeCategoryId(int value) {
+  void changeIsSearching(bool value) {
     final _$actionInfo = _$_DashboardViewModelBaseActionController.startAction(
-        name: '_DashboardViewModelBase.changeCategoryId');
+        name: '_DashboardViewModelBase.changeIsSearching');
     try {
-      return super.changeCategoryId(value);
+      return super.changeIsSearching(value);
     } finally {
       _$_DashboardViewModelBaseActionController.endAction(_$actionInfo);
     }
@@ -189,13 +205,26 @@ mixin _$DashboardViewModel on _DashboardViewModelBase, Store {
   }
 
   @override
+  void filterProducts(String productName) {
+    final _$actionInfo = _$_DashboardViewModelBaseActionController.startAction(
+        name: '_DashboardViewModelBase.filterProducts');
+    try {
+      return super.filterProducts(productName);
+    } finally {
+      _$_DashboardViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 isProductFirstListLoading: ${isProductFirstListLoading},
 isProductMoreListLoading: ${isProductMoreListLoading},
 isProductSliderListLoading: ${isProductSliderListLoading},
-categoryId: ${categoryId},
-isFiltered: ${isFiltered}
+isSearching: ${isSearching},
+productList: ${productList},
+persistProductList: ${persistProductList},
+filterText: ${filterText}
     ''';
   }
 }

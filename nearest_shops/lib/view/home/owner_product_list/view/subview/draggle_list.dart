@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:kartal/kartal.dart';
-import 'package:nearest_shops/view/shop_owner/dashboard/view/owner_dashboard_view.dart';
 
 import '../../../../product/product_list_view/product_list_view.dart';
 import '../../viewmodel/owner_product_list_view_model.dart';
@@ -79,12 +78,12 @@ class DraggleList {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            ownerProductListViewModel.getShopName(),
+            ownerProductListViewModel.getShopModel().name!,
             style: context.textTheme.headline6!
                 .copyWith(fontWeight: FontWeight.bold),
           ),
           Divider(
-            color: Colors.black,
+            color: context.colorScheme.primary,
             height: 5.0,
             thickness: 5.0,
           ),
@@ -107,7 +106,7 @@ class DraggleList {
   Widget buildProductCard(BuildContext context, int index,
       OwnerProductListViewModel ownerProductListViewModel) {
     return ProductListView(
-      index: index,
+      
       productDetailModel:
           ownerProductListViewModel.getListProductDetailModel()[index],
       shopModel: null,
@@ -118,7 +117,7 @@ class DraggleList {
           padding: EdgeInsets.zero,
           icon: Icon(
             Icons.favorite,
-            color: Colors.red,
+            color: context.colorScheme.onPrimaryContainer,
           ),
           onPressed: null,
         ),

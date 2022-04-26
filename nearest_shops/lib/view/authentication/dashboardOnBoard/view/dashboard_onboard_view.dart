@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import '../viewModel/dashboard_onboard_view_model.dart';
 
 import '../../../../core/base/view/base_view.dart';
+import '../viewModel/dashboard_onboard_view_model.dart';
 
 class DashboardOnBoardView extends StatelessWidget {
   DashboardOnBoardView({Key? key}) : super(key: key);

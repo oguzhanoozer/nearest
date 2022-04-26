@@ -6,9 +6,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:nearest_shops/core/extension/string_extension.dart';
 import 'package:nearest_shops/view/home/product_detail/model/product_detail_model.dart';
 import 'package:nearest_shops/view/utility/error_helper.dart';
 
+import '../../../../core/init/lang/locale_keys.g.dart';
+import '../../../../core/init/service/authenticaion/firebase_authentication.dart';
 import '../../../../core/init/service/firestorage/firestorage_initialize.dart';
 
 abstract class IShopOwnerAddProductService {
@@ -70,13 +73,22 @@ class ShopOwnerAddProductService extends IShopOwnerAddProductService
         "${productId} -> ${imageIndex} -> ${DateTime.now().millisecondsSinceEpoch.toString()}";
     imageStoreNameList.add(storageName);
 
-    TaskSnapshot uploadImageSnapshot = await FirebaseStorageInitalize
-        .instance.firabaseStorage
-        .ref()
-        .child("content")
-        .child(storageName)
-        .putFile(_image);
+    try {
+      User? user = FirebaseAuthentication.instance.authCurrentUser();
+      if (user != null) {
+        TaskSnapshot uploadImageSnapshot = await FirebaseStorageInitalize
+            .instance.firabaseStorage
+            .ref()
+            .child("content")
+            .child(user.uid)
+            .child(storageName)
+            .putFile(_image);
 
-    return await uploadImageSnapshot.ref.getDownloadURL();
+        return await uploadImageSnapshot.ref.getDownloadURL();
+      }
+    } catch (e) {
+      showSnackBar(scaffoldState, context,  LocaleKeys.errorOnDeletingAccountText.locale);
+    }
+    return "";
   }
 }

@@ -1,13 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:kartal/kartal.dart';
 import 'package:mobx/mobx.dart';
-import '../../../utility/error_helper.dart';
 
 import '../../../../core/base/model/base_view_model.dart';
-import '../../../../core/init/service/authenticaion/firebase_authentication.dart';
-import '../../../../core/init/service/firestorage/enum/document_collection_enums.dart';
-import '../../onboard/view/onboard_view.dart';
+import '../../../utility/error_helper.dart';
 import '../service/ILogin_service.dart';
 
 part 'login_view_model.g.dart';

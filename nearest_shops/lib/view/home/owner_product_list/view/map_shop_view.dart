@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 import '../viewmodel/owner_product_list_view_model.dart';
 
 class MapShopView extends StatelessWidget {

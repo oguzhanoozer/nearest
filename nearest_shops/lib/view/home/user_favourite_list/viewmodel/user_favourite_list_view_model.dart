@@ -17,6 +17,17 @@ abstract class _UserFavouriteListViewModelBase with Store, BaseViewModel {
   @observable
   bool isProductListLoading = false;
 
+  @observable
+  bool isSearching = false;
+
+  @action
+  void changeIsSearching() {
+    isSearching = !isSearching;
+    if (isSearching == false) {
+      favouriteProductList = persistProductList;
+    }
+  }
+
   @override
   void setContext(BuildContext context) {
     this.context = context;
@@ -33,23 +44,40 @@ abstract class _UserFavouriteListViewModelBase with Store, BaseViewModel {
     fetchFavouriteProductList();
   }
 
+  @observable
   ObservableList<ProductDetailModel> favouriteProductList =
       ObservableList<ProductDetailModel>();
+  @observable
+  ObservableList<ProductDetailModel> persistProductList =
+      ObservableList<ProductDetailModel>();
 
+  @action
   Future<void> fetchFavouriteProductList() async {
     changeIsProductListLoading();
     final favouriteDataList =
         await userFavouriteListService.fetchFavouriteProductList();
     if (favouriteDataList != null) {
       favouriteProductList = favouriteDataList.asObservable();
+      persistProductList = favouriteDataList.asObservable();
     }
 
     changeIsProductListLoading();
   }
 
+  @action
   Future<void> removeFavouriteItem(int index) async {
     await userFavouriteListService.removeItemToFavouriteList(
         favouriteProductList[index].productId.toString());
     favouriteProductList.removeAt(index);
+    persistProductList.removeAt(index);
+  }
+
+  @action
+  void filterProducts(String productName) {
+    favouriteProductList = favouriteProductList
+        .where((item) =>
+            item.name!.toLowerCase().contains(productName..toLowerCase()))
+        .toList()
+        .asObservable();
   }
 }

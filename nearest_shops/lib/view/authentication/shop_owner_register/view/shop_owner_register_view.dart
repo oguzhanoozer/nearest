@@ -32,6 +32,7 @@ class ShopOwnerRegisterView extends StatelessWidget {
   Scaffold buildScaffold(
           BuildContext context, ShopOwnerRegisterViewModel viewModel) =>
       Scaffold(
+          //appBar: AppBar(),
           key: viewModel.scaffoldState,
           body: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -57,9 +58,9 @@ class ShopOwnerRegisterView extends StatelessWidget {
       ShopOwnerRegisterViewModel viewModel, BuildContext context) {
     return FormColumn(
       children: [
-        context.emptySizedHeightBoxHigh,
+        context.emptySizedHeightBoxLow3x,
         buildWelcomeTextColumnBuild(context),
-        context.emptySizedHeightBoxLow,
+        context.emptySizedHeightBoxLow3x,
         buildNameTextField(viewModel, context),
         context.emptySizedHeightBoxLow,
         buildAdressTextField(viewModel, context),
@@ -71,24 +72,22 @@ class ShopOwnerRegisterView extends StatelessWidget {
         buildFirstPasswordTextField(viewModel, context),
         context.emptySizedHeightBoxLow,
         buildLaterPasswordTextField(viewModel, context),
-        context.emptySizedHeightBoxHigh,
+        context.emptySizedHeightBoxLow,
         buildRegisterButton(context, viewModel),
       ],
     );
   }
+ 
+  
 
   Widget buildWelcomeTextColumnBuild(BuildContext context) {
-    return Column(
-      children: [
-        Align(
-          alignment: AlignmentDirectional.centerStart,
-          child: Text(
-            "Welcome to business",
-            style: context.textTheme.headline5!
-                .copyWith(color: context.colorScheme.onPrimary),
-          ),
-        ),
-      ],
+    return Align(
+      alignment: AlignmentDirectional.center,
+      child: Text(
+        LocaleKeys.welcomeBusinessText.locale,
+        style: context.textTheme.headline6!.copyWith(
+            color: context.colorScheme.onPrimary, fontWeight: FontWeight.bold),
+      ),
     );
   }
 
@@ -97,14 +96,14 @@ class ShopOwnerRegisterView extends StatelessWidget {
     return Observer(builder: (_) {
       return NormalButton(
         child: Text(
-          LocaleKeys.createAccount.locale,
+          LocaleKeys.createBusinessAccountButtonText.locale,
           style: context.textTheme.headline6!
               .copyWith(color: context.colorScheme.onSecondary),
         ),
         onPressed: viewModel.isLoading
             ? null
             : () async {
-               await viewModel.registerOwnerData(context);
+                await viewModel.registerOwnerData(context);
               },
         color: context.appTheme.colorScheme.onSurfaceVariant,
       );

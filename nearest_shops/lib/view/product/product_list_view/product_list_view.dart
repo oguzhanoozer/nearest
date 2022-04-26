@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
-import 'package:nearest_shops/view/home/product_detail/model/product_detail_model.dart';
-import 'package:nearest_shops/view/home/shop_list/model/shop_model.dart';
 
 import '../../../core/components/card/list_item_card.dart';
+import '../../home/product_detail/model/product_detail_model.dart';
+import '../../home/shop_list/model/shop_model.dart';
 import '../contstants/image_path.dart';
 
 class ProductListView extends StatelessWidget {
   final ProductDetailModel? productDetailModel;
   final ShopModel? shopModel;
-  final int index;
+
   final Widget? rightSideWidget;
 
   const ProductListView(
       {Key? key,
       required this.productDetailModel,
-      required this.index,
       this.rightSideWidget,
       this.shopModel})
       : super(key: key);
@@ -71,6 +70,9 @@ class ProductListView extends StatelessWidget {
             productDetailModel != null && shopModel == null
                 ? productDetailModel.summary.toString()
                 : shopModel!.address!),
+        productDetailModel == null && shopModel != null
+            ? buildEmailBody(context, shopModel.email!)
+            : Container(),
         buildProductPriceRow(
             context,
             productDetailModel != null && shopModel == null
@@ -89,6 +91,14 @@ class ProductListView extends StatelessWidget {
                 color: context.colorScheme.onPrimary,
                 fontWeight: FontWeight.bold)),
       ],
+    );
+  }
+
+  Widget buildEmailBody(BuildContext context, String email) {
+    return FittedBox(
+      child: Text(email,
+          style: context.textTheme.bodySmall!
+              .copyWith(color: context.colorScheme.onPrimary)),
     );
   }
 

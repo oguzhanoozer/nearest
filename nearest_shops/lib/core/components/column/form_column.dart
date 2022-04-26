@@ -14,6 +14,7 @@ class FormColumn extends StatelessWidget {
         Expanded(
           flex: 8,
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: children!,
           ),
         ),

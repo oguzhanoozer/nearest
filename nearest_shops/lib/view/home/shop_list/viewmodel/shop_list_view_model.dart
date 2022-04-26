@@ -19,9 +19,28 @@ abstract class _ShopListViewModelBase with Store, BaseViewModel {
   @observable
   bool isShopMapListLoading = false;
 
+  @observable
+  bool isSearching = false;
+
   List<ShopModel> _shopModelList = [];
+
   late final GeoPoint _geoPoint;
   late IShopListService shopListService;
+
+  @observable
+  ObservableList<ShopModel> shopModelList = ObservableList<ShopModel>();
+
+  @observable
+  ObservableList<ShopModel> _shopPersistModelList = ObservableList<ShopModel>();
+
+  @action
+  void changeIsSearching() {
+    isSearching = !isSearching;
+    
+    if (isSearching == false) {
+    shopModelList = _shopPersistModelList;
+    }
+  }
 
   @action
   void changeIsShopMapListLoading() {
@@ -43,13 +62,14 @@ abstract class _ShopListViewModelBase with Store, BaseViewModel {
 
   Future<void> fetchShopsLocation() async {
     changeIsShopMapListLoading();
-    _shopModelList = await shopListService.fetchShopList() ?? [];
-    if (_shopModelList.isNotEmpty) {
-      _shopModelList.sort(((a, b) => calculateDistance(_geoPoint.latitude,
+    shopModelList = (await shopListService.fetchShopList().asObservable())!.asObservable();
+    if (shopModelList.isNotEmpty) {
+      shopModelList.sort(((a, b) => calculateDistance(_geoPoint.latitude,
               _geoPoint.longitude, a.location!.latitude, a.location!.longitude)
           .compareTo(calculateDistance(_geoPoint.latitude, _geoPoint.longitude,
               b.location!.latitude, b.location!.longitude))));
     }
+    _shopPersistModelList = shopModelList;
     changeIsShopMapListLoading();
   }
 
@@ -63,6 +83,15 @@ abstract class _ShopListViewModelBase with Store, BaseViewModel {
             (1 - cosConstant((longtitude2 - longtitude1) * p)) /
             2;
     return 12742 * asin(sqrt(a));
+  }
+
+  @action
+  void filterProducts(String productName) {
+    shopModelList = shopModelList
+        .where((item) =>
+            item.name!.toLowerCase().contains(productName..toLowerCase()))
+        .toList()
+        .asObservable();
   }
 
   List<ShopModel> getListShopModel() {

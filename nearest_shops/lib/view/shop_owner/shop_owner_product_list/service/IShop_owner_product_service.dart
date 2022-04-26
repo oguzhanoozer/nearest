@@ -23,7 +23,8 @@ abstract class IShopOwnerProductListService {
   late DocumentSnapshot lastDocument;
 }
 
-class ShopOwnerProductListService extends IShopOwnerProductListService with ErrorHelper {
+class ShopOwnerProductListService extends IShopOwnerProductListService
+    with ErrorHelper {
   ShopOwnerProductListService(
       GlobalKey<ScaffoldState> scaffoldState, BuildContext context)
       : super(scaffoldState, context);
@@ -33,20 +34,21 @@ class ShopOwnerProductListService extends IShopOwnerProductListService with Erro
       String shopId) async {
     ObservableList<ProductDetailModel> productList =
         ObservableList<ProductDetailModel>();
-try{
-  
-    final productListQuery = await FirebaseCollectionRefInitialize
-        .instance.productsCollectionReference
-        .where("shopId", isEqualTo: shopId)
-        .limit(10)
-        .get();
+    try {
+      final productListQuery = await FirebaseCollectionRefInitialize
+          .instance.productsCollectionReference
+          .where("shopId", isEqualTo: shopId)
+          .limit(10)
+          .get();
 
-    List<DocumentSnapshot> docsInShops = productListQuery.docs;
-    for (var element in docsInShops) {
-      productList.add(ProductDetailModel.fromJson(element.data() as Map));
-    }
-    lastDocument = docsInShops.last;
-    return productList;
+      List<DocumentSnapshot> docsInShops = productListQuery.docs;
+      for (var element in docsInShops) {
+        productList.add(ProductDetailModel.fromJson(element.data() as Map));
+      }
+      if (docsInShops.isNotEmpty) {
+        lastDocument = docsInShops.last;
+      }
+      return productList;
     } on FirebaseException catch (e) {
       showSnackBar(scaffoldState, context, e.message.toString());
       return null;
@@ -59,22 +61,22 @@ try{
   ) async {
     ObservableList<ProductDetailModel> productList =
         ObservableList<ProductDetailModel>();
-try{
-    final productListQuery = await FirebaseCollectionRefInitialize
-        .instance.productsCollectionReference
-        .where("shopId", isEqualTo: shopId)
-        .limit(10)
-        .startAfterDocument(lastDocument)
-        .get();
+    try {
+      final productListQuery = await FirebaseCollectionRefInitialize
+          .instance.productsCollectionReference
+          .where("shopId", isEqualTo: shopId)
+          .limit(10)
+          .startAfterDocument(lastDocument)
+          .get();
 
-    List<DocumentSnapshot> docsInShops = productListQuery.docs;
-    if (docsInShops.isNotEmpty) {
-      for (var element in docsInShops) {
-        productList.add(ProductDetailModel.fromJson(element.data() as Map));
+      List<DocumentSnapshot> docsInShops = productListQuery.docs;
+      if (docsInShops.isNotEmpty) {
+        for (var element in docsInShops) {
+          productList.add(ProductDetailModel.fromJson(element.data() as Map));
+        }
+        lastDocument = docsInShops.last;
       }
-      lastDocument = docsInShops.last;
-    }
-    return productList;
+      return productList;
     } on FirebaseException catch (e) {
       showSnackBar(scaffoldState, context, e.message.toString());
       return null;

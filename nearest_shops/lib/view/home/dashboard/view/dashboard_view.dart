@@ -3,13 +3,15 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:kartal/kartal.dart';
 
 import '../../../../core/base/view/base_view.dart';
-import '../../../../core/components/card/list_item_card.dart';
+import '../../../../core/extension/string_extension.dart';
 import '../../../../core/extension/widget_extension.dart';
+import '../../../../core/init/lang/locale_keys.g.dart';
 import '../../../../core/init/service/authenticaion/firebase_authentication.dart';
 import '../../../product/contstants/image_path.dart';
 import '../../../product/grid/product_grid.dart';
 import '../../../product/slider/dashboard_ads_slider.dart';
 import '../../product_detail/model/product_detail_model.dart';
+import '../../user_profile/view/user_profile_view.dart';
 import '../viewmodel/dashboard_view_model.dart';
 
 part 'subview/dashboard_category_view.dart';
@@ -33,12 +35,13 @@ class DashboardView extends StatelessWidget {
   Widget buildScaffold(BuildContext context, DashboardViewModel viewmodel) =>
       Scaffold(
         body: Observer(builder: (_) {
+         
           return Padding(
             padding: context.paddingNormal,
             child: CustomScrollView(
               controller: viewmodel.controller,
               slivers: [
-                appBarRow(context).toSliver,
+                appBarRow(context, viewmodel).toSliver,
                 SizedBox(
                         height: context.dynamicHeight(0.25),
                         child: viewmodel.isProductSliderListLoading
@@ -49,14 +52,11 @@ class DashboardView extends StatelessWidget {
                                     viewmodel.getProductSliderList(),
                                 onlyImage: false))
                     .toSliver,
-                buildCategoriesText(context).toSliver,
-
-                ///buildCategoriesRow(context, viewmodel).toSliver,
-                buildCategoriesSliver(context, viewmodel),
+                ////buildCategoriesText(context).toSliver,
                 viewmodel.isProductFirstListLoading
                     ? const Center(child: CircularProgressIndicator()).toSliver
                     : buildProductsGrid(
-                            context, viewmodel.getProductList(), viewmodel)
+                            context, viewmodel.productList, viewmodel)
                         .toSliver,
                 if (viewmodel.isProductMoreListLoading == true)
                   const Padding(
@@ -71,19 +71,7 @@ class DashboardView extends StatelessWidget {
         }),
       );
 
-  SliverAppBar buildCategoriesSliver(
-      BuildContext context, DashboardViewModel viewmodel) {
-    return SliverAppBar(
-      automaticallyImplyLeading: false,
-      forceElevated: false,
-      //  expandedHeight: context.height * 0.12,
-      pinned: true,
-      title: buildCategoriesRow(context, viewmodel),
-      centerTitle: false,
-    );
-  }
-
-  Widget appBarRow(BuildContext context) {
+  Widget appBarRow(BuildContext context, DashboardViewModel viewmodel) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
@@ -95,7 +83,7 @@ class DashboardView extends StatelessWidget {
                 onPressed: () async {
                   await FirebaseAuthentication.instance.signOut();
                 },
-                icon: Icon(Icons.logout)),
+                icon: const Icon(Icons.logout)),
             buildAppBarTitle(context),
             buildAppBarActionsContainer(context)
           ],
@@ -103,52 +91,47 @@ class DashboardView extends StatelessWidget {
         Center(
           child: TextFormField(
             textAlignVertical: TextAlignVertical.center,
-            //textAlign: TextAlign.center,
+            onChanged: (value) {
+              if (value.isEmpty) {
+              viewmodel.filterProducts("");
+              }
+            },
             validator: (value) => null,
             obscureText: false,
+            onFieldSubmitted: (term) {
+              viewmodel.filterProducts(term);
+            },
+            textInputAction: TextInputAction.search,
             decoration: buildInputDecoration(context),
           ),
         ),
-      ],
+      ], 
     );
   }
 
-  Container buildAppBarActionsContainer(BuildContext context) {
-    return Container(
-      height: context.mediumValue,
-      width: context.mediumValue,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        image: DecorationImage(
-            image: AssetImage(ImagePaths.instance.profile), fit: BoxFit.fill),
+  Widget buildAppBarActionsContainer(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        context.navigateToPage(UserProfileView());
+      },
+      child: Container(
+        height: context.mediumValue,
+        width: context.mediumValue,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          image: DecorationImage(
+              image: AssetImage(ImagePaths.instance.profile), fit: BoxFit.fill),
+        ),
       ),
     );
   }
 
   Widget buildAppBarTitle(BuildContext context) {
     return Text(
-      "The Nearest",
+      LocaleKeys.theNearestText.locale,
       style: context.textTheme.headline5!.copyWith(
           color: context.appTheme.colorScheme.onSurfaceVariant,
           fontWeight: FontWeight.bold),
-    );
-  }
-
-  FlexibleSpaceBar buildFlexibleSpaceBar(BuildContext context) {
-    return FlexibleSpaceBar(
-      titlePadding: context.paddingLow,
-      title: SizedBox(
-        height: context.dynamicHeight(0.03),
-        child: Center(
-          child: TextFormField(
-            textAlignVertical: TextAlignVertical.center,
-            //textAlign: TextAlign.center,
-            validator: (value) => null,
-            obscureText: false,
-            decoration: buildInputDecoration(context),
-          ),
-        ),
-      ),
     );
   }
 
@@ -156,32 +139,7 @@ class DashboardView extends StatelessWidget {
       BuildContext context,
       List<ProductDetailModel> productDetailList,
       DashboardViewModel viewModel) {
-    return ProductGrid(productList: productDetailList, viewModel: viewModel);
-  }
-
-  Widget buildCategoriesText(BuildContext context) {
-    return Padding(
-      padding: context.horizontalPaddingNormal,
-      child: buildTopCetegoriesText(context),
-    );
-  }
-
-  Text buildSeeAllText(BuildContext context) {
-    return Text(
-      "SEE ALL",
-      style: context.textTheme.headline6!.copyWith(
-          fontWeight: FontWeight.w500,
-          color: context.colorScheme.onSurfaceVariant),
-    );
-  }
-
-  Text buildTopCetegoriesText(BuildContext context) {
-    return Text(
-      "Top Categories",
-      style: context.textTheme.headline6!.copyWith(
-        fontWeight: FontWeight.bold,
-        color: context.colorScheme.primary,
-      ),
-    );
+    return ProductGrid(
+        productList: productDetailList, dashboardViewModel: viewModel);
   }
 }

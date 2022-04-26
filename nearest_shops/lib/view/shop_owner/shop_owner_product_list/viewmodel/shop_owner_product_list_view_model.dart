@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
 import 'package:mobx/mobx.dart';
+import '../../../../core/extension/string_extension.dart';
+import '../../../../core/init/lang/locale_keys.g.dart';
 
 import '../../../../core/base/model/base_view_model.dart';
 import '../../../../core/init/service/authenticaion/user_id_initialize.dart';
@@ -26,11 +28,26 @@ abstract class _ShopOwnerProductListViewModelBase with Store, BaseViewModel {
   @observable
   bool isDeleting = false;
 
+  @observable
+  bool isSearching = false;
+
   late IShopOwnerProductListService ownerProductListService;
+
+  @observable
+  ObservableList<ProductDetailModel> persistProductList =
+      ObservableList<ProductDetailModel>();
 
   @observable
   ObservableList<ProductDetailModel> productList =
       ObservableList<ProductDetailModel>();
+
+  @action
+  void changeIsSearching() {
+    isSearching = !isSearching;
+    if (isSearching == false) {
+      productList = persistProductList;
+    }
+  }
 
   @override
   void setContext(BuildContext context) {
@@ -74,6 +91,8 @@ abstract class _ShopOwnerProductListViewModelBase with Store, BaseViewModel {
             : await ownerProductListService.fetchProductFirstList(shopId) ?? [])
         as ObservableList<ProductDetailModel>;
 
+    persistProductList = productList;
+
     changeIsProductFirstListLoading();
   }
 
@@ -88,6 +107,7 @@ abstract class _ShopOwnerProductListViewModelBase with Store, BaseViewModel {
           : await ownerProductListService.fetchProductMoreList(shopId) ??
               []) as ObservableList<ProductDetailModel>;
       productList.addAll(moreDataList);
+      persistProductList = productList;
       changeIsProductMoreListLoading();
     }
   }
@@ -98,7 +118,8 @@ abstract class _ShopOwnerProductListViewModelBase with Store, BaseViewModel {
     changeIsDeleting();
     await ownerProductListService.deleteProductItem(productId: productId);
     productList.removeAt(index);
-    showSnackBar(message: "Item was deleted");
+    showSnackBar(message: LocaleKeys.itemWasDeletedText.locale);
+    persistProductList = productList;
     changeIsDeleting();
   }
 
@@ -109,5 +130,14 @@ abstract class _ShopOwnerProductListViewModelBase with Store, BaseViewModel {
         duration: context!.durationNormal,
       );
     }
+  }
+
+  @action
+  void filterProducts(String productName) {
+    productList = productList
+        .where((item) =>
+            item.name!.toLowerCase().contains(productName..toLowerCase()))
+        .toList()
+        .asObservable();
   }
 }

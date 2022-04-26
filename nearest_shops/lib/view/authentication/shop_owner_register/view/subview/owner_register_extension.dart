@@ -1,12 +1,13 @@
 part of '../shop_owner_register_view.dart';
 
+
 extension _RegisterOwnerExtension on ShopOwnerRegisterView {
   Widget buildFirstPasswordTextField(
       ShopOwnerRegisterViewModel viewModel, BuildContext context) {
     return Observer(builder: (_) {
       return TextFormField(
         validator: (value) =>
-            value!.isNotEmpty ? null : LocaleKeys.theFieldRequired.locale,
+            value!.isNotEmpty ? null : LocaleKeys.theFieldRequiredText.locale,
         controller: viewModel.passwordFirstController,
         obscureText: viewModel.isFirstLockOpen,
         decoration: buildFirstPasswordTextFieldDecoration(context, viewModel),
@@ -19,10 +20,10 @@ extension _RegisterOwnerExtension on ShopOwnerRegisterView {
     return InputDecoration(
       labelStyle: context.textTheme.subtitle1,
       label: Text(
-        LocaleKeys.enterPassword.locale,
+        LocaleKeys.enterPasswordText.locale,
       ),
       icon: buildContainerIconField(context, Icons.vpn_key),
-      hintText: "Password123456",
+      hintText: LocaleKeys.passwordExampleText.locale,
       suffixIcon: TextButton(
         onPressed: () {
           viewModel.isFirstLockStateChange();
@@ -40,10 +41,10 @@ extension _RegisterOwnerExtension on ShopOwnerRegisterView {
     return Observer(builder: (_) {
       return TextFormField(
         validator: (value) => value!.isEmpty
-            ? LocaleKeys.theFieldRequired.locale
+            ? LocaleKeys.theFieldRequiredText.locale
             : viewModel.passwordLaterController!.text !=
                     viewModel.passwordFirstController!.text
-                ? "Passwords are not equals"
+                ? LocaleKeys.passwordNotSameText.locale
                 : null,
         controller: viewModel.passwordLaterController,
         obscureText: viewModel.isLaterLockOpen,
@@ -57,10 +58,10 @@ extension _RegisterOwnerExtension on ShopOwnerRegisterView {
     return InputDecoration(
       labelStyle: context.textTheme.subtitle1,
       label: Text(
-        LocaleKeys.againPassword.locale,
+        LocaleKeys.againPasswordText.locale,
       ),
       icon: buildContainerIconField(context, Icons.vpn_key),
-      hintText: "Password123456",
+      hintText: LocaleKeys.passwordExampleText.locale,
       suffixIcon: TextButton(
         onPressed: () {
           viewModel.isLaterLockStateChange();
@@ -77,7 +78,7 @@ extension _RegisterOwnerExtension on ShopOwnerRegisterView {
       ShopOwnerRegisterViewModel viewModel, BuildContext context) {
     return TextFormField(
       validator: (value) =>
-          value!.isNotEmpty ? null : LocaleKeys.enterValidEmail.locale,
+          value!.isNotEmpty ? null : LocaleKeys.enterValidEmailText.locale,
       keyboardType: TextInputType.emailAddress,
       controller: viewModel.emailController,
       decoration: buildEmailTextFieldDecoration(context),
@@ -87,7 +88,7 @@ extension _RegisterOwnerExtension on ShopOwnerRegisterView {
   InputDecoration buildEmailTextFieldDecoration(BuildContext context) {
     return InputDecoration(
         labelStyle: context.textTheme.subtitle1,
-        label: Text(LocaleKeys.email.locale),
+        label: Text(LocaleKeys.emailText.locale),
         icon: buildContainerIconField(context, Icons.email),
         hintText: "example@email.com");
   }
@@ -96,7 +97,7 @@ extension _RegisterOwnerExtension on ShopOwnerRegisterView {
       ShopOwnerRegisterViewModel viewModel, BuildContext context) {
     return TextFormField(
       validator: (value) =>
-          value!.isNotEmpty ? null : LocaleKeys.enterValidEmail.locale,
+          value!.isNotEmpty ? null : LocaleKeys.theFieldRequiredText.locale,
       keyboardType: TextInputType.streetAddress,
       controller: viewModel.businessNameController,
       decoration: buildNameTextFieldDecoration(context),
@@ -106,9 +107,9 @@ extension _RegisterOwnerExtension on ShopOwnerRegisterView {
   InputDecoration buildNameTextFieldDecoration(BuildContext context) {
     return InputDecoration(
         labelStyle: context.textTheme.subtitle1,
-        label: Text("Business Name"),
+        label: Text(LocaleKeys.businessNameText.locale),
         icon: buildContainerIconField(context, Icons.shop),
-        hintText: "A Shop");
+        hintText: LocaleKeys.businessNameText.locale);
   }
 
   TextFormField buildAdressTextField(
@@ -117,7 +118,7 @@ extension _RegisterOwnerExtension on ShopOwnerRegisterView {
       keyboardType: TextInputType.streetAddress,
       maxLines: 3,
       validator: (value) =>
-          value!.isNotEmpty ? null : LocaleKeys.enterValidEmail.locale,
+          value!.isNotEmpty ? null : LocaleKeys.theFieldRequiredText.locale,
       controller: viewModel.businessAdressController,
       decoration: buildAdressTextFieldDecoration(context),
     );
@@ -126,16 +127,16 @@ extension _RegisterOwnerExtension on ShopOwnerRegisterView {
   InputDecoration buildAdressTextFieldDecoration(BuildContext context) {
     return InputDecoration(
         labelStyle: context.textTheme.subtitle1,
-        label: Text("Business Address"),
+        label: Text(LocaleKeys.businessAddressText.locale),
         icon: buildContainerIconField(context, Icons.location_on),
-        hintText: "1. Street");
+        hintText: LocaleKeys.firstStreetText.locale);
   }
 
   TextFormField buildPhoneTextField(
       ShopOwnerRegisterViewModel viewModel, BuildContext context) {
     return TextFormField(
       validator: (value) =>
-          value!.isNotEmpty ? null : LocaleKeys.enterValidEmail.locale,
+          value!.isNotEmpty ? null : LocaleKeys.theFieldRequiredText.locale,
       keyboardType: TextInputType.phone,
       controller: viewModel.businessPhoneController,
       decoration: buildPhoneTextFieldDecoration(context),
@@ -145,14 +146,13 @@ extension _RegisterOwnerExtension on ShopOwnerRegisterView {
   InputDecoration buildPhoneTextFieldDecoration(BuildContext context) {
     return InputDecoration(
         labelStyle: context.textTheme.subtitle1,
-        label: Text("Business Phone Number"),
+        label: Text(LocaleKeys.businessPhoneNumberText.locale),
         icon: buildContainerIconField(context, Icons.phone),
         hintText: "05987654321");
   }
 
   Container buildContainerIconField(BuildContext context, IconData icon) {
     return Container(
-      // color: context.colors.onError,
       padding: context.paddingLow,
       child: Icon(icon, color: context.appTheme.colorScheme.onSurfaceVariant),
     );

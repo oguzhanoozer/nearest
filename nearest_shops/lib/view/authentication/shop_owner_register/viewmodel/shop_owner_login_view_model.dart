@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
 
@@ -51,11 +50,11 @@ abstract class _ShopOwnerRegisterViewModelBase
   Future<void> registerOwnerData(BuildContext context) async {
     isLoadingChange();
     if (formState.currentState!.validate()) {
-      GeoPoint geoPoint = GeoPoint(10, 25);
+     /// GeoPoint geoPoint = GeoPoint(10, 25);
       Map<String, dynamic> ownerMapData = {
         "address": businessAdressController!.text,
         "email": emailController!.text,
-        "location": geoPoint,
+       /// "location": geoPoint,
         "logoUrl": "",
         "name": businessNameController!.text,
         "phoneNumber": businessPhoneController!.text

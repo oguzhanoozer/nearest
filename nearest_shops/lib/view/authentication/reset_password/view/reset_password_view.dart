@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:kartal/kartal.dart';
+import '../../../../core/extension/string_extension.dart';
+import '../../../../core/init/lang/locale_keys.g.dart';
 
 import '../../../../core/base/view/base_view.dart';
 import '../../../../core/components/button/normal_button.dart';
@@ -30,9 +32,9 @@ class ResetPasswordView extends StatelessWidget {
       body: Center(
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           Text(
-            "Reset Your Password",
+           LocaleKeys.resetYourPasswordText.locale,
             style: context.textTheme.headline6!
-                .copyWith(color: Colors.black, fontWeight: FontWeight.w700),
+                .copyWith(color: context.colorScheme.primary, fontWeight: FontWeight.w700),
           ),
           context.emptySizedHeightBoxNormal,
           SingleChildScrollView(
@@ -56,7 +58,7 @@ class ResetPasswordView extends StatelessWidget {
       ResetPasswordViewModel viewModel, BuildContext context) {
     return TextFormField(
       validator: (value) =>
-          value!.isValidEmail ? null : "Enter valid email address",
+          value!.isValidEmail ? null : LocaleKeys.enterValidEmailText.locale,
       keyboardType: TextInputType.emailAddress,
       controller: viewModel.emailResetTextController,
       decoration: buildResetEmailTextFieldDecoration(context),
@@ -66,13 +68,13 @@ class ResetPasswordView extends StatelessWidget {
   InputDecoration buildResetEmailTextFieldDecoration(BuildContext context) {
     return InputDecoration(
         labelStyle: context.textTheme.subtitle1,
-        label: Text("Email address"),
+        label: Text( LocaleKeys.emailAddressText.locale),
         icon: Container(
           padding: context.paddingLow,
           child: Icon(Icons.email,
               color: context.appTheme.colorScheme.onSurfaceVariant),
         ),
-        hintText: "Email address");
+        hintText:LocaleKeys.emailAddressText.locale);
   }
 
   Widget buildResetEmailButton(
@@ -87,7 +89,7 @@ class ResetPasswordView extends StatelessWidget {
               )
             : NormalButton(
                 child: Text(
-                  "Reset",
+                LocaleKeys.resetText.locale,
                   style: context.textTheme.headline6!
                       .copyWith(color: context.colorScheme.onSecondary),
                 ),

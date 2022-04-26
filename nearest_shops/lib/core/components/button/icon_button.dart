@@ -15,7 +15,7 @@ class NormalIconButton extends StatelessWidget {
     return IconButton(
       icon: icon!,
       onPressed: onPressed,
-      iconSize: 70,
+      iconSize: 50,
     );
   }
 }

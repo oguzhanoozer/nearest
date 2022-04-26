@@ -1,3 +1,6 @@
+import '../../extension/string_extension.dart';
+import '../lang/locale_keys.g.dart';
+
 class Categories {
   String categoryName;
   int categoryId;
@@ -11,12 +14,12 @@ class CategoriesInitializer {
   static CategoriesInitializer get instance => _instance;
 
   final List<Categories> _categoriesList = [
-    Categories(categoryName: "Gift", categoryId: 1),
-    Categories(categoryName: "Kitchen", categoryId: 2),
-    Categories(categoryName: "Technology", categoryId: 3),
-    Categories(categoryName: "Shoes", categoryId: 4),
-    Categories(categoryName: "Car", categoryId: 5),
-    Categories(categoryName: "Other", categoryId: 6),
+    Categories(categoryName: LocaleKeys.giftText.locale, categoryId: 1),
+    Categories(categoryName: LocaleKeys.kitchenText.locale, categoryId: 2),
+    Categories(categoryName: LocaleKeys.technologyText.locale, categoryId: 3),
+    Categories(categoryName: LocaleKeys.shoesText.locale, categoryId: 4),
+    Categories(categoryName: LocaleKeys.carsText.locale, categoryId: 5),
+    Categories(categoryName: LocaleKeys.otherText.locale, categoryId: 6),
   ];
 
   List<Categories> getListCategories() {

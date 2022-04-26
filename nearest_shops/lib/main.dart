@@ -2,17 +2,20 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'view/authentication/onboard/view/onboard_view.dart';
-import 'view/shop_owner/dashboard/view/owner_dashboard_view.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:nearest_shops/view/onboard/builder_Ex.dart';
+import 'package:nearest_shops/view/onboard/onboard_view.dart';
 import 'package:provider/provider.dart';
 
 import 'core/constants/application_constants.dart';
 import 'core/constants/navigation/navigation_service.dart';
+import 'core/extension/string_extension.dart';
 import 'core/init/lang/codegen_loader.g.dart';
 import 'core/init/lang/language_manager.dart';
+import 'core/init/lang/locale_keys.g.dart';
 import 'core/init/notifier/provider_list.dart';
 import 'core/init/theme/app_theme.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'view/authentication/onboard/view/onboard_view.dart';
 
 Future<void> main() async {
   await _init();
@@ -24,10 +27,10 @@ Future<void> main() async {
       child: EasyLocalization(
         path: ApplicationConstants.LANG_ASSET_PATH,
         supportedLocales: LanguageManager.instance.supportedLocales,
-        fallbackLocale: LanguageManager.instance.trLocale,
+        fallbackLocale: LanguageManager.instance.enLocale,
         assetLoader: CodegenLoader(),
         saveLocale: true,
-        startLocale: LanguageManager.instance.trLocale,
+        startLocale: LanguageManager.instance.currentLocale,
         child: MainHome(),
       ),
     ),
@@ -53,16 +56,16 @@ class MainHome extends StatelessWidget {
       //onGenerateRoute: NavigationRoute.instance!.generateRoute,
       navigatorKey: NavigationService.instance!.navigatorKey,
       title: 'Material App',
-      theme: ThemeManager.createTheme(AppThemeLight()),
+      theme: context.watch<ThemeManager>().currentThemeData,
       home: FutureBuilder(
         future: _initalizeFirebaseApp,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(
-              child: Text("There is an error"),
+              child: Text(LocaleKeys.thereIsAnErrorOnBeginnigText.locale),
             );
           } else if (snapshot.hasData) {
-            return SafeArea(child: OnBoardView());
+            return SafeArea(child: OnBoardViewLottie());
           } else {
             return Center(
               child: CircularProgressIndicator(),

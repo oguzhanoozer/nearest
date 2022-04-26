@@ -1,6 +1,6 @@
 part of '../owner_product_list_view.dart';
 
-extension _Owner_product_extension on OwnerUserProductListView {
+extension _Owner_product_extension on OwnerProductListMapView {
   Positioned buildSearchTextField(BuildContext context) {
     return Positioned(
       top: context.dynamicHeight(0.03),
@@ -42,7 +42,7 @@ extension _Owner_product_extension on OwnerUserProductListView {
           color: context.colorScheme.surface, size: context.normalValue),
       hintStyle: context.textTheme.titleMedium!
           .copyWith(color: context.colorScheme.surface),
-      hintText: "Search product",
+      hintText: LocaleKeys.searchTheProductText.locale,
       suffixIcon: Icon(
         Icons.filter_list_outlined,
         size: context.dynamicHeight(0.03),

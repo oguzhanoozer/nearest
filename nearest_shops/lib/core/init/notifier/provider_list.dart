@@ -2,6 +2,7 @@ import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
 import '../../constants/navigation/navigation_service.dart';
+import '../theme/app_theme.dart';
 
 
 class ApplicationProvider {
@@ -15,9 +16,9 @@ class ApplicationProvider {
 
   List<SingleChildWidget> singleItems = [];
   List<SingleChildWidget> dependItems = [
-  /*  ChangeNotifierProvider(
-      create: (context) => ThemeNotifier(),
-    ),*/
+    ChangeNotifierProvider(
+      create: (context) => ThemeManager(),
+    ),
     Provider.value(value: NavigationService.instance)
   ];
   List<SingleChildWidget> uiChangesItems = [];

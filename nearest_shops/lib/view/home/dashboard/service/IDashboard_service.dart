@@ -16,7 +16,7 @@ abstract class IDashboardService {
 
   IDashboardService(this.scaffoldState, this.context);
   Future<List<ProductDetailModel>?> fetchDashboardProductFirstList(
-      {bool isFiltered});
+      {bool isFiltered, bool isCategories = false});
   Future<List<ProductDetailModel>?> fetchDashboardProductMoreList(
       {bool isFiltered});
   Future<List<ProductDetailModel>?> fetchDashboardSliderList();
@@ -53,7 +53,7 @@ class DashboardService extends IDashboardService with ErrorHelper {
 
   @override
   Future<List<ProductDetailModel>?> fetchDashboardProductFirstList(
-      {bool isFiltered = false}) async {
+      {bool isFiltered = false, bool isCategories = false}) async {
     List<ProductDetailModel> productList = [];
     try {
       final productListQuery = await FirebaseCollectionRefInitialize
@@ -62,11 +62,14 @@ class DashboardService extends IDashboardService with ErrorHelper {
           .get();
 
       List<DocumentSnapshot> docsInShops = productListQuery.docs;
-      if (docsInShops.length > 5) {
-        docsInShops.removeRange(0, 5);
-      } else {
-        docsInShops.removeRange(0, docsInShops.length);
+      if (isCategories == false) {
+        if (docsInShops.length > 5) {
+          docsInShops.removeRange(0, 5);
+        } else {
+          docsInShops.removeRange(0, docsInShops.length);
+        }
       }
+
       if (docsInShops.isNotEmpty) {
         for (var element in docsInShops) {
           productList.add(ProductDetailModel.fromJson(element.data() as Map));

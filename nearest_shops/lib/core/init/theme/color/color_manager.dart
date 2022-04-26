@@ -16,7 +16,11 @@ class AppColors {
   final Color grey = Color(0xFF9E9E9E);
   final Color yellow = Color(0xFFFFEB3B);
   final Color red = Color(0xFFF44336);
+  final Color blue = Color(0xFF64B5F6);
 }
+
+  
+
 
 abstract class IColors {
   AppColors get colors;

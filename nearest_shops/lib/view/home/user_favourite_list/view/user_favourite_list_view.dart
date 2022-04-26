@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:kartal/kartal.dart';
 import 'package:mobx/mobx.dart';
-
+import '../../../../core/extension/string_extension.dart';
+import '../../../../core/init/lang/locale_keys.g.dart';
 import '../../../../core/base/view/base_view.dart';
-import '../../../../core/components/card/list_item_card.dart';
 import '../../../home/product_detail/model/product_detail_model.dart';
-import '../../../product/contstants/image_path.dart';
 import '../../../product/product_list_view/product_list_view.dart';
+import '../../product_detail/view/product_detail_view.dart';
 import '../viewmodel/user_favourite_list_view_model.dart';
 
 class UserFavouriteProductListView extends StatelessWidget {
@@ -30,20 +30,9 @@ class UserFavouriteProductListView extends StatelessWidget {
           UserFavouriteListViewModel viewModel, BuildContext context) =>
       Scaffold(
         key: viewModel.scaffoldState,
-        appBar: buildAppBar(context),
+        appBar: buildAppBar(context, viewModel),
         body: buildBody(viewModel, context),
       );
-
-  AppBar buildAppBar(BuildContext context) {
-    return AppBar(
-      centerTitle: true,
-      title: Text("Your Saved Products",
-          style: context.textTheme.headline6!.copyWith(
-              color: context.colorScheme.onPrimary,
-              fontWeight: FontWeight.bold)),
-      automaticallyImplyLeading: false,
-    );
-  }
 
   Widget buildBody(
           UserFavouriteListViewModel viewModel, BuildContext context) =>
@@ -63,7 +52,7 @@ class UserFavouriteProductListView extends StatelessWidget {
       UserFavouriteListViewModel viewModel, BuildContext context) {
     return productList.isEmpty
         ? Center(
-            child: Text("Favourite List Empty"),
+            child: Text(LocaleKeys.favouriteListEmptyText.locale),
           )
         : Padding(
             padding: context.paddingNormal,
@@ -83,20 +72,87 @@ class UserFavouriteProductListView extends StatelessWidget {
       ProductDetailModel productDetailModel,
       UserFavouriteListViewModel viewModel,
       int index) {
-    return ProductListView(
-      index: index,
-      productDetailModel: productDetailModel,
-      shopModel: null,
-      rightSideWidget: IconButton(
-        iconSize: 30,
-        padding: EdgeInsets.zero,
-        icon: Icon(
-          Icons.delete,
-          color: Colors.red,
+    return GestureDetector(
+      onTap: (() => context.navigateToPage(ProductDetailView(
+            productDetailModel: productDetailModel,
+          ))),
+      child: ProductListView(
+        productDetailModel: productDetailModel,
+        shopModel: null,
+        rightSideWidget: IconButton(
+          iconSize: 30,
+          padding: EdgeInsets.zero,
+          icon: Icon(
+            Icons.delete,
+            color: context.colorScheme.onPrimaryContainer,
+          ),
+          onPressed: () async {
+            await viewModel.removeFavouriteItem(index);
+          },
         ),
-        onPressed: () async {
-          await viewModel.removeFavouriteItem(index);
+      ),
+    );
+  }
+
+  AppBar buildAppBar(
+      BuildContext context, UserFavouriteListViewModel viewModel) {
+    return AppBar(
+      elevation: 0.1,
+      automaticallyImplyLeading: false,
+      centerTitle: true,
+      title: Observer(builder: (_) {
+        return viewModel.isSearching
+            ? getAppBarListTile(context, viewModel)
+            : Text(LocaleKeys.yourSavedProductsText.locale,
+                style: context.textTheme.headline6!.copyWith(
+                    color: context.colorScheme.onPrimary,
+                    fontWeight: FontWeight.bold));
+      }),
+      actions: [
+        Observer(builder: (_) {
+          return viewModel.isSearching
+              ? SizedBox()
+              : Padding(
+                  padding: context.horizontalPaddingNormal,
+                  child: IconButton(
+                    onPressed: () {
+                      viewModel.changeIsSearching();
+                    },
+                    icon: Icon(Icons.search, size: context.dynamicHeight(0.04)),
+                  ),
+                );
+        })
+      ],
+    );
+  }
+
+  Widget getAppBarListTile(
+      BuildContext context, UserFavouriteListViewModel viewModel) {
+    return ListTile(
+      title: TextFormField(
+        textInputAction: TextInputAction.search,
+        onChanged: (value) {},
+        autofocus: true,
+        onFieldSubmitted: (term) {
+          viewModel.filterProducts(term);
         },
+        decoration: InputDecoration(
+            isDense: true, // Added this
+            contentPadding: EdgeInsets.all(8),
+            hintText: LocaleKeys.enterProductNameText.locale,
+            hintStyle: TextStyle(
+              color: context.colorScheme.onSecondary.withOpacity(0.5),
+              fontSize: 12,
+              fontStyle: FontStyle.italic,
+            ),
+            prefixIcon: Icon(Icons.search, size: context.dynamicHeight(0.03)),
+            border: InputBorder.none,
+            suffixIcon: IconButton(
+              icon: Icon(Icons.cancel_sharp, size: context.dynamicHeight(0.03)),
+              onPressed: () {
+                viewModel.changeIsSearching();
+              },
+            )),
       ),
     );
   }

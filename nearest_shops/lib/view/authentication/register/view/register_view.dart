@@ -73,7 +73,7 @@ class RegisterView extends StatelessWidget {
         Align(
           alignment: AlignmentDirectional.centerStart,
           child: Text(
-            LocaleKeys.createAccount.locale,
+            LocaleKeys.createAccountText.locale,
             style: context.textTheme.headline4!
                 .copyWith(color: context.colorScheme.onPrimary),
           ),
@@ -84,7 +84,7 @@ class RegisterView extends StatelessWidget {
 
   NormalTextButton buildCreateAccountButton() {
     return NormalTextButton(
-      text: LocaleKeys.createAccount.locale,
+      text: LocaleKeys.createAccountText.locale,
       onPressed: () {},
     );
   }
@@ -94,7 +94,7 @@ class RegisterView extends StatelessWidget {
     return Observer(builder: (_) {
       return NormalButton(
         child: Text(
-          LocaleKeys.createAccount.locale,
+          LocaleKeys.createAccountText.locale,
           style: context.textTheme.headline6!
               .copyWith(color: context.colorScheme.onSecondary),
         ),
@@ -110,7 +110,6 @@ class RegisterView extends StatelessWidget {
 
   Container buildContainerIconField(BuildContext context, IconData icon) {
     return Container(
-      // color: context.colors.onError,
       padding: context.paddingLow,
       child: Icon(icon, color: context.appTheme.colorScheme.onSurfaceVariant),
     );

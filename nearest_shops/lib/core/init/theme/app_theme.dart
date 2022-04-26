@@ -12,7 +12,26 @@ abstract class ITheme {
   IColors get colors;
 }
 
-abstract class ThemeManager {
+enum AppThemeMode { ThemeDark, ThemeLight }
+
+class ThemeManager extends ChangeNotifier {
+  AppThemeMode _currentThemeMode = AppThemeMode.ThemeLight;
+  AppThemeMode get currentThemeMode => _currentThemeMode;
+
+  ThemeData _currentThemeData = createTheme(AppThemeLight());
+  ThemeData get currentThemeData => _currentThemeData;
+
+  void changeTheme() {
+    if (_currentThemeMode == AppThemeMode.ThemeDark) {
+      _currentThemeMode = AppThemeMode.ThemeLight;
+      _currentThemeData = createTheme(AppThemeLight());
+    } else {
+      _currentThemeMode = AppThemeMode.ThemeDark;
+      _currentThemeData = createTheme(AppThemeDark());
+    }
+    notifyListeners();
+  }
+
   static ThemeData createTheme(ITheme theme) => ThemeData(
       fontFamily: theme.textTheme.fontFamily,
       textTheme: theme.textTheme.data,
@@ -25,12 +44,10 @@ abstract class ThemeManager {
 
 InputDecorationTheme buildInputDecorationTheme(ITheme theme) {
   return InputDecorationTheme(
-      //  helperStyle: TextStyle(color: Colors.red),
-      // counterStyle: TextStyle(color: Colors.red),
-      floatingLabelStyle: TextStyle(color: theme.colors.colors.orange),
+      floatingLabelStyle: TextStyle(color: theme.colors.colors.blue),
       focusColor: Colors.black12,
       filled: true,
-      errorStyle: TextStyle(color: theme.colors.colors.red),
+      errorStyle: TextStyle(color: theme.colors.colors.blue),
       fillColor: theme.colors.colors.lightGray,
       labelStyle: TextStyle(),
       errorBorder: OutlineInputBorder(

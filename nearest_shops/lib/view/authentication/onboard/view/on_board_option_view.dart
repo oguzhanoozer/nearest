@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
 
 import '../../../../core/components/button/normal_button.dart';
+import '../../../../core/extension/string_extension.dart';
+import '../../../../core/init/lang/locale_keys.g.dart';
 import '../../register/view/register_view.dart';
 import '../../shop_owner_register/view/shop_owner_register_view.dart';
 
@@ -16,16 +18,13 @@ class OnBoardOptionView extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            "Do you have own business?",
+            
+            LocaleKeys.doYouHaveOwnBusinessText.locale,
             style: context.textTheme.headline5,
-          ),
-          Text(
-            "Please create business account",
-            style: context.textTheme.headline6,
           ),
           NormalButton(
             child: Text(
-              "Create Business Account",
+              LocaleKeys.createBusinessAccountButtonText.locale,
               style: context.textTheme.headline6!
                   .copyWith(color: context.colorScheme.onSecondary),
             ),
@@ -36,12 +35,12 @@ class OnBoardOptionView extends StatelessWidget {
           ),
           context.emptySizedHeightBoxLow3x,
           Text(
-            "If you are a user, please login",
+            LocaleKeys.ifYouAreAuserPLeaseLoginText.locale,
             style: context.textTheme.headline6,
           ),
           NormalButton(
             child: Text(
-              "Register",
+              LocaleKeys.registerButtonText.locale,
               style: context.textTheme.headline6!
                   .copyWith(color: context.colorScheme.onSecondary),
             ),

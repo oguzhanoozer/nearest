@@ -3,6 +3,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:kartal/kartal.dart';
 
 import '../../../core/components/card/list_item_card.dart';
+import '../../home/categories/viewModel/categories_view_model.dart';
 import '../../home/dashboard/viewmodel/dashboard_view_model.dart';
 import '../../home/product_detail/model/product_detail_model.dart';
 import '../../home/product_detail/view/product_detail_view.dart';
@@ -10,10 +11,14 @@ import '../contstants/image_path.dart';
 
 class ProductGrid extends StatelessWidget {
   final List<ProductDetailModel> productList;
-  final DashboardViewModel viewModel;
+  final DashboardViewModel? dashboardViewModel;
+  final CategoriesViewModel? categoriesViewModel;
 
   const ProductGrid(
-      {Key? key, required this.viewModel, required this.productList})
+      {Key? key,
+      this.dashboardViewModel,
+      this.categoriesViewModel,
+      required this.productList})
       : super(key: key);
 
   @override
@@ -29,15 +34,16 @@ class ProductGrid extends StatelessWidget {
       physics: NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) => Padding(
         padding: context.paddingLow / 3,
-        child: buildProductCard(context, index),
+        child: buildProductCard(context, productList[index]),
       ),
     );
   }
 
-  Widget buildProductCard(BuildContext context, int index) {
+  Widget buildProductCard(
+      BuildContext context, ProductDetailModel productDetailModel) {
     return GestureDetector(
         onTap: () => context.navigateToPage(ProductDetailView(
-              productDetailModel: productList[index],
+              productDetailModel: productDetailModel,
             )),
         child: ListItemCard(
           radius: context.normalValue,
@@ -50,18 +56,19 @@ class ProductGrid extends StatelessWidget {
             children: [
               Expanded(
                 flex: 9,
-                child: buildProductImage(index, context),
+                child: buildProductImage(productDetailModel, context),
               ),
               Expanded(
                 flex: 5,
-                child: buildProductDetail(context, index),
+                child: buildProductDetail(context, productDetailModel),
               ),
             ],
           ),
         ));
   }
 
-  Widget buildProductDetail(BuildContext context, int index) {
+  Widget buildProductDetail(
+      BuildContext context, ProductDetailModel productDetailModel) {
     return Observer(builder: (_) {
       return Padding(
         padding: context.paddingLow / 2,
@@ -74,37 +81,16 @@ class ProductGrid extends StatelessWidget {
           child: Column(
             children: [
               Text(
-                productList[index].name ?? "",
+                productDetailModel.name ?? "",
                 textAlign: TextAlign.center,
                 style: context.textTheme.bodyLarge,
                 maxLines: 1,
               ),
               Text(
-                productList[index].summary ?? "",
+                productDetailModel.summary ?? "",
                 maxLines: 1,
               ),
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Text(
-                      productList[index].price.toString(),
-                      style: context.textTheme.bodyLarge!
-                          .copyWith(fontWeight: FontWeight.bold),
-                    ),
-                    IconButton(
-                        onPressed: () async {
-                          await viewModel.changeFavouriteList(
-                              productList[index].productId.toString());
-                        },
-                        icon: Icon(Icons.favorite),
-                        color: viewModel.userFavouriteList
-                                .contains(productList[index].productId)
-                            ? Colors.red
-                            : Colors.grey),
-                  ],
-                ),
-              )
+              buildFavourContainer(productDetailModel, context)
             ],
           ),
         ),
@@ -112,15 +98,57 @@ class ProductGrid extends StatelessWidget {
     });
   }
 
-  Center buildProductImage(int index, BuildContext context) {
+  Widget buildFavourContainer(
+      ProductDetailModel productDetailModel, BuildContext context) {
+    return Expanded(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Text(
+            productDetailModel.price.toString(),
+            style: context.textTheme.bodyLarge!
+                .copyWith(fontWeight: FontWeight.bold),
+          ),
+          buildFavourIconButton(productDetailModel,context),
+        ],
+      ),
+    );
+  }
+
+  IconButton buildFavourIconButton(ProductDetailModel productDetailModel,BuildContext context) {
+    return dashboardViewModel == null && categoriesViewModel!=null
+        ? IconButton(
+            onPressed: () async {
+              await categoriesViewModel!
+                  .changeFavouriteList(productDetailModel.productId.toString());
+            },
+            icon: Icon(Icons.favorite),
+            color: categoriesViewModel!.userFavouriteList
+                    .contains(productDetailModel.productId)
+                ? context.colorScheme.onPrimaryContainer
+                : context.colorScheme.surface)
+        : IconButton(
+            onPressed: () async {
+              await dashboardViewModel!
+                  .changeFavouriteList(productDetailModel.productId.toString());
+            },
+            icon: Icon(Icons.favorite),
+            color: dashboardViewModel!.userFavouriteList
+                    .contains(productDetailModel.productId)
+                ? context.colorScheme.onPrimaryContainer
+                : context.colorScheme.surface);
+  }
+
+  Center buildProductImage(
+      ProductDetailModel productDetailModel, BuildContext context) {
     return Center(
       child: ListItemCard(
         elevation: 0,
         clipBehavior: Clip.antiAliasWithSaveLayer,
         radius: context.normalValue,
-        child: productList[index].imageUrlList!.isEmpty
+        child: productDetailModel.imageUrlList!.isEmpty
             ? Image.asset(ImagePaths.instance.hazelnut, fit: BoxFit.fill)
-            : Image.network(productList[index].imageUrlList!.first.toString(),
+            : Image.network(productDetailModel.imageUrlList!.first.toString(),
                 fit: BoxFit.fill),
       ),
     );

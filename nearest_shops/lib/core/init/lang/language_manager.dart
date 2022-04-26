@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 class LanguageManager {
@@ -12,6 +14,14 @@ class LanguageManager {
   final enLocale = Locale('en');
   final trLocale = Locale('tr');
 
-  List<Locale> get supportedLocales => [enLocale,trLocale];
-}
+  Locale get currentLocale =>Platform.localeName.contains("tr")?trLocale:enLocale;
 
+  List<Locale> get supportedLocales => [enLocale, trLocale];
+
+  String getLanguageTitle(Locale locale) {
+    if (locale == trLocale) {
+      return "Türkçe";
+    }
+    return "English";
+  }
+}

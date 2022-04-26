@@ -1,16 +1,18 @@
 import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:kartal/kartal.dart';
-import '../../../../core/components/column/form_column.dart';
-import '../../../home/product_detail/model/product_detail_model.dart';
-
-import '../viewmodel/add_product_view_model.dart';
 
 import '../../../../core/base/view/base_view.dart';
 import '../../../../core/components/button/normal_button.dart';
+import '../../../../core/components/column/form_column.dart';
+import '../../../../core/extension/string_extension.dart';
+import '../../../../core/init/lang/locale_keys.g.dart';
 import '../../../../core/init/models/categories_model.dart';
+import '../../../home/product_detail/model/product_detail_model.dart';
+import '../viewmodel/add_product_view_model.dart';
 
 part 'subview/add_product_inputs_extension.dart';
 
@@ -42,7 +44,7 @@ class AddProductView extends StatelessWidget {
         key: viewModel.scaffoldState,
         appBar: AppBar(
           centerTitle: true,
-          title: Text("Add new product"),
+          title: Text(LocaleKeys.addNewProductText.locale),
           automaticallyImplyLeading: false,
           elevation: 0.5,
         ),
@@ -93,8 +95,9 @@ class AddProductView extends StatelessWidget {
     return Align(
         alignment: Alignment.centerLeft,
         child: Text(
-          "Categories Options",
-          style: context.textTheme.headline6!.copyWith(color: Colors.black),
+          LocaleKeys.categoriesOptionsText.locale,
+          style: context.textTheme.headline6!
+              .copyWith(color: context.colorScheme.primary),
         ));
   }
 
@@ -158,25 +161,12 @@ class AddProductView extends StatelessWidget {
                         return Padding(
                           padding: const EdgeInsets.all(4.0),
                           child: Stack(
-                            alignment: AlignmentDirectional.center,
                             children: [
+                              buildImage(viewModel.tempFile[index].path),
                               Positioned(
-                                child: GestureDetector(
-                                  child: Icon(
-                                    Icons.cancel,
-                                    color: Colors.black,
-                                  ),
-                                  onTap: () =>
-                                      viewModel.deleteSelectedImage(index),
-                                ),
-                                top: 0,
-                                right: 0,
-                              ),
-                              CircleAvatar(
-                                radius: 30,
-                                backgroundImage: FileImage(
-                                    File(viewModel.tempFile[index].path)),
-                                backgroundColor: Colors.transparent,
+                                bottom: 0,
+                                right: 4,
+                                child: buildEditIcon(viewModel, index, context),
                               ),
                             ],
                           ),
@@ -185,6 +175,48 @@ class AddProductView extends StatelessWidget {
                     ),
                   );
       },
+    );
+  }
+
+  Widget buildImage(String imageUrl) {
+    final image = Image.file(
+      File(imageUrl),
+      fit: BoxFit.contain,
+      height: 90,
+      width: 90,
+    );
+
+    return ClipOval(
+      child: image,
+    );
+  }
+
+  Widget buildEditIcon(
+          AddProductViewModel viewModel, int index, BuildContext context) =>
+      GestureDetector(
+          child: buildCircle(
+            color: context.colorScheme.onSurfaceVariant,
+            all: 5,
+            child: Icon(
+              Icons.cancel,
+              color: context.colorScheme.onSecondary,
+              size: 20,
+            ),
+          ),
+          onTap: () {
+            viewModel.deleteSelectedImage(index);
+          });
+  Widget buildCircle({
+    required Widget child,
+    required double all,
+    required Color color,
+  }) {
+    return ClipOval(
+      child: Container(
+        padding: EdgeInsets.all(all),
+        color: color,
+        child: child,
+      ),
     );
   }
 
@@ -203,7 +235,7 @@ class AddProductView extends StatelessWidget {
                 Positioned(
                   child: Icon(
                     Icons.cancel,
-                    color: Colors.black,
+                    color: context.colorScheme.primary,
                   ),
                   top: 0,
                   right: 0,
@@ -229,7 +261,7 @@ class AddProductView extends StatelessWidget {
     return Observer(builder: (_) {
       return NormalButton(
           child: Text(
-            "Select product image",
+            LocaleKeys.selectProductImageText.locale,
             style: context.textTheme.headline6!
                 .copyWith(color: context.colorScheme.onSecondary),
           ),
@@ -254,7 +286,7 @@ class AddProductView extends StatelessWidget {
             : isUpdate
                 ? NormalButton(
                     child: Text(
-                      "Update Product",
+                      LocaleKeys.updateProductText.locale,
                       style: context.textTheme.headline6!
                           .copyWith(color: context.colorScheme.onSecondary),
                     ),
@@ -267,7 +299,7 @@ class AddProductView extends StatelessWidget {
                   )
                 : NormalButton(
                     child: Text(
-                      "Add Product",
+                      LocaleKeys.addNewProductText.locale,
                       style: context.textTheme.headline6!
                           .copyWith(color: context.colorScheme.onSecondary),
                     ),

@@ -60,6 +60,38 @@ mixin _$ShopOwnerProductListViewModel
     });
   }
 
+  final _$isSearchingAtom =
+      Atom(name: '_ShopOwnerProductListViewModelBase.isSearching');
+
+  @override
+  bool get isSearching {
+    _$isSearchingAtom.reportRead();
+    return super.isSearching;
+  }
+
+  @override
+  set isSearching(bool value) {
+    _$isSearchingAtom.reportWrite(value, super.isSearching, () {
+      super.isSearching = value;
+    });
+  }
+
+  final _$persistProductListAtom =
+      Atom(name: '_ShopOwnerProductListViewModelBase.persistProductList');
+
+  @override
+  ObservableList<ProductDetailModel> get persistProductList {
+    _$persistProductListAtom.reportRead();
+    return super.persistProductList;
+  }
+
+  @override
+  set persistProductList(ObservableList<ProductDetailModel> value) {
+    _$persistProductListAtom.reportWrite(value, super.persistProductList, () {
+      super.persistProductList = value;
+    });
+  }
+
   final _$productListAtom =
       Atom(name: '_ShopOwnerProductListViewModelBase.productList');
 
@@ -107,6 +139,19 @@ mixin _$ShopOwnerProductListViewModel
       ActionController(name: '_ShopOwnerProductListViewModelBase');
 
   @override
+  void changeIsSearching() {
+    final _$actionInfo =
+        _$_ShopOwnerProductListViewModelBaseActionController.startAction(
+            name: '_ShopOwnerProductListViewModelBase.changeIsSearching');
+    try {
+      return super.changeIsSearching();
+    } finally {
+      _$_ShopOwnerProductListViewModelBaseActionController
+          .endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void changeIsProductFirstListLoading() {
     final _$actionInfo =
         _$_ShopOwnerProductListViewModelBaseActionController.startAction(
@@ -148,11 +193,25 @@ mixin _$ShopOwnerProductListViewModel
   }
 
   @override
+  void filterProducts(String productName) {
+    final _$actionInfo = _$_ShopOwnerProductListViewModelBaseActionController
+        .startAction(name: '_ShopOwnerProductListViewModelBase.filterProducts');
+    try {
+      return super.filterProducts(productName);
+    } finally {
+      _$_ShopOwnerProductListViewModelBaseActionController
+          .endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 isProductFirstListLoading: ${isProductFirstListLoading},
 isProductMoreListLoading: ${isProductMoreListLoading},
 isDeleting: ${isDeleting},
+isSearching: ${isSearching},
+persistProductList: ${persistProductList},
 productList: ${productList}
     ''';
   }

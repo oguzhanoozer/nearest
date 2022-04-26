@@ -8,6 +8,7 @@ import '../../../../core/base/model/base_view_model.dart';
 import '../../../../core/init/service/firestorage/user_location_initialize_check.dart';
 import '../../../product/product_list_view/product_list_view.dart';
 import '../../product_detail/model/product_detail_model.dart';
+import '../../product_detail/view/product_detail_view.dart';
 import '../../shop_list/model/shop_model.dart';
 import '../service/IOwner_product_list_service.dart';
 
@@ -41,7 +42,7 @@ abstract class _OwnerProductListViewModelBase with Store, BaseViewModel {
 
   late IOwnerProductListService ownerProductListService;
 
-  late String _shopName;
+  late ShopModel _currentShopModel;
 
   @action
   void changeIsShopMapLoading() {
@@ -58,17 +59,30 @@ abstract class _OwnerProductListViewModelBase with Store, BaseViewModel {
     isShopProductDraggleLoaded = value;
   }
 
+  @action
   void setContext(BuildContext context) {
     this.context = context;
     ownerProductListService = OwnerProductlistService(scaffoldState, context);
   }
 
   @override
-  Future<void> init() async {
+  Future<void> init({bool isDirection = false, ShopModel? shopModel}) async {
     changeIsShopMapLoading();
-    _geoPoint =
-        await UserLocationInitializeCheck.instance.returnUserLocation() ??
-            GeoPoint(_originLatitude, _originLongitude);
+
+    if (isDirection) {
+      if (shopModel != null && shopModel.location != null) {
+        _geoPoint = GeoPoint(
+            shopModel.location!.latitude, shopModel.location!.longitude);
+      } else {
+        _geoPoint =
+            await UserLocationInitializeCheck.instance.returnUserLocation() ??
+                GeoPoint(_originLatitude, _originLongitude);
+      }
+    } else {
+      _geoPoint =
+          await UserLocationInitializeCheck.instance.returnUserLocation() ??
+              GeoPoint(_originLatitude, _originLongitude);
+    }
 
     initalCameraPosition = CameraPosition(
       target: LatLng(_geoPoint.latitude, _geoPoint.longitude),
@@ -92,6 +106,7 @@ abstract class _OwnerProductListViewModelBase with Store, BaseViewModel {
     changeIsShopMapLoading();
   }
 
+  @action
   void addMarker(ShopModel shopModel) {
     String markerIdVal = shopModel.name!;
     final MarkerId markerId = MarkerId(markerIdVal);
@@ -105,19 +120,20 @@ abstract class _OwnerProductListViewModelBase with Store, BaseViewModel {
       onTap: () async {
         await fetchShopProducts(shopId: shopModel.id!);
         showModalBottomSheet(
-            isDismissible: true,
-            isScrollControlled: true,
-            context: context!,
-            backgroundColor: Colors.transparent,
-            builder: (context) => AnimatedCrossFade(
-                  duration: Duration(milliseconds: 1000),
-                  reverseDuration: Duration(milliseconds: 600),
-                  crossFadeState: isShopProductDraggleLoaded
-                      ? CrossFadeState.showSecond
-                      : CrossFadeState.showFirst,
-                  firstChild: Container(),
-                  secondChild: buildDraggeableContainer(),
-                ));
+          isDismissible: true,
+          isScrollControlled: true,
+          context: context!,
+          backgroundColor: Colors.transparent,
+          builder: (context) => AnimatedCrossFade(
+            duration: Duration(milliseconds: 1000),
+            reverseDuration: Duration(milliseconds: 600),
+            crossFadeState: isShopProductDraggleLoaded
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
+            firstChild: Container(),
+            secondChild: buildDraggeableContainer(),
+          ),
+        );
       },
     );
 
@@ -126,13 +142,7 @@ abstract class _OwnerProductListViewModelBase with Store, BaseViewModel {
 
   Widget makeDismissble(
       {required Widget child, required BuildContext context}) {
-    return GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () {
-          changeIsShopProductLoaded(false);
-          Navigator.of(context).pop();
-        },
-        child: child);
+    return child;
   }
 
   Widget buildDraggeableContainer() {
@@ -146,6 +156,7 @@ abstract class _OwnerProductListViewModelBase with Store, BaseViewModel {
           //}
           // else
           if (DSNotification.extent < 0.2) {
+            isShopProductDraggleLoaded = false;
             changeIsShopProductLoaded(false);
           }
           return false;
@@ -189,9 +200,22 @@ abstract class _OwnerProductListViewModelBase with Store, BaseViewModel {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            getShopName(),
+            getShopModel().name!,
             style: context.textTheme.headline6!
                 .copyWith(fontWeight: FontWeight.bold),
+          ),
+          Text(
+            getShopModel().email!,
+            style: context.textTheme.bodyText1!,
+          ),
+          Text(
+            getShopModel().phoneNumber!,
+            style: context.textTheme.bodyText1!,
+          ),
+          Text(
+            getShopModel().address!,
+            style: context.textTheme.bodyText1!
+                .copyWith(fontWeight: FontWeight.w400),
           ),
           Expanded(
             child: ListView.builder(
@@ -208,22 +232,26 @@ abstract class _OwnerProductListViewModelBase with Store, BaseViewModel {
   }
 
   Widget buildProductCard(BuildContext context, int index) {
-    return ProductListView(
-      index: index,
-      productDetailModel: getListProductDetailModel()[index],
-      shopModel: null,
-      rightSideWidget:
-          Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-        IconButton(
-          iconSize: 30,
-          padding: EdgeInsets.zero,
-          icon: Icon(
-            Icons.favorite,
-            color: Colors.red,
+    return GestureDetector(
+      onTap: (() => context.navigateToPage(ProductDetailView(
+            productDetailModel: getListProductDetailModel()[index],
+          ))),
+      child: ProductListView(
+        productDetailModel: getListProductDetailModel()[index],
+        shopModel: null,
+        rightSideWidget:
+            Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+          IconButton(
+            iconSize: 30,
+            padding: EdgeInsets.zero,
+            icon: Icon(
+              Icons.favorite,
+              color: context.colorScheme.onPrimaryContainer,
+            ),
+            onPressed: null,
           ),
-          onPressed: null,
-        ),
-      ]),
+        ]),
+      ),
     );
   }
 
@@ -233,8 +261,8 @@ abstract class _OwnerProductListViewModelBase with Store, BaseViewModel {
     _productsModelList =
         await ownerProductListService.fethcProductListModel(shopId: shopId) ??
             [];
-    _shopName =
-        _shopModelList.firstWhere((element) => element.id == shopId).name!;
+    _currentShopModel =
+        _shopModelList.firstWhere((element) => element.id == shopId);
     changeIsShopProductLoaded(true);
     changeIsShopProductLoading();
   }
@@ -251,7 +279,7 @@ abstract class _OwnerProductListViewModelBase with Store, BaseViewModel {
     return _markerList;
   }
 
-  String getShopName() {
-    return _shopName;
+  ShopModel getShopModel() {
+    return _currentShopModel;
   }
 }

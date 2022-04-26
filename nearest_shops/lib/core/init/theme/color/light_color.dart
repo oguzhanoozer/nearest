@@ -35,11 +35,14 @@ class LightColors implements IColors {
     tabBarColor = colors.green;
     tabbarNormalColor = colors.darkerGrey;
     tabbarSelectedColor = colors.green;
+    
     colorScheme = ColorScheme.light().copyWith(
-        onSurfaceVariant: colors.orange,
+        onSurfaceVariant: colors.blue,
         onInverseSurface: colors.lightOrange,
         primary: colors.black,
         onSecondary: colors.white,
+        onSecondaryContainer: colors.green,
+        onPrimaryContainer: colors.red,
         onSurface: colors.mediumGreyBold,
         brightness: Brightness.light,
         surface: colors.grey,

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -10,6 +11,7 @@ import 'package:mobx/mobx.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../../../core/base/model/base_view_model.dart';
+import '../../../../core/init/service/authenticaion/firebase_authentication.dart';
 import '../../../../core/init/service/authenticaion/user_id_initialize.dart';
 import '../../../../core/init/service/firestorage/firestorage_initialize.dart';
 import '../../../home/product_detail/model/product_detail_model.dart';
@@ -192,12 +194,16 @@ abstract class _AddProductViewModelBase with Store, BaseViewModel {
   }
 
   Future<void> removeOldImage(List<String> imageUrlList) async {
-    await Future.wait(imageUrlList.map((e) async =>
+    await Future.wait(imageUrlList.map((e) async {
+      User? user = FirebaseAuthentication.instance.authCurrentUser();
+      if (user != null) {
         await FirebaseStorageInitalize.instance.firabaseStorage
             .ref()
-            .child("content")
+            .child("content").child(user.uid)
             .child(e)
-            .delete()));
+            .delete();
+      }
+    }));
   }
 
   @action

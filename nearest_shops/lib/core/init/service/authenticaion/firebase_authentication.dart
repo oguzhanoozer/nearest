@@ -25,6 +25,10 @@ class FirebaseAuthentication {
     // }
   }
 
+  FirebaseAuth getInstance() {
+    return _firebaseAuth;
+  }
+
   User? authCurrentUser() {
     return _firebaseAuth.currentUser;
   }
@@ -53,7 +57,11 @@ class FirebaseAuthentication {
 
   Future<void> setUserRole(int roleValue, String userId) async {
     try {
-      Map<String, dynamic> roleMap = {"role": roleValue, "id": userId,"favouriteList":[]};
+      Map<String, dynamic> roleMap = {
+        "role": roleValue,
+        "id": userId,
+        "favouriteList": []
+      };
 
       await FirebaseCollectionRefInitialize.instance.usersCollectionReference
           .doc(userId)

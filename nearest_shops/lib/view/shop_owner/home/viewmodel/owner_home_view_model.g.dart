@@ -24,6 +24,38 @@ mixin _$OwnerHomeViewModel on _OwnerHomeViewModelBase, Store {
     });
   }
 
+  final _$isEnableUpdatingAtom =
+      Atom(name: '_OwnerHomeViewModelBase.isEnableUpdating');
+
+  @override
+  bool get isEnableUpdating {
+    _$isEnableUpdatingAtom.reportRead();
+    return super.isEnableUpdating;
+  }
+
+  @override
+  set isEnableUpdating(bool value) {
+    _$isEnableUpdatingAtom.reportWrite(value, super.isEnableUpdating, () {
+      super.isEnableUpdating = value;
+    });
+  }
+
+  final _$_updateGeoPointAtom =
+      Atom(name: '_OwnerHomeViewModelBase._updateGeoPoint');
+
+  @override
+  GeoPoint? get _updateGeoPoint {
+    _$_updateGeoPointAtom.reportRead();
+    return super._updateGeoPoint;
+  }
+
+  @override
+  set _updateGeoPoint(GeoPoint? value) {
+    _$_updateGeoPointAtom.reportWrite(value, super._updateGeoPoint, () {
+      super._updateGeoPoint = value;
+    });
+  }
+
   final _$markersAtom = Atom(name: '_OwnerHomeViewModelBase.markers');
 
   @override
@@ -72,6 +104,58 @@ mixin _$OwnerHomeViewModel on _OwnerHomeViewModelBase, Store {
     });
   }
 
+  final _$checkShopLocationAsyncAction =
+      AsyncAction('_OwnerHomeViewModelBase.checkShopLocation');
+
+  @override
+  Future<LatLng?> checkShopLocation() {
+    return _$checkShopLocationAsyncAction.run(() => super.checkShopLocation());
+  }
+
+  final _$getLocationPermissionAsyncAction =
+      AsyncAction('_OwnerHomeViewModelBase.getLocationPermission');
+
+  @override
+  Future<Position> getLocationPermission() {
+    return _$getLocationPermissionAsyncAction
+        .run(() => super.getLocationPermission());
+  }
+
+  final _$getCurrentLocationPositionAsyncAction =
+      AsyncAction('_OwnerHomeViewModelBase.getCurrentLocationPosition');
+
+  @override
+  Future<void> getCurrentLocationPosition() {
+    return _$getCurrentLocationPositionAsyncAction
+        .run(() => super.getCurrentLocationPosition());
+  }
+
+  final _$updateLocationAsyncAction =
+      AsyncAction('_OwnerHomeViewModelBase.updateLocation');
+
+  @override
+  Future<void> updateLocation() {
+    return _$updateLocationAsyncAction.run(() => super.updateLocation());
+  }
+
+  final _$updateGeoPointLocationAsyncAction =
+      AsyncAction('_OwnerHomeViewModelBase.updateGeoPointLocation');
+
+  @override
+  Future<void> updateGeoPointLocation() {
+    return _$updateGeoPointLocationAsyncAction
+        .run(() => super.updateGeoPointLocation());
+  }
+
+  final _$_updateShopLocationAsyncAction =
+      AsyncAction('_OwnerHomeViewModelBase._updateShopLocation');
+
+  @override
+  Future<void> _updateShopLocation(GeoPoint currentLocation) {
+    return _$_updateShopLocationAsyncAction
+        .run(() => super._updateShopLocation(currentLocation));
+  }
+
   final _$displayPredictionAsyncAction =
       AsyncAction('_OwnerHomeViewModelBase.displayPrediction');
 
@@ -105,11 +189,22 @@ mixin _$OwnerHomeViewModel on _OwnerHomeViewModelBase, Store {
   }
 
   @override
-  void addMarker(LatLng pos) {
+  void changeUpdateEnable() {
+    final _$actionInfo = _$_OwnerHomeViewModelBaseActionController.startAction(
+        name: '_OwnerHomeViewModelBase.changeUpdateEnable');
+    try {
+      return super.changeUpdateEnable();
+    } finally {
+      _$_OwnerHomeViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void addMarker(LatLng pos, bool isEnabled) {
     final _$actionInfo = _$_OwnerHomeViewModelBaseActionController.startAction(
         name: '_OwnerHomeViewModelBase.addMarker');
     try {
-      return super.addMarker(pos);
+      return super.addMarker(pos, isEnabled);
     } finally {
       _$_OwnerHomeViewModelBaseActionController.endAction(_$actionInfo);
     }
@@ -130,6 +225,7 @@ mixin _$OwnerHomeViewModel on _OwnerHomeViewModelBase, Store {
   String toString() {
     return '''
 location: ${location},
+isEnableUpdating: ${isEnableUpdating},
 markers: ${markers},
 newGoogleMapController: ${newGoogleMapController},
 isMapDataLoading: ${isMapDataLoading}

@@ -1,13 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
-import '../../../../core/base/model/base_view_model.dart';
-import 'package:kartal/kartal.dart';
-import '../../login/view/login_view.dart';
-import '../../../utility/error_helper.dart';
 
-import '../../../../core/init/service/authenticaion/firebase_authentication.dart';
+import '../../../../core/base/model/base_view_model.dart';
+import '../../../utility/error_helper.dart';
 import '../service/IReset_password_service.dart';
+
 part 'reset_password_view_model.g.dart';
 
 class ResetPasswordViewModel = _ResetPasswordViewModelBase

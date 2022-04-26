@@ -40,8 +40,7 @@ class LoginView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Expanded(
-                child: SingleChildScrollView(
-                    child: buildLoginForm(context, viewModel)),
+                child: buildLoginForm(context, viewModel),
               ),
             ],
           ));
@@ -58,14 +57,14 @@ class LoginView extends StatelessWidget {
   Widget buildFormColumn(LoginViewModel viewModel, BuildContext context) {
     return FormColumn(
       children: [
-        context.emptySizedHeightBoxNormal,
+        context.emptySizedHeightBoxLow,
         buildWelcomeTextColumnBuild(context),
-        context.emptySizedHeightBoxHigh,
+        context.emptySizedHeightBoxLow,
         buildEmailTextField(viewModel, context),
         context.emptySizedHeightBoxLow,
         buildPasswordTextField(viewModel, context),
         buildForgotPasswordText(context),
-        context.emptySizedHeightBoxNormal,
+        context.emptySizedHeightBoxLow,
         buildLoginButton(context, viewModel),
         buildCreateAccountButton(context),
         context.emptySizedHeightBoxLow,
@@ -79,15 +78,7 @@ class LoginView extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        /*
-        SizedBox(
-          height: context.mediumValue,
-          width: context.mediumValue,
-          child: ClipOval(
-            child: SvgPicture.asset(SVGIMagePaths.instance.facebookSVG),
-          ),
-        ),
-        */
+    
 
         NormalIconButton(
           onPressed: () {},
@@ -119,35 +110,20 @@ class LoginView extends StatelessWidget {
             //width: 300,
             child: CircleAvatar(
           radius: 150,
-          backgroundColor: Colors.white,
+          backgroundColor: context.colorScheme.onSecondary,
           child: Image.asset(
             "asset/image/shop_orange.png",
             fit: BoxFit.fill,
           ),
         )),
-        // Align(
-        //   alignment: AlignmentDirectional.centerStart,
-        //   child: Text(
-        //     LocaleKeys.login.locale,
-        //     style: context.textTheme.headline2!
-        //         .copyWith(color: context.colorScheme.onPrimary),
-        //   ),
-        // ),
-        // Align(
-        //   alignment: AlignmentDirectional.centerStart,
-        //   child: Text(
-        //     LocaleKeys.welcomeBack.locale,
-        //     style: context.textTheme.headline5!
-        //         .copyWith(color: context.colorScheme.onPrimary),
-        //   ),
-        // ),
+   
       ],
     );
   }
 
   NormalTextButton buildCreateAccountButton(BuildContext context) {
     return NormalTextButton(
-      text: LocaleKeys.createAccount.locale,
+      text: LocaleKeys.createAccountText.locale,
       onPressed: () {
         context.navigateToPage(OnBoardOptionView());
       },
@@ -176,7 +152,7 @@ class LoginView extends StatelessWidget {
     return Align(
       alignment: Alignment.centerRight,
       child: NormalTextButton(
-          text: LocaleKeys.forgotPassword.locale,
+          text: LocaleKeys.forgotPasswordText.locale,
           onPressed: () {
             context.navigateToPage(ResetPasswordView());
           }),

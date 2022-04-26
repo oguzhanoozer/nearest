@@ -59,6 +59,15 @@ mixin _$OwnerProductListViewModel on _OwnerProductListViewModelBase, Store {
     });
   }
 
+  final _$fetchShopProductsAsyncAction =
+      AsyncAction('_OwnerProductListViewModelBase.fetchShopProducts');
+
+  @override
+  Future<void> fetchShopProducts({required String shopId}) {
+    return _$fetchShopProductsAsyncAction
+        .run(() => super.fetchShopProducts(shopId: shopId));
+  }
+
   final _$_OwnerProductListViewModelBaseActionController =
       ActionController(name: '_OwnerProductListViewModelBase');
 
@@ -93,6 +102,28 @@ mixin _$OwnerProductListViewModel on _OwnerProductListViewModelBase, Store {
             name: '_OwnerProductListViewModelBase.changeIsShopProductLoaded');
     try {
       return super.changeIsShopProductLoaded(value);
+    } finally {
+      _$_OwnerProductListViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setContext(BuildContext context) {
+    final _$actionInfo = _$_OwnerProductListViewModelBaseActionController
+        .startAction(name: '_OwnerProductListViewModelBase.setContext');
+    try {
+      return super.setContext(context);
+    } finally {
+      _$_OwnerProductListViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void addMarker(ShopModel shopModel) {
+    final _$actionInfo = _$_OwnerProductListViewModelBaseActionController
+        .startAction(name: '_OwnerProductListViewModelBase.addMarker');
+    try {
+      return super.addMarker(shopModel);
     } finally {
       _$_OwnerProductListViewModelBaseActionController.endAction(_$actionInfo);
     }

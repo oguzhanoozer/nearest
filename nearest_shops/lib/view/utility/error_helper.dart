@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
 
+import '../../core/extension/string_extension.dart';
+import '../../core/init/lang/locale_keys.g.dart';
+
 abstract class ErrorHelper {
   void showSnackBar(GlobalKey<ScaffoldState> scaffoldState,
       BuildContext context, String message) {
@@ -9,16 +12,16 @@ abstract class ErrorHelper {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        duration: context.durationNormal,
+        duration: context.durationNormal * 3,
       ),
     );
   }
 
   Future<void> showVerificationAlertDialog(BuildContext context) async {
     await callAlertDialog(context,
-        title: "Verification is needed!",
+        title: LocaleKeys.vericationIsNeededText.locale,
         content:
-            "You have to verify entered email via send verication email link.");
+           LocaleKeys.youHaveToVerifyEmailText.locale);
   }
 
   Future<bool?> callAlertDialog(BuildContext context,

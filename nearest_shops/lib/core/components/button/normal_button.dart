@@ -21,7 +21,7 @@ class NormalButton extends StatelessWidget {
           //minimumSize: MaterialStateProperty.all(Size(context.width * 0.4, 50)),
           fixedSize: fixedSize == null
               ? MaterialStateProperty.all(
-                  Size(context.dynamicWidth(0.3), context.dynamicWidth(0.02)))
+                  Size(context.dynamicWidth(0.3), context.dynamicHeight(0.05)))
               : MaterialStateProperty.all(fixedSize),
           shape: MaterialStateProperty.all(
               RoundedRectangleBorder(borderRadius: context.normalBorderRadius)),

@@ -4,7 +4,8 @@ extension _AddProductTextFieldsExtension on AddProductView {
   TextFormField buildNameTextField(
       AddProductViewModel viewModel, BuildContext context) {
     return TextFormField(
-      validator: (value) => value!.isNotEmpty ? null : "Enter product name",
+      validator: (value) =>
+          value!.isNotEmpty ? null : LocaleKeys.enterProductNameText.locale,
       keyboardType: TextInputType.name,
       controller: viewModel.productNameController,
       decoration: buildNameTextFieldDecoration(context),
@@ -14,15 +15,16 @@ extension _AddProductTextFieldsExtension on AddProductView {
   InputDecoration buildNameTextFieldDecoration(BuildContext context) {
     return InputDecoration(
         labelStyle: context.textTheme.subtitle1,
-        label: Text("Product Name"),
+        label: Text(LocaleKeys.productNameText.locale),
         icon: buildContainerIconField(context, Icons.business_sharp),
-        hintText: "Product Name");
+        hintText: LocaleKeys.productNameText.locale);
   }
 
   TextFormField buildSummaryTextField(
       AddProductViewModel viewModel, BuildContext context) {
     return TextFormField(
-      validator: (value) => value!.isNotEmpty ? null : "Enter product summary",
+      validator: (value) =>
+          value!.isNotEmpty ? null : LocaleKeys.enterProductSummaryText.locale,
       keyboardType: TextInputType.name,
       controller: viewModel.productSummaryController,
       decoration: buildSummaryTextFieldDecoration(context),
@@ -32,16 +34,17 @@ extension _AddProductTextFieldsExtension on AddProductView {
   InputDecoration buildSummaryTextFieldDecoration(BuildContext context) {
     return InputDecoration(
         labelStyle: context.textTheme.subtitle1,
-        label: Text("Product Summary"),
+        label: Text(LocaleKeys.productSummaryText.locale),
         icon: buildContainerIconField(context, Icons.summarize),
-        hintText: "Product Summary");
+        hintText: LocaleKeys.productSummaryText.locale);
   }
 
   TextFormField buildDetailTextField(
       AddProductViewModel viewModel, BuildContext context) {
     return TextFormField(
       maxLines: 3,
-      validator: (value) => value!.isNotEmpty ? null : "Enter product detail",
+      validator: (value) =>
+          value!.isNotEmpty ? null : LocaleKeys.enterProductDetailText.locale,
       keyboardType: TextInputType.name,
       controller: viewModel.productDetailController,
       decoration: buildDetailTextFieldDecoration(context),
@@ -51,15 +54,17 @@ extension _AddProductTextFieldsExtension on AddProductView {
   InputDecoration buildDetailTextFieldDecoration(BuildContext context) {
     return InputDecoration(
         labelStyle: context.textTheme.subtitle1,
-        label: Text("Product Detail"),
+        label: Text(LocaleKeys.productDetailText.locale),
         icon: buildContainerIconField(context, Icons.details),
-        hintText: "Product Detail");
+        hintText: LocaleKeys.productDetailText.locale);
   }
 
   TextFormField buildPriceTextField(
       AddProductViewModel viewModel, BuildContext context) {
     return TextFormField(
-      validator: (value) => value!.isNotEmpty && double.tryParse(value)!=null ? null : "Enter product price",
+      validator: (value) => value!.isNotEmpty && double.tryParse(value) != null
+          ? null
+          : LocaleKeys.enterProductPriceText.locale,
       keyboardType: TextInputType.number,
       controller: viewModel.productPriceController,
       decoration: buildPriceTextFieldDecoration(context),
@@ -69,9 +74,9 @@ extension _AddProductTextFieldsExtension on AddProductView {
   InputDecoration buildPriceTextFieldDecoration(BuildContext context) {
     return InputDecoration(
         labelStyle: context.textTheme.subtitle1,
-        label: Text("Product Price"),
+        label: Text(LocaleKeys.productPriceText.locale),
         icon: buildContainerIconField(context, Icons.price_change),
-        hintText: "Product Price");
+        hintText: LocaleKeys.productPriceText.locale);
   }
 
   TextFormField buildLastSeenTextField(
@@ -86,11 +91,12 @@ extension _AddProductTextFieldsExtension on AddProductView {
         );
         if (dateTime != null) {
           viewModel.productLastSeenDateController!.text =
-              DateFormat('dd/MM/yyyy').format(dateTime);
+              DateFormat('dd/mm/yyyy').format(dateTime);
         }
       },
-      validator: (value) =>
-          value!.isNotEmpty ? null : "Select product last seen date",
+      validator: (value) => value!.isNotEmpty
+          ? null
+          : LocaleKeys.selectProductLastSeenDateText.locale,
       keyboardType: TextInputType.datetime,
       controller: viewModel.productLastSeenDateController,
       decoration: buildLastSeenTextFieldDecoration(context),
@@ -100,9 +106,9 @@ extension _AddProductTextFieldsExtension on AddProductView {
   InputDecoration buildLastSeenTextFieldDecoration(BuildContext context) {
     return InputDecoration(
         labelStyle: context.textTheme.subtitle1,
-        label: Text("Product last seen date"),
+        label: Text(LocaleKeys.productLastSeenDateText.locale),
         icon: buildContainerIconField(context, Icons.date_range),
-        hintText: "Product last seen date");
+        hintText: LocaleKeys.productLastSeenDateText.locale);
   }
 
   Container buildContainerIconField(BuildContext context, IconData icon) {

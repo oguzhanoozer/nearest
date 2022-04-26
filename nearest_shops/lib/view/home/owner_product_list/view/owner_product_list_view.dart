@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:kartal/kartal.dart';
+import '../../../../core/extension/string_extension.dart';
+import '../../../../core/init/lang/locale_keys.g.dart';
+import '../../shop_list/model/shop_model.dart';
 
 import '../../../../core/base/view/base_view.dart';
 import '../../../../core/components/card/list_item_card.dart';
@@ -11,8 +14,12 @@ import 'map_shop_view.dart';
 
 part 'subview/owner_product_extension.dart';
 
-class OwnerUserProductListView extends StatelessWidget {
-  const OwnerUserProductListView({Key? key}) : super(key: key);
+class OwnerProductListMapView extends StatelessWidget {
+  final bool isDirection;
+  final ShopModel? shopModel;
+  const OwnerProductListMapView(
+      {Key? key, this.isDirection = false, this.shopModel})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +27,7 @@ class OwnerUserProductListView extends StatelessWidget {
       viewModel: OwnerProductListViewModel(),
       onModelReady: (model) {
         model.setContext(context);
-        model.init();
+        model.init(isDirection: isDirection, shopModel: shopModel);
       },
       onPageBuilder:
           (BuildContext context, OwnerProductListViewModel viewmodel) =>
@@ -32,6 +39,7 @@ class OwnerUserProductListView extends StatelessWidget {
       BuildContext context, OwnerProductListViewModel viewmodel) {
     return Observer(builder: (_) {
       return Scaffold(
+    
         key: viewmodel.scaffoldState,
         body: viewmodel.isShopMapLoading
             ? const Center(child: CircularProgressIndicator())
@@ -129,8 +137,13 @@ class OwnerUserProductListView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            viewmodel.getShopName(),
+            viewmodel.getShopModel().name!,
             style: context.textTheme.headline6!
+                .copyWith(fontWeight: FontWeight.bold),
+          ),
+          Text(
+            viewmodel.getShopModel().address!,
+            style: context.textTheme.bodyText1!
                 .copyWith(fontWeight: FontWeight.bold),
           ),
           Expanded(
@@ -150,7 +163,6 @@ class OwnerUserProductListView extends StatelessWidget {
   Widget buildProductCard(
       BuildContext context, OwnerProductListViewModel viewmodel, int index) {
     return ProductListView(
-      index: index,
       productDetailModel: viewmodel.getListProductDetailModel()[index],
       shopModel: null,
       rightSideWidget:
@@ -160,7 +172,7 @@ class OwnerUserProductListView extends StatelessWidget {
           padding: EdgeInsets.zero,
           icon: Icon(
             Icons.favorite,
-            color: Colors.red,
+            color: context.colorScheme.onPrimaryContainer,
           ),
           onPressed: null,
         ),

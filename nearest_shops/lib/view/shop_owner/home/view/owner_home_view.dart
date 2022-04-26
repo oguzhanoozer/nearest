@@ -1,20 +1,29 @@
-/*import 'dart:async';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:kartal/kartal.dart';
-import 'package:nearest_shops/core/components/button/normal_button.dart';
+
 import '../../../../../core/base/view/base_view.dart';
-import '../../../../core/init/service/authenticaion/firebase_authentication.dart';
+import '../../../../core/components/button/normal_button.dart';
+import '../../../../core/extension/string_extension.dart';
+import '../../../../core/init/lang/locale_keys.g.dart';
 import '../viewmodel/owner_home_view_model.dart';
 
-class CreateFacilityMapView extends StatelessWidget {
-  CreateFacilityMapView({Key? key}) : super(key: key);
+class OwnerHomeView extends StatefulWidget {
+  const OwnerHomeView({Key? key}) : super(key: key);
+  @override
+  _MapsState createState() => _MapsState();
+}
 
-  OwnerHomeViewModel viewModel = OwnerHomeViewModel();
+class _MapsState extends State<OwnerHomeView> {
+  final Completer<GoogleMapController> _controllerGoogleMap = Completer();
 
-  Completer<GoogleMapController> controllerGoogleMap = Completer();
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,23 +38,21 @@ class CreateFacilityMapView extends StatelessWidget {
     );
   }
 
-  Widget buildScaffold(BuildContext context, OwnerHomeViewModel viewModel) {
-    return Observer(builder: (_) {
-      return viewModel.isMapDataLoading
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : Scaffold(
-              key: viewModel.scaffoldState,
-              body: Stack(
+  Scaffold buildScaffold(BuildContext context, OwnerHomeViewModel viewModel) {
+    return Scaffold(
+      key: viewModel.scaffoldState,
+      body: Observer(builder: (_) {
+        return viewModel.isMapDataLoading
+            ? Center(child: CircularProgressIndicator())
+            : Stack(
                 children: [
-                  buildGoogleMapContainer(),
-                  buildSearchTextField(context),
+                  buildGoogleMapContainer(context, viewModel),
+                  buildSearchTextField(context, viewModel),
                   buildSelectUseLocationButton(context, viewModel)
                 ],
-              ),
-            );
-    });
+              );
+      }),
+    );
   }
 
   Positioned buildSelectUseLocationButton(
@@ -54,39 +61,46 @@ class CreateFacilityMapView extends StatelessWidget {
       bottom: 10,
       right: context.dynamicWidth(0.2),
       left: context.dynamicWidth(0.2),
-      child: NormalButton(
-        child: Text(
-          "Use Selected Location",
-          style: context.textTheme.bodyText1!
-              .copyWith(color: context.appTheme.colorScheme.onPrimary),
-        ),
-        onPressed: () async {
-          await FirebaseAuthentication.instance.signOut();
-          // await viewModel.updateShopLocation(latitude: 40, longtitude: 32);
-        },
-        color: context.appTheme.colorScheme.onSecondary,
-      ),
+      child: Observer(builder: (_) {
+        return NormalButton(
+          child: viewModel.isEnableUpdating
+              ? Text( LocaleKeys.saveLocationText.locale)
+              : Text(
+                  LocaleKeys.updateLocationText.locale,
+                  style: context.textTheme.bodyText1!
+                      .copyWith(color: context.appTheme.colorScheme.onPrimary),
+                ),
+          onPressed: () async {
+            viewModel.isEnableUpdating
+                ? viewModel.updateGeoPointLocation()
+                : viewModel.changeUpdateEnable();
+          },
+          color: context.appTheme.colorScheme.onSecondary,
+        );
+      }),
     );
   }
 
-  Widget buildGoogleMapContainer() {
-    final data = viewModel.markers ;
+  GoogleMap buildGoogleMapContainer(
+      BuildContext context, OwnerHomeViewModel viewModel) {
     return GoogleMap(
-      markers:data,
       mapType: MapType.normal,
       myLocationButtonEnabled: true,
       initialCameraPosition: viewModel.initialCameraPosition,
       zoomGesturesEnabled: true,
-      myLocationEnabled: true,
+
+      ///myLocationEnabled: true,
       zoomControlsEnabled: true,
       onMapCreated: (GoogleMapController controller) {
-        controllerGoogleMap.complete(controller);
+        _controllerGoogleMap.complete(controller);
         viewModel.newGoogleMapController = controller;
       },
+      markers: viewModel.markers,
     );
   }
 
-  Positioned buildSearchTextField(BuildContext context) {
+  Positioned buildSearchTextField(
+      BuildContext context, OwnerHomeViewModel viewModel) {
     return Positioned(
       top: context.dynamicHeight(0.03),
       right: context.dynamicHeight(0.03),
@@ -95,7 +109,8 @@ class CreateFacilityMapView extends StatelessWidget {
         textAlignVertical: TextAlignVertical.center,
         validator: (value) => null,
         obscureText: false,
-        decoration: buildTextFormFieldsDecoration(context),
+        enabled: viewModel.isEnableUpdating,
+        decoration: buildTextFormFieldsDecoration(context, viewModel),
         onTap: () async {
           await viewModel.getPlaceAutoComplete(context);
         },
@@ -103,7 +118,8 @@ class CreateFacilityMapView extends StatelessWidget {
     );
   }
 
-  InputDecoration buildTextFormFieldsDecoration(BuildContext context) {
+  InputDecoration buildTextFormFieldsDecoration(
+      BuildContext context, OwnerHomeViewModel viewModel) {
     return InputDecoration(
       fillColor: context.colorScheme.onSecondary,
       contentPadding: EdgeInsets.zero,
@@ -135,4 +151,4 @@ class CreateFacilityMapView extends StatelessWidget {
     );
   }
 }
-*/
+ 

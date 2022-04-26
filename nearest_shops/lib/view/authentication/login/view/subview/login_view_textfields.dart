@@ -6,7 +6,7 @@ extension _LoginViewTextFields on LoginView {
     return Observer(builder: (_) {
       return TextFormField(
         validator: (value) =>
-            value!.isNotEmpty ? null : LocaleKeys.theFieldRequired.locale,
+            value!.isNotEmpty ? null : LocaleKeys.theFieldRequiredText.locale,
         keyboardType: TextInputType.visiblePassword,
         controller: viewModel.passwordController,
         obscureText: viewModel.isLockOpen,
@@ -20,7 +20,7 @@ extension _LoginViewTextFields on LoginView {
     return InputDecoration(
       labelStyle: context.textTheme.subtitle1,
       label: Text(
-        LocaleKeys.password.locale,
+        LocaleKeys.passwordText.locale,
       ),
       icon: buildContainerIconField(context, Icons.vpn_key),
       hintText: "Password123456",
@@ -39,7 +39,7 @@ extension _LoginViewTextFields on LoginView {
       LoginViewModel viewModel, BuildContext context) {
     return TextFormField(
       validator: (value) =>
-          value!.isValidEmail ? null : LocaleKeys.enterValidEmail.locale,
+          value!.isValidEmail ? null : LocaleKeys.enterValidEmailText.locale,
       keyboardType: TextInputType.emailAddress,
       controller: viewModel.emailController,
       decoration: buildEmailTextFieldDecoration(context),
@@ -49,14 +49,13 @@ extension _LoginViewTextFields on LoginView {
   InputDecoration buildEmailTextFieldDecoration(BuildContext context) {
     return InputDecoration(
         labelStyle: context.textTheme.subtitle1,
-        label: Text(LocaleKeys.email.locale),
+        label: Text(LocaleKeys.emailText.locale),
         icon: buildContainerIconField(context, Icons.email),
         hintText: "example@email.com");
   }
 
   Container buildContainerIconField(BuildContext context, IconData icon) {
     return Container(
-      // color: context.colors.onError,
       padding: context.paddingLow,
       child: Icon(icon, color: context.appTheme.colorScheme.onSurfaceVariant),
     );

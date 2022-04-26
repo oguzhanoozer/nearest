@@ -19,7 +19,7 @@ extension _RegisterViewTextFields on RegisterView {
     return InputDecoration(
       labelStyle: context.textTheme.subtitle1,
       label: Text(
-        LocaleKeys.enterPassword.locale,
+        LocaleKeys.enterPasswordText.locale,
       ),
       icon: buildContainerIconField(context, Icons.vpn_key),
       hintText: "Password123456",
@@ -39,7 +39,7 @@ extension _RegisterViewTextFields on RegisterView {
     return Observer(builder: (_) {
       return TextFormField(
         validator: (value) => value!.isEmpty
-            ? LocaleKeys.theFieldRequired.locale
+            ? LocaleKeys.theFieldRequiredText.locale
             : viewModel.passwordLaterController!.text !=
                     viewModel.passwordFirstController!.text
                 ? "Passwords are not equals"
@@ -57,7 +57,7 @@ extension _RegisterViewTextFields on RegisterView {
     return InputDecoration(
       labelStyle: context.textTheme.subtitle1,
       label: Text(
-        LocaleKeys.againPassword.locale,
+        LocaleKeys.againPasswordText.locale,
       ),
       icon: buildContainerIconField(context, Icons.vpn_key),
       hintText: "Password123456",
@@ -77,7 +77,7 @@ extension _RegisterViewTextFields on RegisterView {
       RegisterViewModel viewModel, BuildContext context) {
     return TextFormField(
       validator: (value) =>
-          value!.isValidEmail ? null : LocaleKeys.enterValidEmail.locale,
+          value!.isValidEmail ? null : LocaleKeys.enterValidEmailText.locale,
       keyboardType: TextInputType.emailAddress,
       controller: viewModel.emailController,
       decoration: buildEmailTextFieldDecoration(context),
@@ -87,14 +87,13 @@ extension _RegisterViewTextFields on RegisterView {
   InputDecoration buildEmailTextFieldDecoration(BuildContext context) {
     return InputDecoration(
         labelStyle: context.textTheme.subtitle1,
-        label: Text(LocaleKeys.email.locale),
+        label: Text(LocaleKeys.emailText.locale),
         icon: buildContainerIconField(context, Icons.email),
         hintText: "example@email.com");
   }
 
   Container buildContainerIconField(BuildContext context, IconData icon) {
     return Container(
-      // color: context.colors.onError,
       padding: context.paddingLow,
       child: Icon(icon, color: context.appTheme.colorScheme.onSurfaceVariant),
     );

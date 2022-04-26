@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:kartal/kartal.dart';
 import 'package:mobx/mobx.dart';
+import '../../../../core/extension/string_extension.dart';
 
 import '../../../../core/base/view/base_view.dart';
 import '../../../../core/components/card/list_item_card.dart';
+import '../../../../core/init/lang/locale_keys.g.dart';
 import '../../../home/product_detail/model/product_detail_model.dart';
 import '../../../product/contstants/image_path.dart';
 import '../../../product/product_list_view/product_list_view.dart';
@@ -31,12 +33,7 @@ class ShopOwnerProductListView extends StatelessWidget {
           ShopOwnerProductListViewModel viewModel, BuildContext context) =>
       Scaffold(
         key: viewModel.scaffoldState,
-        appBar: AppBar(
-          centerTitle: true,
-          title: Text("Your Products"),
-          automaticallyImplyLeading: false,
-          elevation: 0.5,
-        ),
+        appBar: buildAppBar(context, viewModel),
         body: buildBody(viewModel, context),
       );
 
@@ -82,7 +79,6 @@ class ShopOwnerProductListView extends StatelessWidget {
       ShopOwnerProductListViewModel viewModel,
       int index) {
     return ProductListView(
-      index: index,
       productDetailModel: productDetailModel,
       rightSideWidget: Column(
         children: [
@@ -92,7 +88,7 @@ class ShopOwnerProductListView extends StatelessWidget {
               padding: EdgeInsets.zero,
               icon: Icon(
                 Icons.edit,
-                color: Colors.green,
+                color: context.colorScheme.onSecondaryContainer,
               ),
               onPressed: () {
                 context.navigateToPage(
@@ -110,7 +106,7 @@ class ShopOwnerProductListView extends StatelessWidget {
               padding: EdgeInsets.zero,
               icon: Icon(
                 Icons.delete,
-                color: Colors.red,
+                color: context.colorScheme.onPrimaryContainer,
               ),
               onPressed: () async {
                 await viewModel.deleteProduct(
@@ -121,6 +117,69 @@ class ShopOwnerProductListView extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  AppBar buildAppBar(
+      BuildContext context, ShopOwnerProductListViewModel viewModel) {
+    return AppBar(
+      elevation: 0.1,
+      automaticallyImplyLeading: false,
+      centerTitle: true,
+      title: Observer(builder: (_) {
+        return viewModel.isSearching
+            ? getAppBarListTile(context, viewModel)
+            : Text(LocaleKeys.yourProductsText.locale,
+                style: context.textTheme.headline6!.copyWith(
+                    color: context.colorScheme.onPrimary,
+                    fontWeight: FontWeight.bold));
+      }),
+      actions: [
+        Observer(builder: (_) {
+          return viewModel.isSearching
+              ? SizedBox()
+              : Padding(
+                  padding: context.horizontalPaddingNormal,
+                  child: IconButton(
+                    onPressed: () {
+                      viewModel.changeIsSearching();
+                    },
+                    icon: Icon(Icons.search, size: context.dynamicHeight(0.04)),
+                  ),
+                );
+        })
+      ],
+    );
+  }
+
+  Widget getAppBarListTile(
+      BuildContext context, ShopOwnerProductListViewModel viewModel) {
+    return ListTile(
+      title: TextFormField(
+        textInputAction: TextInputAction.search,
+        onChanged: (value) {},
+        autofocus: true,
+        onFieldSubmitted: (term) {
+          viewModel.filterProducts(term);
+        },
+        decoration: InputDecoration(
+            isDense: true, // Added this
+            contentPadding: EdgeInsets.all(8),
+            hintText: LocaleKeys.enterProductNameText.locale,
+            hintStyle: TextStyle(
+              color: context.colorScheme.onSecondary.withOpacity(0.5),
+              fontSize: 12,
+              fontStyle: FontStyle.italic,
+            ),
+            prefixIcon: Icon(Icons.search, size: context.dynamicHeight(0.03)),
+            border: InputBorder.none,
+            suffixIcon: IconButton(
+              icon: Icon(Icons.cancel_sharp, size: context.dynamicHeight(0.03)),
+              onPressed: () {
+                viewModel.changeIsSearching();
+              },
+            )),
       ),
     );
   }

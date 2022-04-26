@@ -1,10 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
-import '../../../utility/error_helper.dart';
 
 import '../../../../core/init/service/authenticaion/firebase_authentication.dart';
 import '../../../../core/init/service/firestorage/enum/document_collection_enums.dart';
+import '../../../utility/error_helper.dart';
 import '../../onboard/view/onboard_view.dart';
 
 abstract class ILoginService {
@@ -28,6 +28,7 @@ class LoginService extends ILoginService with ErrorHelper {
           .signWithEmailandPassword(email: email, password: password);
       if (!user!.emailVerified) {
         await FirebaseAuthentication.instance.signOut();
+        ///await user.sendEmailVerification();
         await showVerificationAlertDialog(
           context,
         );
