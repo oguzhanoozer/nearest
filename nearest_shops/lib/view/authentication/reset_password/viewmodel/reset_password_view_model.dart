@@ -7,11 +7,9 @@ import '../service/IReset_password_service.dart';
 
 part 'reset_password_view_model.g.dart';
 
-class ResetPasswordViewModel = _ResetPasswordViewModelBase
-    with _$ResetPasswordViewModel;
+class ResetPasswordViewModel = _ResetPasswordViewModelBase with _$ResetPasswordViewModel;
 
-abstract class _ResetPasswordViewModelBase
-    with Store, BaseViewModel, ErrorHelper {
+abstract class _ResetPasswordViewModelBase with Store, BaseViewModel, ErrorHelper {
   GlobalKey<FormState> formState = GlobalKey();
   GlobalKey<ScaffoldState> scaffoldState = GlobalKey();
 
@@ -24,7 +22,7 @@ abstract class _ResetPasswordViewModelBase
   @override
   void setContext(BuildContext context) {
     this.context = context;
-    resetPasswordService = ResetPasswordService(scaffoldState,context);
+    resetPasswordService = ResetPasswordService(scaffoldState, context);
   }
 
   @override
@@ -39,11 +37,9 @@ abstract class _ResetPasswordViewModelBase
 
   Future<void> sendResetPasswordEmail() async {
     changeResetEmail();
-    if (formState.currentState!.validate() &&
-        emailResetTextController != null) {
+    if (formState.currentState!.validate() && emailResetTextController != null) {
       {
-        await resetPasswordService.resetUserPassword(
-            email: emailResetTextController!.text);
+        await resetPasswordService.resetUserPassword(email: emailResetTextController!.text);
       }
     }
     emailResetTextController!.text = "";

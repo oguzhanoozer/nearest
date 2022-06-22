@@ -25,12 +25,10 @@ abstract class _CategoriesViewModelBase with Store, BaseViewModel {
   late IDashboardService dashboardService;
 
   @observable
-  ObservableList<ProductDetailModel> productList =
-      ObservableList<ProductDetailModel>();
+  ObservableList<ProductDetailModel> productList = ObservableList<ProductDetailModel>();
 
   @observable
-  ObservableList<ProductDetailModel> persistProductList =
-      ObservableList<ProductDetailModel>();
+  ObservableList<ProductDetailModel> persistProductList = ObservableList<ProductDetailModel>();
 
   ObservableList<String> userFavouriteList = ObservableList<String>();
 
@@ -58,17 +56,12 @@ abstract class _CategoriesViewModelBase with Store, BaseViewModel {
     categoryId = value;
     if (categoryId != 0) {
       if (isSearching && filterText.isNotEmpty) {
-        List<ProductDetailModel> _tempProductDetailList = persistProductList
-            .where((element) =>
-                element.categoryId == categoryId &&
-                element.name!.toLowerCase().contains(filterText))
-            .toList();
+        List<ProductDetailModel> _tempProductDetailList =
+            persistProductList.where((element) => element.categoryId == categoryId && element.name!.toLowerCase().contains(filterText)).toList();
 
         productList = _tempProductDetailList.asObservable();
       } else {
-        List<ProductDetailModel> _tempProductDetailList = persistProductList
-            .where((element) => element.categoryId == categoryId)
-            .toList();
+        List<ProductDetailModel> _tempProductDetailList = persistProductList.where((element) => element.categoryId == categoryId).toList();
 
         productList = _tempProductDetailList.asObservable();
       }
@@ -109,21 +102,15 @@ abstract class _CategoriesViewModelBase with Store, BaseViewModel {
           fetchProductLastList();
         }
       });
-    userFavouriteList = (await UserLocationInitializeCheck.instance
-        .getUserFavouriteList()
-        .asObservable())!;
+    userFavouriteList = (await UserLocationInitializeCheck.instance.getUserFavouriteList(scaffoldState,context!).asObservable())!;
     fetchProductFirstList();
   }
 
   @action
   Future<void> fetchProductFirstList() async {
     changeIsProductFirstListLoading();
-    String? shopId = await UserIdInitalize.instance.returnUserId();
-    List<ProductDetailModel> _productList = shopId == null
-        ? []
-        : await dashboardService.fetchDashboardProductFirstList(
-                isCategories: true) ??
-            [];
+    String? shopId = await UserIdInitalize.instance.returnUserId(scaffoldState,context!);
+    List<ProductDetailModel> _productList = shopId == null ? [] : await dashboardService.fetchDashboardProductFirstList(isCategories: true) ?? [];
     productList = _productList.asObservable();
     persistProductList = productList;
 
@@ -132,13 +119,10 @@ abstract class _CategoriesViewModelBase with Store, BaseViewModel {
 
   @action
   Future<void> fetchProductLastList() async {
-    if (isProductFirstListLoading == false &&
-        isProductMoreListLoading == false) {
+    if (isProductFirstListLoading == false && isProductMoreListLoading == false) {
       changeIsProductMoreListLoading();
-      String? shopId = await UserIdInitalize.instance.returnUserId();
-      List<ProductDetailModel> moreDataList = shopId == null
-          ? []
-          : await dashboardService.fetchDashboardProductMoreList() ?? [];
+      String? shopId = await UserIdInitalize.instance.returnUserId(scaffoldState,context!);
+      List<ProductDetailModel> moreDataList = shopId == null ? [] : await dashboardService.fetchDashboardProductMoreList() ?? [];
       productList.addAll(moreDataList);
 
       persistProductList = productList;
@@ -162,14 +146,18 @@ abstract class _CategoriesViewModelBase with Store, BaseViewModel {
     productList = productList
         .where((item) {
           if (categoryId != 0 && isSearching) {
-            return item.name!
-                    .toLowerCase()
-                    .contains(productName..toLowerCase()) &&
-                item.categoryId == categoryId;
+            return item.name!.toLowerCase().contains(productName..toLowerCase()) && item.categoryId == categoryId;
           }
           return item.name!.toLowerCase().contains(productName..toLowerCase());
         })
         .toList()
         .asObservable();
   }
+
+  List<ProductDetailModel> filterProductList(String query) => List.of(productList).where((shop) {
+        final productLower = shop.name!.toLowerCase();
+        final queryLower = query.toLowerCase();
+
+        return productLower.contains(queryLower);
+      }).toList();
 }

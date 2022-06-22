@@ -28,26 +28,26 @@ abstract class _RegisterViewModelBase with Store, BaseViewModel, ErrorHelper {
   @observable
   bool isLaterLockOpen = false;
 
+  @override
   void setContext(BuildContext context) {
     this.context = context;
-    registerService = RegisterService(scaffoldState,context);
+    registerService = RegisterService(scaffoldState, context);
   }
 
+  @override
   void init() {
     emailController = TextEditingController();
     passwordFirstController = TextEditingController();
     passwordLaterController = TextEditingController();
-    passwordFirstController!.text = "123456";
-    passwordLaterController!.text = "123456";
-    emailController!.text = "oguzoozer@gmail.com";
+    ///passwordFirstController!.text = "123456";
+    ///passwordLaterController!.text = "123456";
+    ///emailController!.text = "oguzoozer@gmail.com";
   }
 
   Future<void> checkUserData() async {
     isLoadingChange();
     if (formState.currentState!.validate()) {
-      await registerService.registerUser(
-          email: emailController!.text,
-          password: passwordLaterController!.text);
+      await registerService.registerUser(email: emailController!.text, password: passwordLaterController!.text);
     }
     isLoadingChange();
   }

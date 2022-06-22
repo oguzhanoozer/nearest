@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:nearest_shops/core/init/service/firestorage/enum/document_collection_enums.dart';
 import '../../../../core/extension/string_extension.dart';
 import '../../../../core/init/lang/locale_keys.g.dart';
 import '../../../../core/init/service/authenticaion/firebase_authentication.dart';
@@ -20,21 +21,17 @@ abstract class IShopOwnerHomeService {
 }
 
 class ShopOwnerHomeService extends IShopOwnerHomeService with ErrorHelper {
-  ShopOwnerHomeService(
-      GlobalKey<ScaffoldState> scaffoldState, BuildContext context)
-      : super(scaffoldState, context);
+  ShopOwnerHomeService(GlobalKey<ScaffoldState> scaffoldState, BuildContext context) : super(scaffoldState, context);
 
   Future<void> updateShopLocation(GeoPoint geoPoint) async {
     try {
       User? user = FirebaseAuthentication.instance.authCurrentUser();
       if (user != null) {
-        Map<String, dynamic> updateGeoPointData = {"location": geoPoint};
+        Map<String, dynamic> updateGeoPointData = {ContentString.LOCATION.rawValue: geoPoint};
 
-        await FirebaseCollectionRefInitialize.instance.shopsCollectionReference
-            .doc(user.uid)
-            .update(updateGeoPointData);
+        await FirebaseCollectionRefInitialize.instance.shopsCollectionReference.doc(user.uid).update(updateGeoPointData);
       }
-    } catch (e) {
+    }catch (e) {
       showSnackBar(scaffoldState, context, LocaleKeys.errorOnUpdateLocationText.locale);
     }
   }
@@ -43,19 +40,15 @@ class ShopOwnerHomeService extends IShopOwnerHomeService with ErrorHelper {
     try {
       User? user = FirebaseAuthentication.instance.authCurrentUser();
       if (user != null) {
-        final shopsListQuery = await FirebaseCollectionRefInitialize
-            .instance.shopsCollectionReference
-            .get();
+        final shopsListQuery = await FirebaseCollectionRefInitialize.instance.shopsCollectionReference.get();
         List<DocumentSnapshot> docsInShops = shopsListQuery.docs;
         if (docsInShops.isNotEmpty) {
-          ShopModel shopModel =
-              ShopModel.fromJson(docsInShops.first.data() as Map);
+          ShopModel shopModel = ShopModel.fromJson(docsInShops.first.data() as Map);
           return shopModel;
         }
       }
-    } catch (e) {
-      showSnackBar(scaffoldState, context,  LocaleKeys.errorOnUploadingProfileImagaText.locale);
-      return null;
+    }  catch (e) {
+      showSnackBar(scaffoldState, context, LocaleKeys.errorOnUploadingProfileImagaText.locale);
     }
   }
 }

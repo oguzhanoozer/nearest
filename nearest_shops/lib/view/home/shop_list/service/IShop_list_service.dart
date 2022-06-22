@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:nearest_shops/core/extension/string_extension.dart';
+import '../../../../core/init/lang/locale_keys.g.dart';
 import '../../../utility/error_helper.dart';
 
 import '../../../../core/init/service/firestorage/firestorage_initialize.dart';
@@ -35,7 +37,7 @@ class ShopListService extends IShopListService with ErrorHelper {
       }
       return _shopModelList;
     } on FirebaseException catch (e) {
-      showSnackBar(scaffoldState, context, e.message.toString());
+      showSnackBar(scaffoldState, context, LocaleKeys.loginError.locale);
       return null;
     }
   }

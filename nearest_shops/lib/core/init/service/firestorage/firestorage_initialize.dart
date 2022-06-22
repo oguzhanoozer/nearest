@@ -42,4 +42,7 @@ class FirebaseCollectionRefInitialize {
   CollectionReference usersCollectionReference = FirebaseFirestoreInitalize
       .instance._firebaseFiresore
       .collection(FirestorageItems.USERS.rawValue);
+      CollectionReference categoryCollectionReference = FirebaseFirestoreInitalize
+      .instance._firebaseFiresore
+      .collection(FirestorageItems.CATEGORY.rawValue);
 }

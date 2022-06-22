@@ -93,6 +93,15 @@ mixin _$UserFavouriteListViewModel on _UserFavouriteListViewModelBase, Store {
         .run(() => super.removeFavouriteItem(index));
   }
 
+  final _$removeFromFavouriteListAsyncAction =
+      AsyncAction('_UserFavouriteListViewModelBase.removeFromFavouriteList');
+
+  @override
+  Future<void> removeFromFavouriteList(ProductDetailModel productDetailModel) {
+    return _$removeFromFavouriteListAsyncAction
+        .run(() => super.removeFromFavouriteList(productDetailModel));
+  }
+
   final _$_UserFavouriteListViewModelBaseActionController =
       ActionController(name: '_UserFavouriteListViewModelBase');
 

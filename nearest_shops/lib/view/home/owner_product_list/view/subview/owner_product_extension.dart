@@ -1,52 +1,91 @@
 part of '../owner_product_list_view.dart';
 
 extension _Owner_product_extension on OwnerProductListMapView {
-  Positioned buildSearchTextField(BuildContext context) {
+  Positioned buildSelectUseLocationButton(BuildContext context) {
+    return Positioned(
+        bottom: context.dynamicHeight(0.01),
+        right: context.dynamicWidth(0.2),
+        left: context.dynamicWidth(0.2),
+        child: NormalButton(
+          child: buildUpdateText(LocaleKeys.updateLocationText.locale, context),
+          onPressed: () async {
+            Navigator.pushNamed(context, userChangeLocationViewRoute);
+          },
+          color: context.appTheme.colorScheme.onSurfaceVariant,
+        ));
+  }
+
+  Text buildUpdateText(String text, BuildContext context) {
+    return Text(
+      text,
+      style: GoogleFonts.lora(textStyle: context.textTheme.titleMedium!.copyWith(color: context.colorScheme.inversePrimary)),
+    );
+  }
+
+  Positioned buildSearchTextField(BuildContext context, OwnerProductListViewModel viewmodel) {
     return Positioned(
       top: context.dynamicHeight(0.03),
       right: context.dynamicHeight(0.03),
       left: context.dynamicHeight(0.03),
-      child: TextFormField(
-        textAlignVertical: TextAlignVertical.center,
-        validator: (value) => null,
-        obscureText: false,
-        decoration: buildTextFormFieldsDecoration(context),
-      ),
-    );
-  }
+      child: TypeAheadField<ShopModel?>(
+        loadingBuilder: (context) {
+          return CallCircularProgress(context);
+        },
+        hideKeyboard: false,
+        debounceDuration: context.durationLow,
 
-  InputDecoration buildTextFormFieldsDecoration(BuildContext context) {
-    return InputDecoration(
-      fillColor: context.colorScheme.onSecondary,
-      contentPadding: EdgeInsets.zero,
-      focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(
-          width: 0.5,
-          color: context.colorScheme.surface.withOpacity(0.3),
+        ///hideSuggestionsOnKeyboardHide: false,
+        textFieldConfiguration: TextFieldConfiguration(
+          controller: viewmodel.searcpInputTExtFieldController,
+          style: inputTextStyle(context),
+          textAlignVertical: TextAlignVertical.center,
+          obscureText: false,
+          textInputAction: TextInputAction.search,
+          decoration: buildInputDecoration(
+            context,
+            hintText: LocaleKeys.enterShopNameText.locale,
+            fillColor: context.colorScheme.onSecondary,
+          ),
         ),
-        borderRadius: BorderRadius.circular(context.lowValue),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: context.colorScheme.onSecondary),
-        borderRadius: BorderRadius.circular(context.lowValue),
-      ),
-      disabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: context.colorScheme.onSecondary),
-        borderRadius: BorderRadius.circular(context.lowValue),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: context.colorScheme.onSecondary),
-        borderRadius: BorderRadius.circular(context.lowValue),
-      ),
-      prefixIcon: Icon(Icons.search,
-          color: context.colorScheme.surface, size: context.normalValue),
-      hintStyle: context.textTheme.titleMedium!
-          .copyWith(color: context.colorScheme.surface),
-      hintText: LocaleKeys.searchTheProductText.locale,
-      suffixIcon: Icon(
-        Icons.filter_list_outlined,
-        size: context.dynamicHeight(0.03),
-        color: context.colorScheme.onSurfaceVariant,
+        suggestionsCallback: viewmodel.filterShopList,
+        itemBuilder: (context, ShopModel? suggestion) {
+          final shop = suggestion!;
+
+          return Container(
+            color: context.colorScheme.onSecondary,
+            child: ListTile(
+              leading: SizedBox(
+                height: context.dynamicHeight(0.1),
+                width: context.dynamicWidth(0.1),
+                child: shop.logoUrl!.isEmpty
+                    ? Padding(
+                        padding: context.paddingLow,
+                        child: Lottie.asset(
+                          ImagePaths.instance.shop_lottie3,
+                          repeat: true,
+                          reverse: true,
+                          animate: true,
+                        ),
+                      )
+                    : buildImageNetwork(shop.logoUrl ?? "", context),
+              ),
+              title: Text(shop.name.toString(), style: titleTextStyle(context)),
+            ),
+          );
+        },
+        noItemsFoundBuilder: (context) => Container(
+          height: context.dynamicHeight(0.1),
+          width: context.dynamicWidth(1),
+          color: context.colorScheme.onSecondary,
+          child: Center(
+            child: Text(LocaleKeys.anyProductFound.locale, style: inputTextStyle(context)),
+          ),
+        ),
+        onSuggestionSelected: (ShopModel? suggestion) {
+          final shopModel = suggestion!;
+
+          viewmodel.changeCameraPosition(shopModel.location!);
+        },
       ),
     );
   }

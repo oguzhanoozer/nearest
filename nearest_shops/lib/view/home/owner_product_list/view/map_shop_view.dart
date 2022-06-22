@@ -6,7 +6,7 @@ import '../viewmodel/owner_product_list_view_model.dart';
 class MapShopView extends StatelessWidget {
   final OwnerProductListViewModel viewModel;
 
-  MapShopView({Key? key, required this.viewModel}) : super(key: key);
+  const MapShopView({Key? key, required this.viewModel}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,9 @@ class MapShopView extends StatelessWidget {
         scrollGesturesEnabled: true,
         zoomGesturesEnabled: true,
         markers: viewModel.getListMarkerList(),
-        onMapCreated: (GoogleMapController controller) {},
+        onMapCreated: (GoogleMapController controller) {
+          viewModel.newGoogleMapController = controller;
+        },
       ),
     );
   }

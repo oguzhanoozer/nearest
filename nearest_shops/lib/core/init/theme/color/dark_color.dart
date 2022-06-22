@@ -22,20 +22,38 @@ class DarkColors implements IColors {
 
   @override
   Color? tabbarNormalColor;
-
+ 
   @override
   Color? tabbarSelectedColor;
 
   AppColors colors = AppColors();
 
   DarkColors() {
-    appBarColor = colors.darkGrey;
-    scaffoldBackgroundColor = colors.darkGrey;
+    appBarColor = colors.darkBackgroundColor;
+
+    scaffoldBackgroundColor = colors.darkBackgroundColor;
     tabBarColor = colors.green;
-    tabbarNormalColor = colors.lighterGrey;
+    tabbarNormalColor = colors.darkerGrey;
     tabbarSelectedColor = colors.green;
-    colorScheme = ColorScheme.dark()
-        .copyWith(onPrimary: colors.green, onSecondary: colors.darkGrey);
+
+    colorScheme = ColorScheme.dark().copyWith(
+        background: colors.darkBackgroundColor,
+        onSurfaceVariant: colors.green,
+        onInverseSurface: colors.lightOrange,
+        primary: colors.white,
+        onSecondary: colors.darkerGrey,
+        onSecondaryContainer: colors.darkShadowGreyColor,
+        onPrimaryContainer: colors.red,
+        onSurface: colors.mediumGreyBold,
+        brightness: Brightness.dark,
+        surface: colors.grey,
+        onPrimary: colors.darkGrey,
+        primaryContainer: colors.darkerGrey,
+        surfaceVariant: colors.mediumGrey,
+        inverseSurface: colors.lightGrey,
+        inversePrimary: colors.white,
+        onTertiary: colors.darkShimmerColor,
+        onTertiaryContainer: colors.green);
     brightness = Brightness.dark;
   }
 }

@@ -4,8 +4,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobx/mobx.dart';
+import 'package:nearest_shops/core/base/route/generate_route.dart';
 import '../../../../core/base/model/base_view_model.dart';
 import '../../../../core/init/lang/language_manager.dart';
+import '../../../../core/init/service/cacheManager/CacheManager.dart';
 import '../../../../core/init/theme/app_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:kartal/kartal.dart';
@@ -14,8 +16,7 @@ import '../../../authentication/onboard/view/onboard_view.dart';
 import '../service/IUserProfile_service.dart';
 part 'user_profile_view_model.g.dart';
 
-class UserProfileViewModel = _UserProfileViewModelBase
-    with _$UserProfileViewModel;
+class UserProfileViewModel = _UserProfileViewModelBase with _$UserProfileViewModel;
 
 abstract class _UserProfileViewModelBase with Store, BaseViewModel {
   final GlobalKey<FormState> formState = GlobalKey();
@@ -24,6 +25,14 @@ abstract class _UserProfileViewModelBase with Store, BaseViewModel {
   TextEditingController? emailController;
 
   late IUserProfileService _userProfileService;
+
+  @observable
+  bool isLogOut = false;
+
+  @action
+  void changeIsLogOut() {
+    isLogOut = !isLogOut;
+  }
 
   @observable
   User? user;
@@ -40,16 +49,16 @@ abstract class _UserProfileViewModelBase with Store, BaseViewModel {
   XFile? pickedFile;
 
   late AppThemeMode currentAppThemeMode;
+
   late Locale appLocale;
   late String currentLangTitle;
 
   @override
-  init() {
+  init() async {
     changeProfileLoading();
     emailController = TextEditingController();
     user = FirebaseAuthentication.instance.authCurrentUser();
     emailController!.text = user!.email!;
-
     changeProfileLoading();
   }
 
@@ -57,11 +66,16 @@ abstract class _UserProfileViewModelBase with Store, BaseViewModel {
   setContext(BuildContext context) {
     this.context = context;
     _userProfileService = UserProfileService(scaffoldState, context);
+
     currentAppThemeMode = context.read<ThemeManager>().currentThemeMode;
     changerLangSetting(context.locale);
+  }
 
-    ///appLocale = context.locale;
-    ///currentLangTitle = LanguageManager.instance.getLanguageTitle(appLocale);
+  Future<void> logOut() async {
+    changeIsLogOut();
+    await FirebaseAuthentication.instance.signOut();
+    Navigator.pushReplacementNamed(context!, onBoardViewRoute);
+    changeIsLogOut();
   }
 
   void changerLangSetting(Locale locale) {
@@ -84,8 +98,6 @@ abstract class _UserProfileViewModelBase with Store, BaseViewModel {
       appLocale = locale;
       changerLangSetting(appLocale);
       context!.setLocale(locale);
-
-      ///currentLangTitle = LanguageManager.instance.getLanguageTitle(appLocale);
     }
   }
 
@@ -100,14 +112,13 @@ abstract class _UserProfileViewModelBase with Store, BaseViewModel {
     pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
-      String? url =
-          await _userProfileService.uploadProfileImage(File(pickedFile!.path));
+      String? url = await _userProfileService.uploadProfileImage(File(pickedFile!.path));
     }
 
     isImageSelectedChange();
   }
 
-  void changeAppTheme() {
+  Future<void> changeAppTheme() async {
     if (this.context != null) {
       context!.read<ThemeManager>().changeTheme();
       currentAppThemeMode = context!.read<ThemeManager>().currentThemeMode;
@@ -116,7 +127,8 @@ abstract class _UserProfileViewModelBase with Store, BaseViewModel {
 
   Future<void> deleteAccount() async {
     await _userProfileService.deleteAccount();
-       context!.navigateToPage(OnBoardView());
+
+    Navigator.pushReplacementNamed(context!, onBoardViewRoute);
   }
 
   @action

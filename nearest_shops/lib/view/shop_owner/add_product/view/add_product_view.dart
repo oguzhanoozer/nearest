@@ -3,26 +3,30 @@ import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:kartal/kartal.dart';
+import 'package:provider/provider.dart';
 
+import '../../../../core/base/model/add_product_view_arg.dart';
 import '../../../../core/base/view/base_view.dart';
 import '../../../../core/components/button/normal_button.dart';
 import '../../../../core/components/column/form_column.dart';
 import '../../../../core/extension/string_extension.dart';
 import '../../../../core/init/lang/locale_keys.g.dart';
 import '../../../../core/init/models/categories_model.dart';
+import '../../../../core/init/theme/app_theme.dart';
 import '../../../home/product_detail/model/product_detail_model.dart';
+import '../../../product/circular_progress/circular_progress_indicator.dart';
+import '../../../product/input_text_decoration.dart';
 import '../viewmodel/add_product_view_model.dart';
 
 part 'subview/add_product_inputs_extension.dart';
 
 // ignore: must_be_immutable
 class AddProductView extends StatelessWidget {
-  final ProductDetailModel? productDetailModel;
-  final bool isUpdate;
+  final AddProductViewArguments addProductViewArguments;
 
-  AddProductView({Key? key, this.productDetailModel, this.isUpdate = false})
-      : super(key: key);
+  AddProductView({Key? key, required this.addProductViewArguments}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -30,8 +34,7 @@ class AddProductView extends StatelessWidget {
         viewModel: AddProductViewModel(),
         onModelReady: (model) {
           model.setContext(context);
-          model.init(
-              isUpdate: isUpdate, productDetailModel: productDetailModel);
+          model.init(isUpdate: addProductViewArguments.isUpdate, productDetailModel: addProductViewArguments.productDetailModel);
         },
         onPageBuilder: (BuildContext context, AddProductViewModel viewModel) {
           return buildScaffold(context, viewModel);
@@ -42,12 +45,7 @@ class AddProductView extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         key: viewModel.scaffoldState,
-        appBar: AppBar(
-          centerTitle: true,
-          title: Text(LocaleKeys.addNewProductText.locale),
-          automaticallyImplyLeading: false,
-          elevation: 0.5,
-        ),
+        appBar: buildAppBar(context),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -60,6 +58,7 @@ class AddProductView extends StatelessWidget {
                     key: viewModel.formState,
                     child: FormColumn(
                       children: [
+                        context.emptySizedHeightBoxLow,
                         buildNameTextField(viewModel, context),
                         context.emptySizedHeightBoxLow,
                         buildSummaryTextField(viewModel, context),
@@ -74,10 +73,9 @@ class AddProductView extends StatelessWidget {
                         buildLastSeenTextField(viewModel, context),
                         context.emptySizedHeightBoxLow,
                         buildSelectProductImageButton(viewModel, context),
-                        context.emptySizedHeightBoxLow,
+                        context.emptySizedHeightBoxLow3x,
                         selectedImageSlider(viewModel, context),
-
-                        /// isUpdate ? updatedImageSlider(context) : Container(),
+                        context.emptySizedHeightBoxLow3x,
                         buildAddProductButton(viewModel, context),
                       ],
                     ),
@@ -91,27 +89,36 @@ class AddProductView extends StatelessWidget {
     );
   }
 
+  AppBar buildAppBar(BuildContext context) {
+    return AppBar(
+      centerTitle: true,
+      title: Text(LocaleKeys.addNewProductText.locale,
+          style: GoogleFonts.concertOne(
+              textStyle: context.textTheme.headline5!.copyWith(
+            color: context.appTheme.colorScheme.onSurfaceVariant,
+          ))),
+      automaticallyImplyLeading: false,
+    );
+  }
+
   Widget categoriesText(BuildContext context) {
     return Align(
         alignment: Alignment.centerLeft,
         child: Text(
           LocaleKeys.categoriesOptionsText.locale,
-          style: context.textTheme.headline6!
-              .copyWith(color: context.colorScheme.primary),
+          style: GoogleFonts.lora(textStyle: context.textTheme.bodyLarge!.copyWith(color: context.colorScheme.primary, fontWeight: FontWeight.bold)),
         ));
   }
 
-  Widget categoriesOptions(
-      AddProductViewModel viewModel, BuildContext context) {
-    List<Categories> categoriesList =
-        CategoriesInitializer.instance.getListCategories();
+  Widget categoriesOptions(AddProductViewModel viewModel, BuildContext context) {
+    List<Categories> categoriesList = CategoriesInitializer.instance.getListCategories();
 
     return Observer(builder: (_) {
       return SizedBox(
         height: context.dynamicHeight(0.05),
         child: ListView(
           shrinkWrap: true,
-          padding: const EdgeInsets.all(0.0),
+          padding: EdgeInsets.zero,
           scrollDirection: Axis.horizontal,
           children: categoriesList
               .map(
@@ -119,14 +126,16 @@ class AddProductView extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Radio(
-                        activeColor: context.colorScheme.onSurfaceVariant,
+                        activeColor: context.colorScheme.primary,
                         value: data.categoryId,
-                        groupValue: viewModel.returnGroupId,
+                        groupValue: viewModel.returnCategoryId,
                         onChanged: (index) {
-                          viewModel.changeGroupId(data.categoryId);
+                          viewModel.changeCategoryId(data.categoryId);
+                          viewModel.changeCategoryTitle(data.categoryName);
                         }),
                     Text(
                       data.categoryName,
+                      style: GoogleFonts.lora(textStyle: context.textTheme.bodyMedium!.copyWith(color: context.colorScheme.primary)),
                     ),
                   ],
                 ),
@@ -137,35 +146,29 @@ class AddProductView extends StatelessWidget {
     });
   }
 
-  Widget selectedImageSlider(
-      AddProductViewModel viewModel, BuildContext context) {
+  Widget selectedImageSlider(AddProductViewModel viewModel, BuildContext context) {
     return Observer(
       builder: (_) {
         return viewModel.isImageSelected
-            ? CircularProgressIndicator()
+            ? CallCircularProgress(context)
             : viewModel.tempFile.isEmpty
-                ? Container(
-                    height: context.highValue,
-                    child: CircleAvatar(
-                      backgroundColor: context.colorScheme.onInverseSurface,
-                      radius: 50,
-                      child: Icon(Icons.shopify_sharp),
-                    ),
-                  )
-                : Container(
-                    height: context.highValue,
+                ? const SizedBox()
+                : SizedBox(
+                    height: context.highValue * 1.2,
                     child: ListView.builder(
+                      shrinkWrap: true,
+                      padding: EdgeInsets.zero,
                       scrollDirection: Axis.horizontal,
                       itemCount: viewModel.tempFile.length,
                       itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.all(4.0),
+                        return Align(
+                          alignment: Alignment.centerLeft,
                           child: Stack(
                             children: [
-                              buildImage(viewModel.tempFile[index].path),
+                              buildImage(viewModel.tempFile[index].path, context),
                               Positioned(
                                 bottom: 0,
-                                right: 4,
+                                right: context.dynamicHeight(0.01),
                                 child: buildEditIcon(viewModel, index, context),
                               ),
                             ],
@@ -178,34 +181,33 @@ class AddProductView extends StatelessWidget {
     );
   }
 
-  Widget buildImage(String imageUrl) {
-    final image = Image.file(
-      File(imageUrl),
-      fit: BoxFit.contain,
-      height: 90,
-      width: 90,
-    );
+  Widget buildImage(String imageUrl, BuildContext context) {
+    // final image = Image.file(
+    //   File(imageUrl),
+    //   fit: BoxFit.fill,
+    //   height: context.dynamicHeight(0.15),
+    //   width: context.dynamicHeight(0.15),
+    // );
 
-    return ClipOval(
-      child: image,
+    return CircleAvatar(
+      radius: context.dynamicHeight(0.2) / 3,
+      backgroundImage: Image.file(
+        File(imageUrl),
+        height: context.highValue,
+        width: context.highValue,
+        fit: BoxFit.fill,
+      ).image,
     );
   }
 
-  Widget buildEditIcon(
-          AddProductViewModel viewModel, int index, BuildContext context) =>
-      GestureDetector(
-          child: buildCircle(
-            color: context.colorScheme.onSurfaceVariant,
-            all: 5,
-            child: Icon(
-              Icons.cancel,
-              color: context.colorScheme.onSecondary,
-              size: 20,
-            ),
-          ),
-          onTap: () {
-            viewModel.deleteSelectedImage(index);
-          });
+  Widget buildEditIcon(AddProductViewModel viewModel, int index, BuildContext context) => GestureDetector(
+      child: CircleAvatar(
+          child: Icon(Icons.close, color: context.colorScheme.inversePrimary),
+          radius: context.normalValue,
+          backgroundColor: context.colorScheme.onSurfaceVariant),
+      onTap: () {
+        viewModel.deleteSelectedImage(index);
+      });
   Widget buildCircle({
     required Widget child,
     required double all,
@@ -220,95 +222,63 @@ class AddProductView extends StatelessWidget {
     );
   }
 
-  Widget updatedImageSlider(BuildContext context) {
-    return Container(
-      height: context.highValue,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: productDetailModel!.imageUrlList!.length,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.all(0.0),
-            child: Stack(
-              alignment: AlignmentDirectional.center,
-              children: [
-                Positioned(
-                  child: Icon(
-                    Icons.cancel,
-                    color: context.colorScheme.primary,
-                  ),
-                  top: 0,
-                  right: 0,
-
-                  ///right: -30,
-                ),
-                CircleAvatar(
-                  radius: 30,
-                  child: Image.network(
-                      productDetailModel!.imageUrlList![index].toString()),
-                  backgroundColor: Colors.transparent,
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget buildSelectProductImageButton(
-      AddProductViewModel viewModel, BuildContext context) {
+  Widget buildSelectProductImageButton(AddProductViewModel viewModel, BuildContext context) {
     return Observer(builder: (_) {
-      return NormalButton(
-          child: Text(
-            LocaleKeys.selectProductImageText.locale,
-            style: context.textTheme.headline6!
-                .copyWith(color: context.colorScheme.onSecondary),
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          NormalButton(
+            child: Text(
+              LocaleKeys.selectProductImageText.locale,
+              style: GoogleFonts.lora(textStyle: context.textTheme.bodyLarge!.copyWith(color: context.colorScheme.inversePrimary)),
+            ),
+            onPressed: viewModel.isLoading
+                ? null
+                : () async {
+                    await viewModel.selectImage();
+                  },
+            color: context.appTheme.colorScheme.onSurfaceVariant,
+            fixedSize: Size(context.width * 0.5, context.height * 0.06),
           ),
-          onPressed: viewModel.isLoading
-              ? null
-              : () async {
-                  await viewModel.selectImage();
-                },
-          color: context.appTheme.colorScheme.onSurfaceVariant,
-          fixedSize: Size(context.width * 0.7, context.height * 0.06));
+        ],
+      );
     });
   }
 
-  Widget buildAddProductButton(
-      AddProductViewModel viewModel, BuildContext context) {
+  Widget buildAddProductButton(AddProductViewModel viewModel, BuildContext context) {
     return Observer(
       builder: (_) {
-        return viewModel.isLoading
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
-            : isUpdate
-                ? NormalButton(
-                    child: Text(
-                      LocaleKeys.updateProductText.locale,
-                      style: context.textTheme.headline6!
-                          .copyWith(color: context.colorScheme.onSecondary),
-                    ),
-                    onPressed: () async {
-                      await viewModel.addProduct(viewModel.tempFile, isUpdate,
-                          productModel: productDetailModel!);
-                    },
-                    color: context.appTheme.colorScheme.onSurfaceVariant,
-                    //   fixedSize: Size(context.width * 0.7, context.height * 0.06),
-                  )
-                : NormalButton(
-                    child: Text(
-                      LocaleKeys.addNewProductText.locale,
-                      style: context.textTheme.headline6!
-                          .copyWith(color: context.colorScheme.onSecondary),
-                    ),
-                    onPressed: () async {
-                      await viewModel.addProduct(viewModel.tempFile, isUpdate);
-                    },
-                    color: context.appTheme.colorScheme.onSurfaceVariant,
-                    //   fixedSize: Size(context.width * 0.7, context.height * 0.06),
-                  );
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            viewModel.isLoading
+                ? CallCircularProgress(context)
+                : addProductViewArguments.isUpdate
+                    ? NormalButton(
+                        child: Text(
+                          LocaleKeys.updateProductText.locale,
+                          style: GoogleFonts.lora(textStyle: context.textTheme.bodyLarge!.copyWith(color: context.colorScheme.inversePrimary)),
+                        ),
+                        onPressed: () async {
+                          await viewModel.addProduct(viewModel.tempFile, addProductViewArguments.isUpdate,
+                              productModel: addProductViewArguments.productDetailModel!);
+                        },
+                        color: context.appTheme.colorScheme.onSurfaceVariant,
+                        fixedSize: Size(context.width * 0.5, context.height * 0.06),
+                      )
+                    : NormalButton(
+                        child: Text(
+                          LocaleKeys.addNewProductText.locale,
+                          style: GoogleFonts.lora(textStyle: context.textTheme.bodyLarge!.copyWith(color: context.colorScheme.inversePrimary)),
+                        ),
+                        onPressed: () async {
+                          await viewModel.addProduct(viewModel.tempFile, addProductViewArguments.isUpdate);
+                        },
+                        color: context.appTheme.colorScheme.onSurfaceVariant,
+                        fixedSize: Size(context.width * 0.5, context.height * 0.06),
+                      ),
+          ],
+        );
       },
     );
   }

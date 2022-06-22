@@ -6,8 +6,7 @@ import '../../../../core/base/model/base_view_model.dart';
 import '../service/user_favourite_list_service.dart';
 part 'user_favourite_list_view_model.g.dart';
 
-class UserFavouriteListViewModel = _UserFavouriteListViewModelBase
-    with _$UserFavouriteListViewModel;
+class UserFavouriteListViewModel = _UserFavouriteListViewModelBase with _$UserFavouriteListViewModel;
 
 abstract class _UserFavouriteListViewModelBase with Store, BaseViewModel {
   GlobalKey<ScaffoldState> scaffoldState = GlobalKey();
@@ -45,17 +44,14 @@ abstract class _UserFavouriteListViewModelBase with Store, BaseViewModel {
   }
 
   @observable
-  ObservableList<ProductDetailModel> favouriteProductList =
-      ObservableList<ProductDetailModel>();
+  ObservableList<ProductDetailModel> favouriteProductList = ObservableList<ProductDetailModel>();
   @observable
-  ObservableList<ProductDetailModel> persistProductList =
-      ObservableList<ProductDetailModel>();
+  ObservableList<ProductDetailModel> persistProductList = ObservableList<ProductDetailModel>();
 
   @action
   Future<void> fetchFavouriteProductList() async {
     changeIsProductListLoading();
-    final favouriteDataList =
-        await userFavouriteListService.fetchFavouriteProductList();
+    final favouriteDataList = await userFavouriteListService.fetchFavouriteProductList();
     if (favouriteDataList != null) {
       favouriteProductList = favouriteDataList.asObservable();
       persistProductList = favouriteDataList.asObservable();
@@ -66,18 +62,25 @@ abstract class _UserFavouriteListViewModelBase with Store, BaseViewModel {
 
   @action
   Future<void> removeFavouriteItem(int index) async {
-    await userFavouriteListService.removeItemToFavouriteList(
-        favouriteProductList[index].productId.toString());
+    await userFavouriteListService.removeItemToFavouriteList(favouriteProductList[index].productId.toString());
     favouriteProductList.removeAt(index);
     persistProductList.removeAt(index);
   }
 
   @action
   void filterProducts(String productName) {
-    favouriteProductList = favouriteProductList
-        .where((item) =>
-            item.name!.toLowerCase().contains(productName..toLowerCase()))
-        .toList()
-        .asObservable();
+    favouriteProductList = favouriteProductList.where((item) => item.name!.toLowerCase().contains(productName..toLowerCase())).toList().asObservable();
+  }
+
+  List<ProductDetailModel> filterProductList(String query) => List.of(favouriteProductList).where((shop) {
+        final productLower = shop.name!.toLowerCase();
+        final queryLower = query.toLowerCase();
+
+        return productLower.contains(queryLower);
+      }).toList();
+
+  @action
+  Future<void> removeFromFavouriteList(ProductDetailModel productDetailModel) async {
+    favouriteProductList.remove(productDetailModel);
   }
 }

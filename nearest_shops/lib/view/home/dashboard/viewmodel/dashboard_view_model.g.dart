@@ -205,6 +205,17 @@ mixin _$DashboardViewModel on _DashboardViewModelBase, Store {
   }
 
   @override
+  void sortProductList(Sorting sortingOption) {
+    final _$actionInfo = _$_DashboardViewModelBaseActionController.startAction(
+        name: '_DashboardViewModelBase.sortProductList');
+    try {
+      return super.sortProductList(sortingOption);
+    } finally {
+      _$_DashboardViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void filterProducts(String productName) {
     final _$actionInfo = _$_DashboardViewModelBaseActionController.startAction(
         name: '_DashboardViewModelBase.filterProducts');

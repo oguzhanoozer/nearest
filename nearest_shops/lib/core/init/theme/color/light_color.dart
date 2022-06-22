@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/src/material/color_scheme.dart';
 
 import 'color_manager.dart';
@@ -30,25 +31,31 @@ class LightColors implements IColors {
   AppColors colors = AppColors();
 
   LightColors() {
-    appBarColor = colors.white;
-    scaffoldBackgroundColor = colors.white;
+    appBarColor = colors.lightBackgroundColor;
+
+    scaffoldBackgroundColor = colors.lightBackgroundColor;
     tabBarColor = colors.green;
     tabbarNormalColor = colors.darkerGrey;
     tabbarSelectedColor = colors.green;
-    
+
     colorScheme = ColorScheme.light().copyWith(
-        onSurfaceVariant: colors.blue,
+        background: colors.lightBackgroundColor,
+        onSurfaceVariant: colors.green,
         onInverseSurface: colors.lightOrange,
         primary: colors.black,
         onSecondary: colors.white,
-        onSecondaryContainer: colors.green,
+        onSecondaryContainer: colors.lightShadowGreyColor,
         onPrimaryContainer: colors.red,
         onSurface: colors.mediumGreyBold,
         brightness: Brightness.light,
         surface: colors.grey,
         onPrimary: colors.darkGrey,
+        primaryContainer: colors.darkerGrey,
         surfaceVariant: colors.mediumGrey,
-        inversePrimary: colors.yellow);
+        inverseSurface: colors.lightGrey,
+        inversePrimary: colors.white,
+        onTertiary: colors.lightShimmerColor,
+        onTertiaryContainer: colors.shimmerGreyTwo);
     brightness = Brightness.light;
   }
 }

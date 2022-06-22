@@ -193,6 +193,19 @@ mixin _$ShopOwnerProductListViewModel
   }
 
   @override
+  void changeProductList(int index, ProductDetailModel productDetailModel) {
+    final _$actionInfo =
+        _$_ShopOwnerProductListViewModelBaseActionController.startAction(
+            name: '_ShopOwnerProductListViewModelBase.changeProductList');
+    try {
+      return super.changeProductList(index, productDetailModel);
+    } finally {
+      _$_ShopOwnerProductListViewModelBaseActionController
+          .endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void filterProducts(String productName) {
     final _$actionInfo = _$_ShopOwnerProductListViewModelBaseActionController
         .startAction(name: '_ShopOwnerProductListViewModelBase.filterProducts');

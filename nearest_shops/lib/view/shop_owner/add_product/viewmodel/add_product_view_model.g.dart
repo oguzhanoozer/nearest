@@ -70,18 +70,36 @@ mixin _$AddProductViewModel on _AddProductViewModelBase, Store {
     });
   }
 
-  final _$_groupIdAtom = Atom(name: '_AddProductViewModelBase._groupId');
+  final _$_defaultCategoryIdAtom =
+      Atom(name: '_AddProductViewModelBase._defaultCategoryId');
 
   @override
-  int get _groupId {
-    _$_groupIdAtom.reportRead();
-    return super._groupId;
+  int get _defaultCategoryId {
+    _$_defaultCategoryIdAtom.reportRead();
+    return super._defaultCategoryId;
   }
 
   @override
-  set _groupId(int value) {
-    _$_groupIdAtom.reportWrite(value, super._groupId, () {
-      super._groupId = value;
+  set _defaultCategoryId(int value) {
+    _$_defaultCategoryIdAtom.reportWrite(value, super._defaultCategoryId, () {
+      super._defaultCategoryId = value;
+    });
+  }
+
+  final _$_defaultCategoryTitleAtom =
+      Atom(name: '_AddProductViewModelBase._defaultCategoryTitle');
+
+  @override
+  String get _defaultCategoryTitle {
+    _$_defaultCategoryTitleAtom.reportRead();
+    return super._defaultCategoryTitle;
+  }
+
+  @override
+  set _defaultCategoryTitle(String value) {
+    _$_defaultCategoryTitleAtom.reportWrite(value, super._defaultCategoryTitle,
+        () {
+      super._defaultCategoryTitle = value;
     });
   }
 
@@ -116,11 +134,22 @@ mixin _$AddProductViewModel on _AddProductViewModelBase, Store {
       ActionController(name: '_AddProductViewModelBase');
 
   @override
-  void changeGroupId(int value) {
+  void changeCategoryId(int value) {
     final _$actionInfo = _$_AddProductViewModelBaseActionController.startAction(
-        name: '_AddProductViewModelBase.changeGroupId');
+        name: '_AddProductViewModelBase.changeCategoryId');
     try {
-      return super.changeGroupId(value);
+      return super.changeCategoryId(value);
+    } finally {
+      _$_AddProductViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void changeCategoryTitle(String value) {
+    final _$actionInfo = _$_AddProductViewModelBaseActionController.startAction(
+        name: '_AddProductViewModelBase.changeCategoryTitle');
+    try {
+      return super.changeCategoryTitle(value);
     } finally {
       _$_AddProductViewModelBaseActionController.endAction(_$actionInfo);
     }

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
+import 'package:nearest_shops/view/home/product_detail/model/product_detail_model.dart';
 
+import '../../../../core/base/model/add_product_view_arg.dart';
 import '../../../../core/base/view/base_view.dart';
+import '../../../ads/banner/add_banner_view.dart';
 import '../../../product/bottom_navigation/bottom_owner_dashboard.dart';
 import '../../add_product/view/add_product_view.dart';
 import '../../home/view/owner_home_view.dart';
@@ -27,7 +30,7 @@ class _OwnerDashboardViewState extends State<OwnerDashboardView> {
     _widgetList = [
       OwnerHomeView(),
       ShopOwnerProductListView(),
-      AddProductView(),
+      AddProductView(addProductViewArguments: AddProductViewArguments(null, isUpdate: false)),
       ShopOwnerSettingsView()
     ];
   }
@@ -40,21 +43,26 @@ class _OwnerDashboardViewState extends State<OwnerDashboardView> {
         model.setContext(context);
         model.init();
       },
-      onPageBuilder: (context, OwnerDashboardViewModel value) =>
-          buildScaffold(),
+      onPageBuilder: (context, OwnerDashboardViewModel value) => buildScaffold(),
     );
   }
 
-  Scaffold buildScaffold() => Scaffold(
-        body: _widgetList[_currentWidgetIndex],
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _currentWidgetIndex,
-          selectedItemColor: context.appTheme.colorScheme.onSurfaceVariant,
-          onTap: ((value) => changePage(value)),
-          elevation: 0,
-          items: BottomOwnerNavigatorDashboardListModel()
-              .modelToOwnerBarItemWidgets(),
-        ),
+  Widget buildScaffold() => Column(
+        children: [
+          Expanded(
+            child: Scaffold(
+              body: _widgetList[_currentWidgetIndex],
+              bottomNavigationBar: BottomNavigationBar(
+                currentIndex: _currentWidgetIndex,
+                selectedItemColor: context.appTheme.colorScheme.onSurfaceVariant,
+                onTap: ((value) => changePage(value)),
+                elevation: 0,
+                items: BottomOwnerNavigatorDashboardListModel().modelToOwnerBarItemWidgets(),
+              ),
+            ),
+          ),
+          AddBannerView(),
+        ],
       );
   void changePage(int index) {
     setState(() {

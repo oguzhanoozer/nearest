@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../comment/model/product_comment_model.dart';
 
-class ProductDetailModel {
+class ProductDetailModel { 
   String? name;
   String? summary;
   String? detail;
@@ -12,6 +12,7 @@ class ProductDetailModel {
   String? shopId;
   String? productId;
   int? categoryId;
+  String? categoryTitle;
   List<String>? imageStoreNameList;
   List<ProductCommentModel>? comments;
 
@@ -25,6 +26,7 @@ class ProductDetailModel {
       this.summary,
       this.shopId,
       this.categoryId,
+      this.categoryTitle,
       this.imageStoreNameList,
       this.comments});
 
@@ -38,6 +40,7 @@ class ProductDetailModel {
         "summary": summary,
         "shopId": shopId,
         "categoryId": categoryId,
+        "categoryTitle": categoryTitle,
         "imageStoreNameList": imageStoreNameList,
         "productCommentList": comments
       };
@@ -52,10 +55,8 @@ class ProductDetailModel {
         summary: map["summary"],
         shopId: map["shopId"],
         categoryId: map["categoryId"],
-        comments: List<ProductCommentModel>.from((map["comments"] ?? [])
-                .map((e) => ProductCommentModel.fromJson(e))
-                .toList() ??
-            []),
+        categoryTitle: map["categoryTitle"],
+        comments: List<ProductCommentModel>.from((map["comments"] ?? []).map((e) => ProductCommentModel.fromJson(e)).toList() ?? []),
         imageStoreNameList: List<String>.from(map["imageStoreNameList"] ??= []),
       );
 }

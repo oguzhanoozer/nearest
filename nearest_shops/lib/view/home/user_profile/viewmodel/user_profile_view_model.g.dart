@@ -9,6 +9,21 @@ part of 'user_profile_view_model.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$UserProfileViewModel on _UserProfileViewModelBase, Store {
+  final _$isLogOutAtom = Atom(name: '_UserProfileViewModelBase.isLogOut');
+
+  @override
+  bool get isLogOut {
+    _$isLogOutAtom.reportRead();
+    return super.isLogOut;
+  }
+
+  @override
+  set isLogOut(bool value) {
+    _$isLogOutAtom.reportWrite(value, super.isLogOut, () {
+      super.isLogOut = value;
+    });
+  }
+
   final _$userAtom = Atom(name: '_UserProfileViewModelBase.user');
 
   @override
@@ -83,6 +98,17 @@ mixin _$UserProfileViewModel on _UserProfileViewModelBase, Store {
       ActionController(name: '_UserProfileViewModelBase');
 
   @override
+  void changeIsLogOut() {
+    final _$actionInfo = _$_UserProfileViewModelBaseActionController
+        .startAction(name: '_UserProfileViewModelBase.changeIsLogOut');
+    try {
+      return super.changeIsLogOut();
+    } finally {
+      _$_UserProfileViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void changeAppLanguage(Locale? locale) {
     final _$actionInfo = _$_UserProfileViewModelBaseActionController
         .startAction(name: '_UserProfileViewModelBase.changeAppLanguage');
@@ -118,6 +144,7 @@ mixin _$UserProfileViewModel on _UserProfileViewModelBase, Store {
   @override
   String toString() {
     return '''
+isLogOut: ${isLogOut},
 user: ${user},
 profileLoading: ${profileLoading},
 isImageSelected: ${isImageSelected},

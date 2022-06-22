@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
 
 import '../../../../core/base/model/base_view_model.dart';
+import '../../../../core/init/service/authenticaion/firebase_authentication.dart';
 import '../../../utility/error_helper.dart';
 import '../service/ILogin_service.dart';
 
@@ -22,13 +23,15 @@ abstract class _LoginViewModelBase with Store, BaseViewModel, ErrorHelper {
   bool isLoading = false;
 
   @observable
-  bool isLockOpen = false;
+  bool isLockOpen = true;
 
+  @override
   void setContext(BuildContext context) {
     this.context = context;
     loginService = LoginService(scaffoldState, context);
   }
 
+  @override
   void init() {
     emailController = TextEditingController();
     passwordController = TextEditingController();
@@ -40,8 +43,7 @@ abstract class _LoginViewModelBase with Store, BaseViewModel, ErrorHelper {
     isLoadingChange();
 
     if (formState.currentState!.validate()) {
-      await loginService.loginUser(
-          email: emailController!.text, password: passwordController!.text);
+      await loginService.loginUser(email: emailController!.text, password: passwordController!.text);
     }
     isLoadingChange();
   }

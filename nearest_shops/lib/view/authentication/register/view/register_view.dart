@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:kartal/kartal.dart';
+import 'package:lottie/lottie.dart';
 
 import '../../../../core/base/view/base_view.dart';
+import '../../../../core/components/button/button_shadow.dart';
 import '../../../../core/components/button/normal_button.dart';
 import '../../../../core/components/button/text_button.dart';
 import '../../../../core/components/column/form_column.dart';
 import '../../../../core/extension/string_extension.dart';
 import '../../../../core/init/lang/locale_keys.g.dart';
+import '../../../product/circular_progress/circular_progress_indicator.dart';
+import '../../../product/contstants/image_path.dart';
+import '../../../product/input_text_decoration.dart';
 import '../viewmodel/register_view_model.dart';
 
 part 'subview/register_view_textfields.dart';
@@ -28,41 +34,49 @@ class RegisterView extends StatelessWidget {
         });
   }
 
-  Scaffold buildScaffold(BuildContext context, RegisterViewModel viewModel) =>
-      Scaffold(
-          key: viewModel.scaffoldState,
-          body: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                    child: buildLoginForm(context, viewModel)),
-              ),
-            ],
-          ));
+  Scaffold buildScaffold(BuildContext context, RegisterViewModel viewModel) => Scaffold(
+      key: viewModel.scaffoldState,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+            child: SingleChildScrollView(child: buildLoginForm(context, viewModel)),
+          ),
+        ],
+      ));
 
-  Container buildLoginForm(BuildContext context, RegisterViewModel viewModel) {
-    return Container(
-      child: Form(
-        key: viewModel.formState,
-        child: buildFormColumn(viewModel, context),
-      ),
+  Widget buildLoginForm(BuildContext context, RegisterViewModel viewModel) {
+    return Form(
+      key: viewModel.formState,
+      child: buildFormColumn(viewModel, context),
     );
   }
 
   Widget buildFormColumn(RegisterViewModel viewModel, BuildContext context) {
     return FormColumn(
       children: [
-        context.emptySizedHeightBoxHigh,
+        context.emptySizedHeightBoxLow,
+        SizedBox(
+          height: context.dynamicHeight(0.3),
+          width: context.dynamicWidth(0.9),
+          child: Lottie.asset(
+            ImagePaths.instance.loti_17,
+            repeat: true,
+            reverse: true,
+            animate: true,
+          ),
+        ),
+        context.emptySizedHeightBoxNormal,
         buildWelcomeTextColumnBuild(context),
-        context.emptySizedHeightBoxNormal,
+        context.emptySizedHeightBoxLow,
         buildEmailTextField(viewModel, context),
-        context.emptySizedHeightBoxNormal,
+        context.emptySizedHeightBoxLow,
         buildFirstPasswordTextField(viewModel, context),
-        context.emptySizedHeightBoxNormal,
+        context.emptySizedHeightBoxLow,
         buildLaterPasswordTextField(viewModel, context),
-        context.emptySizedHeightBoxNormal,
+        context.emptySizedHeightBoxLow3x,
         buildRegisterButton(context, viewModel),
+        context.emptySizedHeightBoxLow3x,
       ],
     );
   }
@@ -74,8 +88,7 @@ class RegisterView extends StatelessWidget {
           alignment: AlignmentDirectional.centerStart,
           child: Text(
             LocaleKeys.createAccountText.locale,
-            style: context.textTheme.headline4!
-                .copyWith(color: context.colorScheme.onPrimary),
+            style: context.textTheme.headline5!.copyWith(color: context.colorScheme.onSurfaceVariant, fontWeight: FontWeight.bold),
           ),
         ),
       ],
@@ -89,22 +102,20 @@ class RegisterView extends StatelessWidget {
     );
   }
 
-  Widget buildRegisterButton(
-      BuildContext context, RegisterViewModel viewModel) {
+  Widget buildRegisterButton(BuildContext context, RegisterViewModel viewModel) {
     return Observer(builder: (_) {
-      return NormalButton(
-        child: Text(
-          LocaleKeys.createAccountText.locale,
-          style: context.textTheme.headline6!
-              .copyWith(color: context.colorScheme.onSecondary),
-        ),
-        onPressed: viewModel.isLoading
-            ? null
-            : () async {
+      return viewModel.isLoading
+          ? CallCircularProgress(context)
+          : ButtonShadow(
+              onTap: () async {
                 await viewModel.checkUserData();
               },
-        color: context.appTheme.colorScheme.onSurfaceVariant,
-      );
+              child: Text(
+                LocaleKeys.registerButtonText.locale,
+                style: GoogleFonts.lora(
+                    textStyle: context.textTheme.headline6!.copyWith(fontWeight: FontWeight.bold, color: context.colorScheme.onSurfaceVariant)),
+              ),
+            );
     });
   }
 

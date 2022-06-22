@@ -1,6 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
+import 'package:nearest_shops/core/base/route/generate_route.dart';
+import 'package:nearest_shops/core/extension/string_extension.dart';
+import 'package:nearest_shops/core/init/lang/locale_keys.g.dart';
 
 import '../../../../core/init/service/authenticaion/firebase_authentication.dart';
 import '../../../../core/init/service/firestorage/enum/document_collection_enums.dart';
@@ -17,25 +20,32 @@ abstract class ILoginService {
 }
 
 class LoginService extends ILoginService with ErrorHelper {
-  LoginService(GlobalKey<ScaffoldState> scaffoldState, BuildContext context)
-      : super(scaffoldState, context);
+  LoginService(GlobalKey<ScaffoldState> scaffoldState, BuildContext context) : super(scaffoldState, context);
 
   @override
-  Future<void> loginUser(
-      {required String email, required String password}) async {
+  Future<void> loginUser({required String email, required String password}) async {
     try {
-      final user = await FirebaseAuthentication.instance
-          .signWithEmailandPassword(email: email, password: password);
+      final user = await FirebaseAuthentication.instance.signWithEmailandPassword(email: email, password: password);
       if (!user!.emailVerified) {
-        await FirebaseAuthentication.instance.signOut();
-        ///await user.sendEmailVerification();
-        await showVerificationAlertDialog(
-          context,
-        );
+        FirebaseAuthentication.instance.signOut();
+
+        await showVerificationAlertDialog(context);
       }
-      context.navigateToPage(const OnBoardView());
+      Navigator.pushReplacementNamed(context, onBoardViewRoute);
     } on FirebaseAuthException catch (e) {
-      showSnackBar(scaffoldState, context, e.message.toString());
+      if (e.code == AuthErrorString.USER_NOT_FOUND.rawValue) {
+        showSnackBar(scaffoldState, context, LocaleKeys.errorUserNotFound.locale);
+      } else if (e.code == AuthErrorString.INVALID_EMAIL.rawValue) {
+        showSnackBar(scaffoldState, context, LocaleKeys.errorInvalidEmail.locale);
+      } else if (e.code == AuthErrorString.USER_DISABLED.rawValue) {
+        showSnackBar(scaffoldState, context, LocaleKeys.errorUserDisabled.locale);
+      } else if (e.code == AuthErrorString.WRONG_PASSWORD.rawValue) {
+        showSnackBar(scaffoldState, context, LocaleKeys.errorWeakPassword.locale);
+      } else {
+        showSnackBar(scaffoldState, context, LocaleKeys.loginError.locale);
+      }
+    } catch (e) {
+      showSnackBar(scaffoldState, context, LocaleKeys.loginError.locale);
     }
   }
 
@@ -44,11 +54,10 @@ class LoginService extends ILoginService with ErrorHelper {
     try {
       final user = await FirebaseAuthentication.instance.signInWithGoogle();
       if (user != null) {
-        await FirebaseAuthentication.instance
-            .setUserRole(UserRole.USER.roleRawValue, user.uid);
+        await FirebaseAuthentication.instance.setUserRole(UserRole.USER.roleRawValue, user.uid);
       }
-    } on FirebaseAuthException catch (e) {
-      showSnackBar(scaffoldState, context, e.message.toString());
+    } catch (e) {
+      showSnackBar(scaffoldState, context, LocaleKeys.loginError.locale);
     }
   }
 }

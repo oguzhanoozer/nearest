@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:kartal/kartal.dart';
+import 'package:lottie/lottie.dart';
+import 'package:nearest_shops/core/base/route/generate_route.dart';
 
-import '../../../../core/components/button/normal_button.dart';
+import '../../../../core/components/button/button_shadow.dart';
+import '../../../../core/components/column/form_column.dart';
 import '../../../../core/extension/string_extension.dart';
 import '../../../../core/init/lang/locale_keys.g.dart';
+import '../../../product/contstants/image_path.dart';
 import '../../register/view/register_view.dart';
 import '../../shop_owner_register/view/shop_owner_register_view.dart';
 
@@ -13,41 +18,51 @@ class OnBoardOptionView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(),
       body: Center(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+          child: FormColumn(
         children: [
-          Text(
-            
-            LocaleKeys.doYouHaveOwnBusinessText.locale,
-            style: context.textTheme.headline5,
+          SizedBox(
+            height: context.dynamicHeight(0.3),
+            width: context.dynamicWidth(0.9),
+            child: Lottie.asset(
+              ImagePaths.instance.loti_1,
+              repeat: true,
+              reverse: true,
+              animate: true,
+            ),
           ),
-          NormalButton(
+          context.emptySizedHeightBoxHigh,
+          Text(
+            LocaleKeys.doYouHaveOwnBusinessText.locale,
+            style: GoogleFonts.lora(textStyle: context.textTheme.headline6!.copyWith(fontWeight: FontWeight.w500, color: context.colorScheme.primary)),
+          ),
+          context.emptySizedHeightBoxLow,
+          ButtonShadow(
+            onTap: () {
+              Navigator.pushNamed(context, shopOwnerRegisterViewRoute);
+            },
             child: Text(
               LocaleKeys.createBusinessAccountButtonText.locale,
-              style: context.textTheme.headline6!
-                  .copyWith(color: context.colorScheme.onSecondary),
+              style:
+                  GoogleFonts.lora(textStyle: context.textTheme.headline6!.copyWith(fontWeight: FontWeight.bold, color: context.colorScheme.onSurfaceVariant)),
             ),
-            onPressed: () {
-              context.navigateToPage(ShopOwnerRegisterView());
-            },
-            color: context.appTheme.colorScheme.onSurfaceVariant,
           ),
-          context.emptySizedHeightBoxLow3x,
+          context.emptySizedHeightBoxNormal,
           Text(
             LocaleKeys.ifYouAreAuserPLeaseLoginText.locale,
-            style: context.textTheme.headline6,
+            style: GoogleFonts.lora(textStyle: context.textTheme.headline6!.copyWith(fontWeight: FontWeight.w500, color: context.colorScheme.primary)),
           ),
-          NormalButton(
+          context.emptySizedHeightBoxLow,
+          ButtonShadow(
+            onTap: () {
+              Navigator.pushNamed(context, registerViewRoute);
+            },
             child: Text(
               LocaleKeys.registerButtonText.locale,
-              style: context.textTheme.headline6!
-                  .copyWith(color: context.colorScheme.onSecondary),
+              style:
+                  GoogleFonts.lora(textStyle: context.textTheme.headline6!.copyWith(fontWeight: FontWeight.bold, color: context.colorScheme.onSurfaceVariant)),
             ),
-            onPressed: () {
-              context.navigateToPage(RegisterView());
-            },
-            color: context.appTheme.colorScheme.onSurfaceVariant,
           ),
         ],
       )),

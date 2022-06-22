@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:kartal/kartal.dart';
+import 'package:lottie/lottie.dart';
 
+import '../../../../core/base/route/generate_route.dart';
 import '../../../../core/base/view/base_view.dart';
-import '../../../../core/components/button/icon_button.dart';
-import '../../../../core/components/button/normal_button.dart';
+import '../../../../core/components/button/button_shadow.dart';
 import '../../../../core/components/button/text_button.dart';
 import '../../../../core/components/column/form_column.dart';
 import '../../../../core/extension/string_extension.dart';
 import '../../../../core/init/lang/locale_keys.g.dart';
+import '../../../../core/init/service/firestorage/enum/document_collection_enums.dart';
+import '../../../product/circular_progress/circular_progress_indicator.dart';
+import '../../../product/contstants/image_path.dart';
 import '../../../product/contstants/image_path_svg.dart';
+import '../../../product/input_text_decoration.dart';
 import '../../onboard/view/on_board_option_view.dart';
 import '../../reset_password/view/reset_password_view.dart';
 import '../viewmodel/login_view_model.dart';
@@ -33,24 +39,21 @@ class LoginView extends StatelessWidget {
         });
   }
 
-  Scaffold buildScaffold(BuildContext context, LoginViewModel viewModel) =>
-      Scaffold(
-          key: viewModel.scaffoldState,
-          body: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: buildLoginForm(context, viewModel),
-              ),
-            ],
-          ));
+  Scaffold buildScaffold(BuildContext context, LoginViewModel viewModel) => Scaffold(
+      key: viewModel.scaffoldState,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Expanded(
+            child: buildLoginForm(context, viewModel),
+          ),
+        ],
+      ));
 
-  Container buildLoginForm(BuildContext context, LoginViewModel viewModel) {
-    return Container(
-      child: Form(
-        key: viewModel.formState,
-        child: buildFormColumn(viewModel, context),
-      ),
+  Widget buildLoginForm(BuildContext context, LoginViewModel viewModel) {
+    return Form(
+      key: viewModel.formState,
+      child: buildFormColumn(viewModel, context),
     );
   }
 
@@ -59,42 +62,43 @@ class LoginView extends StatelessWidget {
       children: [
         context.emptySizedHeightBoxLow,
         buildWelcomeTextColumnBuild(context),
-        context.emptySizedHeightBoxLow,
+        context.emptySizedHeightBoxLow3x,
         buildEmailTextField(viewModel, context),
         context.emptySizedHeightBoxLow,
         buildPasswordTextField(viewModel, context),
         buildForgotPasswordText(context),
-        context.emptySizedHeightBoxLow,
+        context.emptySizedHeightBoxLow3x,
         buildLoginButton(context, viewModel),
         buildCreateAccountButton(context),
         context.emptySizedHeightBoxLow,
         buildSocialMediaIcons(context, viewModel),
+        context.emptySizedHeightBoxHigh,
       ],
     );
   }
 
-  Row buildSocialMediaIcons(BuildContext context, LoginViewModel viewModel) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-    
-
-        NormalIconButton(
-          onPressed: () {},
-          icon: ClipOval(
-            child: SvgPicture.asset(SVGIMagePaths.instance.facebookSVG),
+  Widget buildSocialMediaIcons(BuildContext context, LoginViewModel viewModel) {
+    return ButtonShadow(
+      onTap: () async {
+        await viewModel.signWithGoogle();
+      },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            ContentString.GOOGLE.rawValue,
+            style: GoogleFonts.lora(textStyle: context.textTheme.headline6!.copyWith(fontWeight: FontWeight.bold, color: context.colorScheme.onSurfaceVariant)),
           ),
-        ),
-        NormalIconButton(
-          onPressed: () async {
-            await viewModel.signWithGoogle();
-          },
-          icon: ClipOval(
-            child: SvgPicture.asset(SVGIMagePaths.instance.googleSVG),
+          context.emptySizedWidthBoxLow3x,
+          Padding(
+            padding: context.paddingLow,
+            child: SvgPicture.asset(
+              SVGIMagePaths.instance.googleSVG,
+              width: context.dynamicHeight(0.05),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -103,48 +107,47 @@ class LoginView extends StatelessWidget {
   }
 
   Widget buildWelcomeTextColumnBuild(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-            //height: 300,
-            //width: 300,
-            child: CircleAvatar(
-          radius: 150,
-          backgroundColor: context.colorScheme.onSecondary,
-          child: Image.asset(
-            "asset/image/shop_orange.png",
-            fit: BoxFit.fill,
-          ),
-        )),
-   
-      ],
+    return Expanded(
+      child: Lottie.asset(
+        ImagePaths.instance.loti_16,
+        repeat: true,
+        reverse: true,
+        animate: true,
+      ),
     );
   }
 
-  NormalTextButton buildCreateAccountButton(BuildContext context) {
-    return NormalTextButton(
-      text: LocaleKeys.createAccountText.locale,
-      onPressed: () {
-        context.navigateToPage(OnBoardOptionView());
-      },
+  Widget buildCreateAccountButton(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(LocaleKeys.donthaveaAccount.locale,
+            maxLines: 3,
+            style: GoogleFonts.lora(textStyle: context.textTheme.bodyText2!.copyWith(fontWeight: FontWeight.w500, color: context.colorScheme.primary))),
+        NormalTextButton(
+          text: LocaleKeys.createAccountText.locale,
+          onPressed: () {
+            Navigator.pushNamed(context, onBoardOptionViewRoute);
+          },
+        ),
+      ],
     );
   }
 
   Widget buildLoginButton(BuildContext context, LoginViewModel viewModel) {
     return Observer(builder: (_) {
-      return NormalButton(
-        child: Text(
-          LocaleKeys.loginButtonText.locale,
-          style: context.textTheme.headline6!
-              .copyWith(color: context.colorScheme.onSecondary),
-        ),
-        onPressed: viewModel.isLoading
-            ? null
-            : () async {
+      return viewModel.isLoading
+          ? CallCircularProgress(context)
+          : ButtonShadow(
+              onTap: () async {
                 await viewModel.checkUserData();
               },
-        color: context.appTheme.colorScheme.onSurfaceVariant,
-      );
+              child: Text(
+                LocaleKeys.loginButtonText.locale,
+                style: GoogleFonts.lora(
+                    textStyle: context.textTheme.headline6!.copyWith(fontWeight: FontWeight.bold, color: context.colorScheme.onSurfaceVariant)),
+              ),
+            );
     });
   }
 
@@ -152,10 +155,11 @@ class LoginView extends StatelessWidget {
     return Align(
       alignment: Alignment.centerRight,
       child: NormalTextButton(
-          text: LocaleKeys.forgotPasswordText.locale,
-          onPressed: () {
-            context.navigateToPage(ResetPasswordView());
-          }),
+        text: LocaleKeys.forgotPasswordText.locale,
+        onPressed: () {
+          Navigator.pushNamed(context, resetPasswordViewRoute);
+        },
+      ),
     );
   }
 }

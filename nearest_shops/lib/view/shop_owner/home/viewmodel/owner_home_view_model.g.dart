@@ -104,6 +104,47 @@ mixin _$OwnerHomeViewModel on _OwnerHomeViewModelBase, Store {
     });
   }
 
+  final _$isSearchPredictLaodingAtom =
+      Atom(name: '_OwnerHomeViewModelBase.isSearchPredictLaoding');
+
+  @override
+  bool get isSearchPredictLaoding {
+    _$isSearchPredictLaodingAtom.reportRead();
+    return super.isSearchPredictLaoding;
+  }
+
+  @override
+  set isSearchPredictLaoding(bool value) {
+    _$isSearchPredictLaodingAtom
+        .reportWrite(value, super.isSearchPredictLaoding, () {
+      super.isSearchPredictLaoding = value;
+    });
+  }
+
+  final _$predictionsAtom = Atom(name: '_OwnerHomeViewModelBase.predictions');
+
+  @override
+  ObservableList<AutocompletePrediction> get predictions {
+    _$predictionsAtom.reportRead();
+    return super.predictions;
+  }
+
+  @override
+  set predictions(ObservableList<AutocompletePrediction> value) {
+    _$predictionsAtom.reportWrite(value, super.predictions, () {
+      super.predictions = value;
+    });
+  }
+
+  final _$autoCompleteSearchAsyncAction =
+      AsyncAction('_OwnerHomeViewModelBase.autoCompleteSearch');
+
+  @override
+  Future<void> autoCompleteSearch(String value) {
+    return _$autoCompleteSearchAsyncAction
+        .run(() => super.autoCompleteSearch(value));
+  }
+
   final _$checkShopLocationAsyncAction =
       AsyncAction('_OwnerHomeViewModelBase.checkShopLocation');
 
@@ -116,7 +157,7 @@ mixin _$OwnerHomeViewModel on _OwnerHomeViewModelBase, Store {
       AsyncAction('_OwnerHomeViewModelBase.getLocationPermission');
 
   @override
-  Future<Position> getLocationPermission() {
+  Future<Position?> getLocationPermission() {
     return _$getLocationPermissionAsyncAction
         .run(() => super.getLocationPermission());
   }
@@ -156,22 +197,14 @@ mixin _$OwnerHomeViewModel on _OwnerHomeViewModelBase, Store {
         .run(() => super._updateShopLocation(currentLocation));
   }
 
-  final _$displayPredictionAsyncAction =
-      AsyncAction('_OwnerHomeViewModelBase.displayPrediction');
+  final _$updatePositionWithSelectedLocationAsyncAction =
+      AsyncAction('_OwnerHomeViewModelBase.updatePositionWithSelectedLocation');
 
   @override
-  Future<void> displayPrediction(Prediction placePrediction) {
-    return _$displayPredictionAsyncAction
-        .run(() => super.displayPrediction(placePrediction));
-  }
-
-  final _$getPlaceAutoCompleteAsyncAction =
-      AsyncAction('_OwnerHomeViewModelBase.getPlaceAutoComplete');
-
-  @override
-  Future<void> getPlaceAutoComplete(BuildContext context) {
-    return _$getPlaceAutoCompleteAsyncAction
-        .run(() => super.getPlaceAutoComplete(context));
+  Future<void> updatePositionWithSelectedLocation(
+      AutocompletePrediction placePrediction) {
+    return _$updatePositionWithSelectedLocationAsyncAction
+        .run(() => super.updatePositionWithSelectedLocation(placePrediction));
   }
 
   final _$_OwnerHomeViewModelBaseActionController =
@@ -183,6 +216,17 @@ mixin _$OwnerHomeViewModel on _OwnerHomeViewModelBase, Store {
         name: '_OwnerHomeViewModelBase.changDataLoadingMap');
     try {
       return super.changDataLoadingMap();
+    } finally {
+      _$_OwnerHomeViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void changeIsSearchPredictLaoding() {
+    final _$actionInfo = _$_OwnerHomeViewModelBaseActionController.startAction(
+        name: '_OwnerHomeViewModelBase.changeIsSearchPredictLaoding');
+    try {
+      return super.changeIsSearchPredictLaoding();
     } finally {
       _$_OwnerHomeViewModelBaseActionController.endAction(_$actionInfo);
     }
@@ -228,7 +272,9 @@ location: ${location},
 isEnableUpdating: ${isEnableUpdating},
 markers: ${markers},
 newGoogleMapController: ${newGoogleMapController},
-isMapDataLoading: ${isMapDataLoading}
+isMapDataLoading: ${isMapDataLoading},
+isSearchPredictLaoding: ${isSearchPredictLaoding},
+predictions: ${predictions}
     ''';
   }
 }

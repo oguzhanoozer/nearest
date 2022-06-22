@@ -3,6 +3,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:mobx/mobx.dart';
 
 import '../../../../core/base/model/base_view_model.dart';
+import '../../../../core/extension/string_extension.dart';
+import '../../../../core/init/lang/locale_keys.g.dart';
 import '../../../../core/init/service/authenticaion/user_id_initialize.dart';
 import '../../../../core/init/service/firestorage/user_location_initialize_check.dart';
 import '../../product_detail/model/product_detail_model.dart';
@@ -11,6 +13,8 @@ import '../service/IDashboard_service.dart';
 part 'dashboard_view_model.g.dart';
 
 class DashboardViewModel = _DashboardViewModelBase with _$DashboardViewModel;
+
+enum Sorting { SUGGEST_ORDER, DECREASE_PRICE, INCREASE_PRICE }
 
 abstract class _DashboardViewModelBase with Store, BaseViewModel {
   GlobalKey<FormState> formState = GlobalKey();
@@ -33,8 +37,12 @@ abstract class _DashboardViewModelBase with Store, BaseViewModel {
 
   late IDashboardService dashboardService;
 
+  TextEditingController searcpInputTExtFieldController = TextEditingController();
+
   @observable
   bool isSearching = false;
+
+  List<String> menuItems = [LocaleKeys.aShopText.locale, LocaleKeys.addNewProductText.locale, LocaleKeys.createBusinessAccountButtonText.locale];
 
   @action
   void changeIsSearching(bool value) {
@@ -45,12 +53,10 @@ abstract class _DashboardViewModelBase with Store, BaseViewModel {
   }
 
   @observable
-  ObservableList<ProductDetailModel> productList =
-      ObservableList<ProductDetailModel>();
+  ObservableList<ProductDetailModel> productList = ObservableList<ProductDetailModel>();
 
   @observable
-  ObservableList<ProductDetailModel> persistProductList =
-      ObservableList<ProductDetailModel>();
+  ObservableList<ProductDetailModel> persistProductList = ObservableList<ProductDetailModel>();
 
   @override
   List<ProductDetailModel> _productSliderList = [];
@@ -71,6 +77,7 @@ abstract class _DashboardViewModelBase with Store, BaseViewModel {
   @override
   void init() {
     checkUserLocation();
+    FocusScope.of(context!).unfocus();
   }
 
   @action
@@ -89,7 +96,7 @@ abstract class _DashboardViewModelBase with Store, BaseViewModel {
   }
 
   Future<void> checkUserLocation() async {
-    await UserLocationInitializeCheck.instance.assignUserLocation();
+    await UserLocationInitializeCheck.instance.assignUserLocation(scaffoldState,context!);
     initializeState();
   }
 
@@ -100,9 +107,7 @@ abstract class _DashboardViewModelBase with Store, BaseViewModel {
           fetchProductLastList();
         }
       });
-    userFavouriteList = (await UserLocationInitializeCheck.instance
-        .getUserFavouriteList()
-        .asObservable())!;
+    userFavouriteList = (await UserLocationInitializeCheck.instance.getUserFavouriteList(scaffoldState,context!).asObservable())!;
     fetchProductSliderList();
     fetchProductFirstList();
   }
@@ -110,10 +115,8 @@ abstract class _DashboardViewModelBase with Store, BaseViewModel {
   @action
   Future<void> fetchProductFirstList() async {
     changeIsProductFirstListLoading();
-    String? shopId = await UserIdInitalize.instance.returnUserId();
-    List<ProductDetailModel> _productList = shopId == null
-        ? []
-        : await dashboardService.fetchDashboardProductFirstList() ?? [];
+    String? shopId = await UserIdInitalize.instance.returnUserId(scaffoldState,context!);
+    List<ProductDetailModel> _productList = shopId == null ? [] : await dashboardService.fetchDashboardProductFirstList() ?? [];
 
     productList = _productList.asObservable();
     persistProductList = productList;
@@ -122,14 +125,22 @@ abstract class _DashboardViewModelBase with Store, BaseViewModel {
   }
 
   @action
+  void sortProductList(Sorting sortingOption) {
+    if (sortingOption == Sorting.SUGGEST_ORDER) {
+      productList.sort((ProductDetailModel dataA, ProductDetailModel dataB) => dataA.productId!.compareTo(dataB.productId!));
+    } else if (sortingOption == Sorting.DECREASE_PRICE) {
+      productList.sort((ProductDetailModel dataA, ProductDetailModel dataB) => dataB.price!.compareTo(dataA.price!));
+    } else if (sortingOption == Sorting.INCREASE_PRICE) {
+      productList.sort((ProductDetailModel dataA, ProductDetailModel dataB) => dataA.price!.compareTo(dataB.price!));
+    }
+  }
+
+  @action
   Future<void> fetchProductLastList() async {
-    if (isProductFirstListLoading == false &&
-        isProductMoreListLoading == false) {
+    if (isProductFirstListLoading == false && isProductMoreListLoading == false) {
       changeIsProductMoreListLoading();
-      String? shopId = await UserIdInitalize.instance.returnUserId();
-      List<ProductDetailModel> moreDataList = shopId == null
-          ? []
-          : await dashboardService.fetchDashboardProductMoreList() ?? [];
+      String? shopId = await UserIdInitalize.instance.returnUserId(scaffoldState,context!);
+      List<ProductDetailModel> moreDataList = shopId == null ? [] : await dashboardService.fetchDashboardProductMoreList() ?? [];
       productList.addAll(moreDataList);
 
       persistProductList = productList;
@@ -152,10 +163,9 @@ abstract class _DashboardViewModelBase with Store, BaseViewModel {
   @action
   Future<void> fetchProductSliderList() async {
     changeIsProductSliderListLoading();
-    String? shopId = await UserIdInitalize.instance.returnUserId();
-    _productSliderList = shopId == null
-        ? []
-        : await dashboardService.fetchDashboardSliderList() ?? [];
+    String? shopId = await UserIdInitalize.instance.returnUserId(scaffoldState,context!);
+    _productSliderList = shopId == null ? [] : await dashboardService.fetchDashboardSliderList() ?? [];
+
     changeIsProductSliderListLoading();
   }
 
@@ -169,11 +179,14 @@ abstract class _DashboardViewModelBase with Store, BaseViewModel {
       changeIsSearching(false);
     } else {
       changeIsSearching(true);
-      productList = productList
-          .where((item) =>
-              item.name!.toLowerCase().contains(productName..toLowerCase()))
-          .toList()
-          .asObservable();
+      productList = productList.where((item) => item.name!.toLowerCase().contains(productName..toLowerCase())).toList().asObservable();
     }
   }
+
+  List<ProductDetailModel> filterProductList(String query) => List.of(productList).where((shop) {
+        final productLower = shop.name!.toLowerCase();
+        final queryLower = query.toLowerCase();
+
+        return productLower.contains(queryLower);
+      }).toList();
 }

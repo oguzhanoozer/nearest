@@ -6,6 +6,7 @@ import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
+import 'package:google_place/google_place.dart';
 import 'package:kartal/kartal.dart';
 import 'package:mobx/mobx.dart';
 
@@ -38,9 +39,9 @@ abstract class _OwnerHomeViewModelBase with Store, BaseViewModel, ErrorHelper {
   late LocationPermission permission;
 
   @observable
-  String location = "Click to search find address";
+  String location = LocaleKeys.clicktSearchText.locale;
 
-  String shopName = "Your Shop";
+  String shopName = LocaleKeys.yourLocationText.locale;
   @observable
   bool isEnableUpdating = false;
 
@@ -56,6 +57,27 @@ abstract class _OwnerHomeViewModelBase with Store, BaseViewModel, ErrorHelper {
   @observable
   bool isMapDataLoading = false;
 
+  @observable
+  bool isSearchPredictLaoding = false;
+
+  late GooglePlace googlePlace;
+
+  TextEditingController searchInputTextController = TextEditingController();
+
+  @observable
+  ObservableList<AutocompletePrediction> predictions = ObservableList<AutocompletePrediction>();
+
+  Timer? debounceForSearch;
+
+  @action
+  Future<void> autoCompleteSearch(String value) async {
+    changeIsSearchPredictLaoding();
+    var result = await googlePlace.autocomplete.get(value);
+    if (result != null && result.predictions != null) {
+      predictions = result.predictions!.asObservable();
+    }
+  }
+
   @override
   void setContext(BuildContext context) {
     this.context = context;
@@ -65,6 +87,7 @@ abstract class _OwnerHomeViewModelBase with Store, BaseViewModel, ErrorHelper {
   @override
   void init() {
     getCurrentLocationPosition();
+    googlePlace = GooglePlace(EnvConnection.instance.googleMapsApiKey);
   }
 
   @action
@@ -73,13 +96,17 @@ abstract class _OwnerHomeViewModelBase with Store, BaseViewModel, ErrorHelper {
   }
 
   @action
+  void changeIsSearchPredictLaoding() {
+    isSearchPredictLaoding = !isSearchPredictLaoding;
+  }
+
+  @action
   Future<LatLng?> checkShopLocation() async {
     ShopModel? shopModel = await shopOwnerHomeService.fetchShopLocation();
     if (shopModel != null) {
       shopName = shopModel.name!;
       if (shopModel.location != null) {
-        return LatLng(
-            shopModel.location!.latitude, shopModel.location!.longitude);
+        return LatLng(shopModel.location!.latitude, shopModel.location!.longitude);
       }
     }
     return null;
@@ -92,17 +119,23 @@ abstract class _OwnerHomeViewModelBase with Store, BaseViewModel, ErrorHelper {
   }
 
   @action
-  Future<Position> getLocationPermission() async {
-    serviceEnabled = await _geolocatorPlatform.isLocationServiceEnabled();
-    if (!serviceEnabled) {}
-    permission = await _geolocatorPlatform.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await _geolocatorPlatform.requestPermission();
-      if (permission == LocationPermission.denied) {}
+  Future<Position?> getLocationPermission() async {
+    Position? position;
+    try {
+      serviceEnabled = await _geolocatorPlatform.isLocationServiceEnabled();
+      if (!serviceEnabled) {}
+      permission = await _geolocatorPlatform.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await _geolocatorPlatform.requestPermission();
+      }
+
+      position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+
+      return position;
+    } catch (e) {
+      showSnackBar(scaffoldState, context!, "Konum bilgisine erişilemedi.Lütfen uygulama izinlerini kontrol ederek,konum güncelle ile tekrar deneyiniz.",
+          timeIsLong: true);
     }
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    return position;
   }
 
   @action
@@ -112,17 +145,22 @@ abstract class _OwnerHomeViewModelBase with Store, BaseViewModel, ErrorHelper {
 
     savedLocation = await checkShopLocation();
     if (savedLocation == null) {
-      Position position = await getLocationPermission();
+      Position? position = await getLocationPermission();
 
-      savedLocation = LatLng(position.latitude, position.longitude);
-      await _updateShopLocation(
-          GeoPoint(savedLocation.latitude, savedLocation.longitude));
+      if (position != null) {
+        savedLocation = LatLng(position.latitude, position.longitude);
+        await _updateShopLocation(GeoPoint(savedLocation.latitude, savedLocation.longitude));
+        initialCameraPosition = CameraPosition(target: savedLocation, zoom: 6);
+        addMarker(savedLocation, false);
+      } else {
+        initialCameraPosition = CameraPosition(target: LatLng(42, 32), zoom: 6);
+      }
+    } else {
+      initialCameraPosition = CameraPosition(target: savedLocation, zoom: 6);
+      addMarker(savedLocation, false);
     }
 
-    ///setCameraLocation(savedLocation);
-    initialCameraPosition = CameraPosition(target: savedLocation, zoom: 6);
-    addMarker(savedLocation,false);
-    changDataLoadingMap(); 
+    changDataLoadingMap();
   }
 
   @action
@@ -130,17 +168,16 @@ abstract class _OwnerHomeViewModelBase with Store, BaseViewModel, ErrorHelper {
     if (isEnableUpdating) {
       LatLng? savedLocation;
 
-      Position position = await getLocationPermission();
+      Position? position = await getLocationPermission();
 
-      savedLocation = LatLng(position.latitude, position.longitude);
+      if (position != null) {
+        savedLocation = LatLng(position.latitude, position.longitude);
 
-      ///      await _updateGeoPointLocation(GeoPoint(position.latitude, position.longitude));
-      _updateGeoPoint = GeoPoint(position.latitude, position.longitude);
+        _updateGeoPoint = GeoPoint(position.latitude, position.longitude);
 
-      setCameraLocation(savedLocation);
-
-      ///      initialCameraPosition = CameraPosition(target: savedLocation, zoom: 6);
-      addMarker(savedLocation,true);
+        setCameraLocation(savedLocation);
+        addMarker(savedLocation, true);
+      }
     }
   }
 
@@ -150,10 +187,9 @@ abstract class _OwnerHomeViewModelBase with Store, BaseViewModel, ErrorHelper {
       if (_updateGeoPoint != null) {
         await _updateShopLocation(_updateGeoPoint!);
       } else {
-        showSnackBar(
-            scaffoldState, context!, LocaleKeys.locationWasNotUpdatedText.locale);
+        showSnackBar(scaffoldState, context!, LocaleKeys.locationWasNotUpdatedText.locale);
       }
-
+      searchInputTextController.clear();
       isEnableUpdating = false;
     }
   }
@@ -164,7 +200,7 @@ abstract class _OwnerHomeViewModelBase with Store, BaseViewModel, ErrorHelper {
   }
 
   @action
-  void addMarker(LatLng pos,bool isEnabled) {
+  void addMarker(LatLng pos, bool isEnabled) {
     String markerIdVal = shopName;
 
     final MarkerId markerId = MarkerId(markerIdVal);
@@ -173,16 +209,12 @@ abstract class _OwnerHomeViewModelBase with Store, BaseViewModel, ErrorHelper {
     Marker marker = Marker(
         markerId: markerId,
         position: pos,
-        draggable: isEnabled,
+        draggable: isEnableUpdating,
         infoWindow: InfoWindow(title: markerIdVal),
         onTap: () {},
         onDragEnd: ((newPosition) async {
           setCameraLocation(newPosition);
-          _updateGeoPoint =
-              GeoPoint(newPosition.latitude, newPosition.longitude);
-        //  isEnableUpdating = false;
-
-          ///await _updateGeoPointLocation(  GeoPoint(newPosition.latitude, newPosition.longitude));
+          _updateGeoPoint = GeoPoint(newPosition.latitude, newPosition.longitude);
         }));
 
     markers = <Marker>{marker};
@@ -190,46 +222,24 @@ abstract class _OwnerHomeViewModelBase with Store, BaseViewModel, ErrorHelper {
 
   @action
   void setCameraLocation(LatLng newPosition) {
-    newGoogleMapController?.animateCamera(CameraUpdate.newCameraPosition(
-        CameraPosition(target: newPosition, zoom: 8)));
+    newGoogleMapController?.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: newPosition, zoom: 8)));
   }
 
   @action
-  Future<void> displayPrediction(Prediction placePrediction) async {
-    PlacesDetailsResponse detail =
-        await _places.getDetailsByPlaceId(placePrediction.placeId!);
-    double lat = (detail.result.geometry?.location.lat)!;
-    double lng = (detail.result.geometry?.location.lng)!;
+  Future<void> updatePositionWithSelectedLocation(AutocompletePrediction placePrediction) async {
+    var result = await googlePlace.details.get(placePrediction.placeId!);
+    if (result != null && result.result != null) {
+      var detailsResult = result.result!;
 
-    addMarker(LatLng(lat, lng),true);
-    setCameraLocation(LatLng(lat, lng));
-    _updateGeoPoint = GeoPoint(lat, lng);
+      double? lat = detailsResult.geometry?.location?.lat;
+      double? lng = detailsResult.geometry?.location?.lng;
 
-    ///await _updateGeoPointLocation(GeoPoint(lat, lng));
-  }
-
-  @action
-  Future<void> getPlaceAutoComplete(BuildContext context) async {
-    Prediction? placePrediction = await PlacesAutocomplete.show(
-
-        ///overlayBorderRadius: BorderRadius.all(Radius.circular(20)),
-        strictbounds: false,
-        types: [],
-        mode: Mode.overlay,
-        language: "tr",
-        logo: const SizedBox(),
-        components: [Component(Component.country, "tr")],
-        context: context,
-        cursorColor: context.colorScheme.onPrimaryContainer,
-        apiKey: EnvConnection.instance.googleMapsApiKey);
-
-    if (placePrediction != null && placePrediction.description != null) {
-      location = placePrediction.description!;
-
-      await displayPrediction(placePrediction);
-    } else {
-      location = LocaleKeys.errorLocationNotFoundText.locale;
-      showSnackBar(scaffoldState, context, LocaleKeys.errorOnFindingPlaceAddressText.locale);
+      if (lat != null && lng != null) {
+        addMarker(LatLng(lat, lng), true);
+        setCameraLocation(LatLng(lat, lng));
+        _updateGeoPoint = GeoPoint(lat, lng);
+      }
     }
+    changeIsSearchPredictLaoding();
   }
 }

@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:kartal/kartal.dart';
 
 import '../../../../core/base/view/base_view.dart';
-import '../../../../core/components/button/normal_button.dart';
 import '../../../../core/extension/string_extension.dart';
 import '../../../../core/init/lang/locale_keys.g.dart';
-import '../../../product/product_list_view/product_list_view.dart';
-import '../../dashboard/view/home_dashboard_navigation_view.dart';
+import '../../../product/circular_progress/circular_progress_indicator.dart';
+import '../../../product/input_text_decoration.dart';
+import '../../../product/shop_product_view/product_list_view.dart';
 import '../model/shop_model.dart';
 import '../viewmodel/shop_list_view_model.dart';
 
 class ShopListView extends StatelessWidget {
-  const ShopListView({Key? key}) : super(key: key);
+  ShopListView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +23,7 @@ class ShopListView extends StatelessWidget {
         model.setContext(context);
         model.init();
       },
-      onPageBuilder: (BuildContext context, ShopListViewModel viewmodel) =>
-          buildScaffold(context, viewmodel),
+      onPageBuilder: (BuildContext context, ShopListViewModel viewmodel) => buildScaffold(context, viewmodel),
     );
   }
 
@@ -36,11 +36,7 @@ class ShopListView extends StatelessWidget {
           key: viewmodel.scaffoldState,
           appBar: buildAppBar(context, viewmodel),
           body: Observer(builder: (_) {
-            return viewmodel.isShopMapListLoading
-                ? Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : buildShopList(viewmodel, context);
+            return viewmodel.isShopMapListLoading ? CallCircularProgress(context) : buildShopList(viewmodel, context);
           })),
     );
   }
@@ -49,75 +45,68 @@ class ShopListView extends StatelessWidget {
     List<ShopModel> currentShopList = viewmodel.shopModelList;
 
     return Padding(
-      padding: context.paddingNormal,
-      child: ListView.builder(
-        itemCount: currentShopList.length,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: context.paddingLow,
-            child: buildShopCard(context, currentShopList[index], index),
-          );
-        },
-      ),
+      padding: context.horizontalPaddingNormal,
+      child: currentShopList.isEmpty
+          ? Center(
+              child: Text(
+                LocaleKeys.nearestShopsListEmptyText.locale,
+                style: titleTextStyle(context),
+              ),
+            )
+          : ListView.builder(
+              itemCount: currentShopList.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: context.verticalPaddingLow,
+                  child: buildShopCard(context, currentShopList[index], index, viewmodel),
+                );
+              },
+            ),
     );
   }
 
-  Widget buildShopCard(BuildContext context, ShopModel shopModel, int index) {
-    return ProductListView(
+  Widget buildShopCard(BuildContext context, ShopModel shopModel, int index, ShopListViewModel viewmodel) {
+    return ShopProductView(
       productDetailModel: null,
       shopModel: shopModel,
-      rightSideWidget: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          IconButton(
-              icon: Icon(Icons.location_on_outlined,
-                  size: context.mediumValue,
-                  color: context.colorScheme.onPrimary),
-              onPressed: () {
-                context.navigateToPage(HomeDashboardNavigationView(
-                    isDirection: true, shopModel: shopModel));
-              }),
-          Container(
-            height: context.dynamicHeight(0.04),
-            child: NormalButton(
-              child: Text(
-               LocaleKeys.viewSellerText.locale,
-                style: context.textTheme.titleMedium!
-                    .copyWith(color: context.colorScheme.onSecondary),
-              ),
-              onPressed: null,
-              color: context.appTheme.colorScheme.onSurfaceVariant,
-            ),
+      rightSideWidget: Observer(builder: (_) {
+        return Center(
+          child: IconButton(
+            icon: Icon(Icons.location_on_outlined, size: context.normalValue * 3, color: context.colorScheme.onSurfaceVariant),
+            onPressed: () async {
+              if (viewmodel.isInterstitialAdReady) {
+                viewmodel.paramShopModel = shopModel;
+                viewmodel.interstitialAd!.show();
+              }
+            },
           ),
-        ],
-      ),
+        );
+      }),
     );
   }
 
   AppBar buildAppBar(BuildContext context, ShopListViewModel viewModel) {
     return AppBar(
-      elevation: 0.1,
       automaticallyImplyLeading: false,
       centerTitle: true,
       title: Observer(builder: (_) {
         return viewModel.isSearching
             ? getAppBarListTile(context, viewModel)
             : Text(LocaleKeys.theNearestText.locale,
-                style: context.textTheme.headline6!.copyWith(
-                    color: context.colorScheme.onPrimary,
-                    fontWeight: FontWeight.bold));
+                style: GoogleFonts.concertOne(
+                    textStyle: context.textTheme.headline5!.copyWith(color: context.colorScheme.onSurfaceVariant, fontWeight: FontWeight.bold)));
       }),
       actions: [
         Observer(builder: (_) {
           return viewModel.isSearching
-              ? SizedBox()
+              ? const SizedBox()
               : Padding(
                   padding: context.horizontalPaddingNormal,
                   child: IconButton(
                     onPressed: () {
                       viewModel.changeIsSearching();
                     },
-                    icon: Icon(Icons.search, size: context.dynamicHeight(0.04)),
+                    icon: Icon(Icons.search, size: context.dynamicHeight(0.03)),
                   ),
                 );
         })
@@ -128,29 +117,27 @@ class ShopListView extends StatelessWidget {
   Widget getAppBarListTile(BuildContext context, ShopListViewModel viewModel) {
     return ListTile(
       title: TextFormField(
+        style: inputTextStyle(context),
         textInputAction: TextInputAction.search,
         onChanged: (value) {},
         autofocus: true,
         onFieldSubmitted: (term) {
           viewModel.filterProducts(term);
         },
-        decoration: InputDecoration(
-            isDense: true, // Added this
-            contentPadding: EdgeInsets.all(8),
-            hintText: LocaleKeys.enterShopNameText.locale,
-            hintStyle: TextStyle(
-              color: context.colorScheme.onSecondary.withOpacity(0.5),
-              fontSize: 12,
-              fontStyle: FontStyle.italic,
+        decoration: buildInputDecoration(
+          context,
+          hintText: LocaleKeys.enterShopNameText.locale,
+          suffixIcon: IconButton(
+            icon: Icon(
+              Icons.cancel_sharp,
+              size: context.dynamicHeight(0.03),
+              color: context.colorScheme.onSurfaceVariant,
             ),
-            prefixIcon: Icon(Icons.search, size: context.dynamicHeight(0.03)),
-            border: InputBorder.none,
-            suffixIcon: IconButton(
-              icon: Icon(Icons.cancel_sharp, size: context.dynamicHeight(0.03)),
-              onPressed: () {
-                viewModel.changeIsSearching();
-              },
-            )),
+            onPressed: () {
+              viewModel.changeIsSearching();
+            },
+          ),
+        ),
       ),
     );
   }

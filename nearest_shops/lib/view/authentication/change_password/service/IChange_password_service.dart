@@ -15,39 +15,29 @@ abstract class IChangePasswordService {
 }
 
 class ChangePasswordService extends IChangePasswordService with ErrorHelper {
-  ChangePasswordService(
-      GlobalKey<ScaffoldState> scaffoldState, BuildContext context)
-      : super(scaffoldState, context);
+  ChangePasswordService(GlobalKey<ScaffoldState> scaffoldState, BuildContext context) : super(scaffoldState, context);
 
   @override
-  Future<void> changeUserPassword(
-      String currentPassword, String newPassword) async {
+  Future<void> changeUserPassword(String currentPassword, String newPassword) async {
     try {
       User? user = FirebaseAuthentication.instance.authCurrentUser();
 
       if (user != null) {
-        final credential = EmailAuthProvider.credential(
-            email: user.email!, password: currentPassword);
+        final credential = EmailAuthProvider.credential(email: user.email!, password: currentPassword);
 
         await user.reauthenticateWithCredential(credential).then((value) async {
           await user.updatePassword(newPassword).then((value) {
             showSnackBar(scaffoldState, context, LocaleKeys.yourPasswordUpdateText.locale);
           }).catchError((value) {
-            throw  LocaleKeys.errorOnUpdatingPasswordText.locale + value.toString();
+            throw LocaleKeys.errorOnUpdatingPasswordText.locale + value.toString();
           });
         }).catchError((value) {
-          throw  LocaleKeys.errorOnUpdatingPasswordText.locale +
-              (value.code.toString().contains("wrong-password")
-                  ? " "+ LocaleKeys.dueToWrongPasswordText.locale
-                  : ".");
-        }); 
+          throw LocaleKeys.errorOnUpdatingPasswordText.locale +
+              (value.code.toString().contains("wrong-password") ? " " + LocaleKeys.dueToWrongPasswordText.locale : ".");
+        });
       } else {}
-    } on FirebaseAuthException catch (e) {
-      throw e.message.toString();
-    } on FirebaseException catch (e) {
-      showSnackBar(scaffoldState, context, e.message.toString());
     } catch (e) {
-      showSnackBar(scaffoldState, context, e.toString());
+      showSnackBar(scaffoldState, context, LocaleKeys.loginError.locale);
     }
   }
 }

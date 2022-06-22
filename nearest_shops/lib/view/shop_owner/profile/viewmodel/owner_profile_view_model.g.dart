@@ -86,6 +86,21 @@ mixin _$OwnerProfileViewModel on _OwnerProfileViewModelBase, Store {
     });
   }
 
+  final _$isUpdatingAtom = Atom(name: '_OwnerProfileViewModelBase.isUpdating');
+
+  @override
+  bool get isUpdating {
+    _$isUpdatingAtom.reportRead();
+    return super.isUpdating;
+  }
+
+  @override
+  set isUpdating(bool value) {
+    _$isUpdatingAtom.reportWrite(value, super.isUpdating, () {
+      super.isUpdating = value;
+    });
+  }
+
   final _$selectImageAsyncAction =
       AsyncAction('_OwnerProfileViewModelBase.selectImage');
 
@@ -96,6 +111,17 @@ mixin _$OwnerProfileViewModel on _OwnerProfileViewModelBase, Store {
 
   final _$_OwnerProfileViewModelBaseActionController =
       ActionController(name: '_OwnerProfileViewModelBase');
+
+  @override
+  void changeIsUpdating() {
+    final _$actionInfo = _$_OwnerProfileViewModelBaseActionController
+        .startAction(name: '_OwnerProfileViewModelBase.changeIsUpdating');
+    try {
+      return super.changeIsUpdating();
+    } finally {
+      _$_OwnerProfileViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
 
   @override
   void isImageSelectedChange() {
@@ -125,7 +151,8 @@ mixin _$OwnerProfileViewModel on _OwnerProfileViewModelBase, Store {
 user: ${user},
 profileLoading: ${profileLoading},
 isImageSelected: ${isImageSelected},
-pickedFile: ${pickedFile}
+pickedFile: ${pickedFile},
+isUpdating: ${isUpdating}
     ''';
   }
 }

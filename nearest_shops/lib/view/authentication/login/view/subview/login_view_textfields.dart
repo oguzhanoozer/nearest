@@ -1,63 +1,42 @@
 part of '../login_view.dart';
 
 extension _LoginViewTextFields on LoginView {
-  Widget buildPasswordTextField(
-      LoginViewModel viewModel, BuildContext context) {
+  Widget buildPasswordTextField(LoginViewModel viewModel, BuildContext context) {
     return Observer(builder: (_) {
       return TextFormField(
-        validator: (value) =>
-            value!.isNotEmpty ? null : LocaleKeys.theFieldRequiredText.locale,
+        style: inputTextStyle(context),
+        validator: (value) => value!.isNotEmpty ? null : LocaleKeys.theFieldRequiredText.locale,
         keyboardType: TextInputType.visiblePassword,
         controller: viewModel.passwordController,
         obscureText: viewModel.isLockOpen,
-        decoration: buildPasswordTextFieldDecoration(context, viewModel),
+        decoration: buildInputDecoration(
+          context,
+          hintText: LocaleKeys.passwordExampleText.locale,
+          prefixIcon: Icons.lock_open,
+          prefixIconColor: context.colorScheme.primary,
+          suffixIcon: TextButton(
+            onPressed: () {
+              viewModel.isLockStateChange();
+            },
+            child: Observer(
+              builder: (_) {
+                return Icon(viewModel.isLockOpen ? Icons.visibility_off : Icons.visibility);
+              },
+            ),
+          ),
+        ),
       );
     });
   }
 
-  InputDecoration buildPasswordTextFieldDecoration(
-      BuildContext context, LoginViewModel viewModel) {
-    return InputDecoration(
-      labelStyle: context.textTheme.subtitle1,
-      label: Text(
-        LocaleKeys.passwordText.locale,
-      ),
-      icon: buildContainerIconField(context, Icons.vpn_key),
-      hintText: "Password123456",
-      suffixIcon: TextButton(
-        onPressed: () {
-          viewModel.isLockStateChange();
-        },
-        child: Observer(builder: (_) {
-          return Icon(viewModel.isLockOpen ? Icons.lock : Icons.lock_open);
-        }),
-      ),
-    );
-  }
-
-  TextFormField buildEmailTextField(
-      LoginViewModel viewModel, BuildContext context) {
+  TextFormField buildEmailTextField(LoginViewModel viewModel, BuildContext context) {
     return TextFormField(
-      validator: (value) =>
-          value!.isValidEmail ? null : LocaleKeys.enterValidEmailText.locale,
+      style: inputTextStyle(context),
+      validator: (value) => value!.isValidEmail ? null : LocaleKeys.enterValidEmailText.locale,
       keyboardType: TextInputType.emailAddress,
       controller: viewModel.emailController,
-      decoration: buildEmailTextFieldDecoration(context),
-    );
-  }
-
-  InputDecoration buildEmailTextFieldDecoration(BuildContext context) {
-    return InputDecoration(
-        labelStyle: context.textTheme.subtitle1,
-        label: Text(LocaleKeys.emailText.locale),
-        icon: buildContainerIconField(context, Icons.email),
-        hintText: "example@email.com");
-  }
-
-  Container buildContainerIconField(BuildContext context, IconData icon) {
-    return Container(
-      padding: context.paddingLow,
-      child: Icon(icon, color: context.appTheme.colorScheme.onSurfaceVariant),
+      decoration:
+          buildInputDecoration(context, hintText: LocaleKeys.emailExampleText.locale, prefixIcon: Icons.email, prefixIconColor: context.colorScheme.primary),
     );
   }
 }

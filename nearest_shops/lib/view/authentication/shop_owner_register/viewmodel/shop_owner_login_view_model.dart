@@ -7,11 +7,9 @@ import '../service/IShop_owner_register_service.dart';
 
 part 'shop_owner_login_view_model.g.dart';
 
-class ShopOwnerRegisterViewModel = _ShopOwnerRegisterViewModelBase
-    with _$ShopOwnerRegisterViewModel;
+class ShopOwnerRegisterViewModel = _ShopOwnerRegisterViewModelBase with _$ShopOwnerRegisterViewModel;
 
-abstract class _ShopOwnerRegisterViewModelBase
-    with Store, BaseViewModel, ErrorHelper {
+abstract class _ShopOwnerRegisterViewModelBase with Store, BaseViewModel, ErrorHelper {
   GlobalKey<FormState> formState = GlobalKey();
   GlobalKey<ScaffoldState> scaffoldState = GlobalKey();
 
@@ -33,11 +31,13 @@ abstract class _ShopOwnerRegisterViewModelBase
   @observable
   bool isLaterLockOpen = false;
 
+  @override
   void setContext(BuildContext context) {
     this.context = context;
     shopOwnerRegisterService = ShopOwnerRegisterService(scaffoldState, context);
   }
 
+  @override
   void init() {
     businessNameController = TextEditingController();
     businessAdressController = TextEditingController();
@@ -50,20 +50,15 @@ abstract class _ShopOwnerRegisterViewModelBase
   Future<void> registerOwnerData(BuildContext context) async {
     isLoadingChange();
     if (formState.currentState!.validate()) {
-     /// GeoPoint geoPoint = GeoPoint(10, 25);
       Map<String, dynamic> ownerMapData = {
         "address": businessAdressController!.text,
         "email": emailController!.text,
-       /// "location": geoPoint,
         "logoUrl": "",
         "name": businessNameController!.text,
         "phoneNumber": businessPhoneController!.text
       };
 
-      await shopOwnerRegisterService.shopOwnerRegister(
-          email: emailController!.text,
-          password: passwordLaterController!.text,
-          ownerMapData: ownerMapData);
+      await shopOwnerRegisterService.shopOwnerRegister(email: emailController!.text, password: passwordLaterController!.text, ownerMapData: ownerMapData);
     }
 
     isLoadingChange();

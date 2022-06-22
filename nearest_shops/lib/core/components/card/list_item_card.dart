@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 class ListItemCard extends Card {
   ListItemCard(
       {Key? key,
-      Color color = Colors.white,
+      bool onlyBottomRadius = false,
+      required Color color,
       required Widget child,
       required double radius,
       EdgeInsetsGeometry margin = EdgeInsets.zero,
       double elevation = 0.3,
-      Color shadowColor = Colors.white,
       BorderSide borderSide = BorderSide.none,
       Clip clipBehavior = Clip.antiAliasWithSaveLayer})
       : super(
@@ -21,5 +21,7 @@ class ListItemCard extends Card {
             borderOnForeground: true,
             shape: RoundedRectangleBorder(
                 side: borderSide,
-                borderRadius: BorderRadius.all(Radius.circular(radius))));
+                borderRadius: !onlyBottomRadius
+                    ? BorderRadius.all(Radius.circular(radius))
+                    : BorderRadius.only(bottomLeft: Radius.circular(radius), bottomRight: Radius.circular(radius))));
 }

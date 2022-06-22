@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:kartal/kartal.dart';
 
 import '../../../../core/base/view/base_view.dart';
+import '../../../product/circular_progress/circular_progress_indicator.dart';
 import '../viewModel/dashboard_onboard_view_model.dart';
 
 class DashboardOnBoardView extends StatelessWidget {
   DashboardOnBoardView({Key? key}) : super(key: key);
 
-  DashboardOnBoardViewModel onBoardViewModel = DashboardOnBoardViewModel();
 
   @override
   Widget build(BuildContext context) {
@@ -17,21 +18,17 @@ class DashboardOnBoardView extends StatelessWidget {
           model.setContext(context);
           model.init();
         },
-        onPageBuilder:
-            (BuildContext context, DashboardOnBoardViewModel viewModel) {
+        onPageBuilder: (BuildContext context, DashboardOnBoardViewModel viewModel) {
           return buildScaffold(context, viewModel);
         });
   }
 
-  Observer buildScaffold(
-      BuildContext context, DashboardOnBoardViewModel viewModel) {
+  Observer buildScaffold(BuildContext context, DashboardOnBoardViewModel viewModel) {
     return Observer(builder: (_) {
       return Scaffold(
         key: viewModel.scaffoldState,
         body: viewModel.isDashboardLoading
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
+            ? CallCircularProgress(context)
             : viewModel.directDashboard(),
       );
     });

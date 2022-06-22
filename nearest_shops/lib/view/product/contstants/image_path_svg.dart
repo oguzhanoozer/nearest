@@ -13,5 +13,4 @@ class SVGIMagePaths {
   final localization1SVG = "localization1".toSVG;
   final localization2SVG = "localization2".toSVG;
   final localization3SVG = "localization3".toSVG;
-  //final google2SVG = "google2".toSVG;
 }

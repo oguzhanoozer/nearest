@@ -42,21 +42,30 @@ mixin _$OwnerProductListViewModel on _OwnerProductListViewModelBase, Store {
     });
   }
 
-  final _$isShopProductDraggleLoadedAtom =
-      Atom(name: '_OwnerProductListViewModelBase.isShopProductDraggleLoaded');
+  final _$newGoogleMapControllerAtom =
+      Atom(name: '_OwnerProductListViewModelBase.newGoogleMapController');
 
   @override
-  bool get isShopProductDraggleLoaded {
-    _$isShopProductDraggleLoadedAtom.reportRead();
-    return super.isShopProductDraggleLoaded;
+  GoogleMapController? get newGoogleMapController {
+    _$newGoogleMapControllerAtom.reportRead();
+    return super.newGoogleMapController;
   }
 
   @override
-  set isShopProductDraggleLoaded(bool value) {
-    _$isShopProductDraggleLoadedAtom
-        .reportWrite(value, super.isShopProductDraggleLoaded, () {
-      super.isShopProductDraggleLoaded = value;
+  set newGoogleMapController(GoogleMapController? value) {
+    _$newGoogleMapControllerAtom
+        .reportWrite(value, super.newGoogleMapController, () {
+      super.newGoogleMapController = value;
     });
+  }
+
+  final _$changeFavouriteListAsyncAction =
+      AsyncAction('_OwnerProductListViewModelBase.changeFavouriteList');
+
+  @override
+  Future<void> changeFavouriteList(String productId) {
+    return _$changeFavouriteListAsyncAction
+        .run(() => super.changeFavouriteList(productId));
   }
 
   final _$fetchShopProductsAsyncAction =
@@ -96,23 +105,12 @@ mixin _$OwnerProductListViewModel on _OwnerProductListViewModelBase, Store {
   }
 
   @override
-  void changeIsShopProductLoaded(bool value) {
+  void changeCameraPosition(GeoPoint geoPoint) {
     final _$actionInfo =
         _$_OwnerProductListViewModelBaseActionController.startAction(
-            name: '_OwnerProductListViewModelBase.changeIsShopProductLoaded');
+            name: '_OwnerProductListViewModelBase.changeCameraPosition');
     try {
-      return super.changeIsShopProductLoaded(value);
-    } finally {
-      _$_OwnerProductListViewModelBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void setContext(BuildContext context) {
-    final _$actionInfo = _$_OwnerProductListViewModelBaseActionController
-        .startAction(name: '_OwnerProductListViewModelBase.setContext');
-    try {
-      return super.setContext(context);
+      return super.changeCameraPosition(geoPoint);
     } finally {
       _$_OwnerProductListViewModelBaseActionController.endAction(_$actionInfo);
     }
@@ -134,7 +132,7 @@ mixin _$OwnerProductListViewModel on _OwnerProductListViewModelBase, Store {
     return '''
 isShopMapLoading: ${isShopMapLoading},
 isShopProductLoading: ${isShopProductLoading},
-isShopProductDraggleLoaded: ${isShopProductDraggleLoaded}
+newGoogleMapController: ${newGoogleMapController}
     ''';
   }
 }

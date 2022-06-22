@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:kartal/kartal.dart';
-import '../../../../core/extension/string_extension.dart';
-import '../../../../core/init/lang/locale_keys.g.dart';
 
 import '../../../../core/base/view/base_view.dart';
-import '../../../../core/components/button/normal_button.dart';
+import '../../../../core/components/button/button_shadow.dart';
 import '../../../../core/components/column/form_column.dart';
+import '../../../../core/extension/string_extension.dart';
+import '../../../../core/init/lang/locale_keys.g.dart';
+import '../../../product/circular_progress/circular_progress_indicator.dart';
+import '../../../product/input_text_decoration.dart';
 import '../viewmodel/reset_password_view_model.dart';
 
 class ResetPasswordView extends StatelessWidget {
@@ -20,31 +23,26 @@ class ResetPasswordView extends StatelessWidget {
           model.init();
           model.setContext(context);
         },
-        onPageBuilder:
-            (BuildContext context, ResetPasswordViewModel viewModel) {
+        onPageBuilder: (BuildContext context, ResetPasswordViewModel viewModel) {
           return buildScaffold(context, viewModel);
         });
   }
 
   Widget buildScaffold(BuildContext context, ResetPasswordViewModel viewModel) {
     return Scaffold(
+      appBar: AppBar(),
       key: viewModel.scaffoldState,
       body: Center(
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        child: FormColumn(children: [
           Text(
-           LocaleKeys.resetYourPasswordText.locale,
-            style: context.textTheme.headline6!
-                .copyWith(color: context.colorScheme.primary, fontWeight: FontWeight.w700),
+            LocaleKeys.createAccountText.locale,
+            style: context.textTheme.headline5!.copyWith(color: context.colorScheme.onSurfaceVariant, fontWeight: FontWeight.bold),
           ),
           context.emptySizedHeightBoxNormal,
           SingleChildScrollView(
             child: Form(
               key: viewModel.formState,
-              child: FormColumn(
-                children: [
-                  buildResetEmailTextField(viewModel, context),
-                ],
-              ),
+              child: buildResetEmailTextField(viewModel, context),
             ),
           ),
           context.emptySizedHeightBoxNormal,
@@ -54,51 +52,35 @@ class ResetPasswordView extends StatelessWidget {
     );
   }
 
-  TextFormField buildResetEmailTextField(
-      ResetPasswordViewModel viewModel, BuildContext context) {
+  TextFormField buildResetEmailTextField(ResetPasswordViewModel viewModel, BuildContext context) {
     return TextFormField(
-      validator: (value) =>
-          value!.isValidEmail ? null : LocaleKeys.enterValidEmailText.locale,
-      keyboardType: TextInputType.emailAddress,
-      controller: viewModel.emailResetTextController,
-      decoration: buildResetEmailTextFieldDecoration(context),
-    );
+        style: inputTextStyle(context),
+        validator: (value) => value!.isValidEmail ? null : LocaleKeys.enterValidEmailText.locale,
+        keyboardType: TextInputType.emailAddress,
+        controller: viewModel.emailResetTextController,
+        decoration:
+            buildInputDecoration(context, hintText: LocaleKeys.emailExampleText.locale, prefixIcon: Icons.email, prefixIconColor: context.colorScheme.primary)
+
+
+        );
   }
 
-  InputDecoration buildResetEmailTextFieldDecoration(BuildContext context) {
-    return InputDecoration(
-        labelStyle: context.textTheme.subtitle1,
-        label: Text( LocaleKeys.emailAddressText.locale),
-        icon: Container(
-          padding: context.paddingLow,
-          child: Icon(Icons.email,
-              color: context.appTheme.colorScheme.onSurfaceVariant),
-        ),
-        hintText:LocaleKeys.emailAddressText.locale);
-  }
-
-  Widget buildResetEmailButton(
-      ResetPasswordViewModel viewModel, BuildContext context) {
+  Widget buildResetEmailButton(ResetPasswordViewModel viewModel, BuildContext context) {
     return Observer(
       builder: (_) {
         return viewModel.isResetEmailSend
-            ? Container(
-                child: Center(
-                  child: CircularProgressIndicator(),
-                ),
-              )
-            : NormalButton(
+            ? CallCircularProgress(context)
+            : ButtonShadow(
+                onTap: () async {
+                  if (!viewModel.isResetEmailSend) {
+                    await viewModel.sendResetPasswordEmail();
+                  }
+                },
                 child: Text(
-                LocaleKeys.resetText.locale,
-                  style: context.textTheme.headline6!
-                      .copyWith(color: context.colorScheme.onSecondary),
+                  LocaleKeys.resetText.locale,
+                  style: GoogleFonts.lora(
+                      textStyle: context.textTheme.headline6!.copyWith(fontWeight: FontWeight.bold, color: context.colorScheme.onSurfaceVariant)),
                 ),
-                onPressed: viewModel.isResetEmailSend
-                    ? null
-                    : () async {
-                        await viewModel.sendResetPasswordEmail();
-                      },
-                color: context.appTheme.colorScheme.onSurfaceVariant,
               );
       },
     );

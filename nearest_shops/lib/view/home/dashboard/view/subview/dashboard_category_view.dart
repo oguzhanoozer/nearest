@@ -1,38 +1,116 @@
 part of '../dashboard_view.dart';
 
 extension _DashboardProductsWidgets on DashboardView {
-  InputDecoration buildInputDecoration(BuildContext context) {
-    return InputDecoration(
-      fillColor: context.colorScheme.surface.withOpacity(0.05),
-      contentPadding: EdgeInsets.zero,
-      focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(
-          width: 0.5, 
-          color: context.colorScheme.surface.withOpacity(0.3),
+  Shimmer buildProductShimmer(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: context.colorScheme.onTertiary,
+      highlightColor: context.colorScheme.onTertiary,
+      direction: ShimmerDirection.ltr,
+      child: buildGridViewShimmer(),
+    );
+  }
+
+  GridView buildGridViewShimmer() {
+    return GridView.builder(
+      padding: EdgeInsets.zero,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 0.7,
+      ),
+      itemCount: 10,
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      itemBuilder: (context, index) => Padding(padding: context.paddingLow, child: buildShimmerColumn(context)),
+    );
+  }
+
+  Column buildShimmerColumn(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Expanded(
+          flex: 6,
+          child: Container(
+            width: double.infinity,
+            child: Card(
+              color: context.colorScheme.inversePrimary,
+            ),
+          ),
         ),
-        borderRadius: BorderRadius.circular(15),
+        context.emptySizedHeightBoxLow,
+        buildShimmerContainer(context, 0.4),
+        context.emptySizedHeightBoxLow,
+        buildShimmerContainer(context, 0.3),
+        context.emptySizedHeightBoxLow,
+        builderShimmerRow(context),
+      ],
+    );
+  }
+
+  Expanded builderShimmerRow(BuildContext context) {
+    return Expanded(
+      flex: 1,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            flex: 1,
+            child: Card(
+              color: context.colorScheme.inversePrimary,
+              child: Container(),
+            ),
+          ),
+          Expanded(flex: 1, child: Align(alignment: Alignment.centerRight, child: Icon(Icons.favorite)))
+        ],
       ),
-      enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: context.colorScheme.onSecondary),
-        borderRadius: BorderRadius.circular(15),
+    );
+  }
+
+  Expanded buildShimmerContainer(BuildContext context, double height) {
+    return Expanded(
+      flex: 1,
+      child: SizedBox(
+        width: context.dynamicWidth(height),
+        child: Card(
+          color: context.colorScheme.inversePrimary,
+        ),
       ),
-      disabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: context.colorScheme.onSecondary),
-        borderRadius: BorderRadius.circular(15),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: context.colorScheme.onSecondary),
-        borderRadius: BorderRadius.circular(15),
-      ),
-      prefixIcon:
-          Icon(Icons.search, color: context.colorScheme.surface, size: 20),
-      hintStyle: TextStyle(fontSize: 15, color: context.colorScheme.surface),
-      hintText: LocaleKeys.searchTheProductText.locale,
-      suffixIcon: Icon(
-        Icons.filter_list_outlined,
-        size: 30,
-        color: context.colorScheme.onSurfaceVariant,
-      ),
+    );
+  }
+
+  Row buildSliderShimmer(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Expanded(
+          flex: 2,
+          child: Padding(
+            padding: context.paddingNormal,
+            child: Card(
+              color: context.colorScheme.inversePrimary,
+              child: Container(),
+            ),
+          ),
+        ),
+        context.emptySizedWidthBoxLow3x,
+        Expanded(
+          flex: 2,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              context.emptySizedHeightBoxLow3x,
+              buildShimmerContainer(context, 0.5),
+              context.emptySizedHeightBoxLow,
+              buildShimmerContainer(context, 0.3),
+              context.emptySizedHeightBoxLow,
+              buildShimmerContainer(context, 0.2),
+              context.emptySizedHeightBoxLow,
+              builderShimmerRow(context),
+              context.emptySizedHeightBoxLow3x,
+            ],
+          ),
+        )
+      ],
     );
   }
 }

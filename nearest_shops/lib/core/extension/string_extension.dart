@@ -16,3 +16,9 @@ extension ImageSVGPathExtension on String {
 extension ImagePathExtension on String {
   String get toImagePath => "asset/image/$this.png";
 }
+
+extension LottieExtension on String {
+  String get toLottiePath => "asset/lottie/$this.json";
+}
+
+

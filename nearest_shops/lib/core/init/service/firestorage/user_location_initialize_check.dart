@@ -1,15 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mobx/mobx.dart';
+import 'package:nearest_shops/core/extension/string_extension.dart';
+import 'package:nearest_shops/core/init/service/firestorage/enum/document_collection_enums.dart';
+import 'package:nearest_shops/view/utility/error_helper.dart';
 
 import '../../../../view/authentication/login/model/user_model.dart';
+import '../../lang/locale_keys.g.dart';
 import '../authenticaion/user_id_initialize.dart';
 import 'firestorage_initialize.dart';
 
-class UserLocationInitializeCheck {
-  static UserLocationInitializeCheck _instance =
-      UserLocationInitializeCheck._init();
+class UserLocationInitializeCheck with ErrorHelper {
+  static UserLocationInitializeCheck _instance = UserLocationInitializeCheck._init();
   UserLocationInitializeCheck._init();
   static UserLocationInitializeCheck get instance => _instance;
 
@@ -20,14 +25,11 @@ class UserLocationInitializeCheck {
 
   final GeolocatorPlatform _geolocatorPlatform = GeolocatorPlatform.instance;
 
-  Future<ObservableList<String>?> getUserFavouriteList() async {
+  Future<ObservableList<String>?> getUserFavouriteList(GlobalKey<ScaffoldState> scaffoldState, BuildContext context) async {
     ObservableList<String> _favouriteList = ObservableList<String>();
-    final userId = await UserIdInitalize.instance.returnUserId();
+    final userId = await UserIdInitalize.instance.returnUserId(scaffoldState, context);
 
-    final userQuery = await FirebaseCollectionRefInitialize
-        .instance.usersCollectionReference
-        .where("id", isEqualTo: userId)
-        .get();
+    final userQuery = await FirebaseCollectionRefInitialize.instance.usersCollectionReference.where(ContentString.ID.rawValue, isEqualTo: userId).get();
 
     List<DocumentSnapshot> userDocs = userQuery.docs;
 
@@ -38,18 +40,22 @@ class UserLocationInitializeCheck {
     }
   }
 
-  Future<void> assignUserLocation() async {
+  Future<void> assignUserLocation(GlobalKey<ScaffoldState> scaffoldState, BuildContext context) async {
     if (_userLocation == null) {
-      final geoPoint = await _fetchUserLocation();
+      final geoPoint = await _fetchUserLocation(scaffoldState, context);
       if (geoPoint == null) {
-        await gerCurrentLocationPosition();
+        await gerCurrentLocationPosition(scaffoldState, context);
       }
     }
   }
 
-  Future<GeoPoint?> returnUserLocation() async {
+  void setUserLocation(GeoPoint geoPoint) {
+    _userLocation = geoPoint;
+  }
+
+  Future<GeoPoint?> returnUserLocation(GlobalKey<ScaffoldState> scaffoldState, BuildContext context) async {
     if (_userLocation == null) {
-      await assignUserLocation();
+      await assignUserLocation(scaffoldState, context);
     }
     return _userLocation;
   }
@@ -58,57 +64,58 @@ class UserLocationInitializeCheck {
     _userLocation = shopLocation;
   }
 
-  Future<GeoPoint?> _fetchUserLocation() async {
+  Future<GeoPoint?> _fetchUserLocation(GlobalKey<ScaffoldState> scaffoldState, BuildContext context) async {
     try {
-      final userId = await UserIdInitalize.instance.returnUserId();
+      final userId = await UserIdInitalize.instance.returnUserId(scaffoldState, context);
 
-      final userQuery = await FirebaseCollectionRefInitialize
-          .instance.usersCollectionReference
-          .where("id", isEqualTo: userId)
-          .get();
+      final userQuery = await FirebaseCollectionRefInitialize.instance.usersCollectionReference.where(ContentString.ID.rawValue, isEqualTo: userId).get();
 
       List<DocumentSnapshot> userDocs = userQuery.docs;
 
       if (userDocs.isNotEmpty) {
         UserModel userModel = UserModel.fromJson(userDocs.first.data() as Map);
         _userLocation = userModel.location;
-        // _favouriteList = userModel.favouriteList;
         return _userLocation;
       }
-    } on FirebaseAuthException catch (e) {
-      throw e.message.toString();
+    } catch (e) {
+      showSnackBar(scaffoldState, context, LocaleKeys.loginError.locale);
     }
   }
 
-  Future<Position> getLocationPermission() async {
-    serviceEnabled = await _geolocatorPlatform.isLocationServiceEnabled();
-    if (!serviceEnabled) {}
-    permission = await _geolocatorPlatform.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await _geolocatorPlatform.requestPermission();
-      if (permission == LocationPermission.denied) {}
-    }
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    return position;
-  }
-
-  Future<void> gerCurrentLocationPosition() async {
-    Position position = await getLocationPermission();
-    _userLocation = GeoPoint(position.latitude, position.longitude);
-
-    final userId = await UserIdInitalize.instance.returnUserId();
-
-    Map<String, dynamic> locationMap = {
-      "location": GeoPoint(position.latitude, position.longitude)
-    };
-
+  @action
+  Future<Position?> getLocationPermission(GlobalKey<ScaffoldState> scaffoldState, BuildContext context) async {
+    Position? position;
     try {
-      await FirebaseCollectionRefInitialize.instance.usersCollectionReference
-          .doc(userId)
-          .update(locationMap);
-    } on FirebaseException catch (e) {
-      rethrow;
+      serviceEnabled = await _geolocatorPlatform.isLocationServiceEnabled();
+      if (!serviceEnabled) {}
+      permission = await _geolocatorPlatform.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await _geolocatorPlatform.requestPermission();
+      }
+
+      position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+
+      return position;
+    } catch (e) {
+      setLocation(GeoPoint(42, 32));
+      showSnackBar(scaffoldState, context, "Konum bilgisine erişilemedi.Konum erişimine izin vererek, daha yakın yerleri görebilirsiniz", timeIsLong: true);
+    }
+  }
+
+  Future<void> gerCurrentLocationPosition(GlobalKey<ScaffoldState> scaffoldState, BuildContext context) async {
+    try {
+      Position? position = await getLocationPermission(scaffoldState, context);
+      if (position != null) {
+        _userLocation = GeoPoint(position.latitude, position.longitude);
+
+        final userId = await UserIdInitalize.instance.returnUserId(scaffoldState, context);
+
+        Map<String, dynamic> locationMap = {ContentString.LOCATION.rawValue: GeoPoint(position.latitude, position.longitude)};
+
+        await FirebaseCollectionRefInitialize.instance.usersCollectionReference.doc(userId).update(locationMap);
+      }
+    } catch (e) {
+      showSnackBar(scaffoldState, context, LocaleKeys.loginError.locale);
     }
   }
 }

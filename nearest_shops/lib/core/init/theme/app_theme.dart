@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../service/cacheManager/CacheManager.dart';
 import 'color/color_manager.dart';
 import 'color/dark_color.dart';
 import 'color/light_color.dart';
@@ -14,14 +15,41 @@ abstract class ITheme {
 
 enum AppThemeMode { ThemeDark, ThemeLight }
 
+extension ThemeOptionStringExtension on String {
+  AppThemeMode get themeOptionString {
+    switch (this) {
+      case "lightTheme":
+        return AppThemeMode.ThemeLight;
+      case "darkTheme":
+        return AppThemeMode.ThemeDark;
+    }
+    throw "ThemeData not found";
+  }
+}
+
+extension ThemeOptionExtension on AppThemeMode {
+  String get themeOption {
+    switch (this) {
+      case AppThemeMode.ThemeLight:
+        return "lightTheme";
+      case AppThemeMode.ThemeDark:
+        return "darkTheme";
+    }
+  }
+}
+
 class ThemeManager extends ChangeNotifier {
-  AppThemeMode _currentThemeMode = AppThemeMode.ThemeLight;
-  AppThemeMode get currentThemeMode => _currentThemeMode;
+  ThemeManager() {
+    initialTheme();
+  }
 
-  ThemeData _currentThemeData = createTheme(AppThemeLight());
-  ThemeData get currentThemeData => _currentThemeData;
+  AppThemeMode? _currentThemeMode;
+  AppThemeMode get currentThemeMode => _currentThemeMode!;
 
-  void changeTheme() {
+  ThemeData? _currentThemeData;
+  ThemeData get currentThemeData => _currentThemeData!;
+
+  void changeTheme() async {
     if (_currentThemeMode == AppThemeMode.ThemeDark) {
       _currentThemeMode = AppThemeMode.ThemeLight;
       _currentThemeData = createTheme(AppThemeLight());
@@ -29,43 +57,37 @@ class ThemeManager extends ChangeNotifier {
       _currentThemeMode = AppThemeMode.ThemeDark;
       _currentThemeData = createTheme(AppThemeDark());
     }
+    await CacheManager.instance.putThemeOption(_currentThemeMode!.themeOption);
+
     notifyListeners();
   }
 
+  void initialTheme() {
+    String savedThemeOption = CacheManager.instance.getThemeOption();
+    _currentThemeMode = savedThemeOption.themeOptionString;
+    _currentThemeData = createTheme(_currentThemeMode == AppThemeMode.ThemeDark ? AppThemeDark() : AppThemeLight());
+  }
+
   static ThemeData createTheme(ITheme theme) => ThemeData(
-      fontFamily: theme.textTheme.fontFamily,
-      textTheme: theme.textTheme.data,
-      colorScheme: theme.colors.colorScheme,
-      scaffoldBackgroundColor: theme.colors.scaffoldBackgroundColor,
-      appBarTheme:
-          AppBarTheme(backgroundColor: theme.colors.appBarColor, elevation: 0),
-      inputDecorationTheme: buildInputDecorationTheme(theme));
+        fontFamily: theme.textTheme.fontFamily,
+        textTheme: theme.textTheme.data,
+        colorScheme: theme.colors.colorScheme,
+        scaffoldBackgroundColor: theme.colors.scaffoldBackgroundColor,
+        appBarTheme: AppBarTheme(backgroundColor: theme.colors.appBarColor, elevation: 0),
+
+
+      );
 }
 
 InputDecorationTheme buildInputDecorationTheme(ITheme theme) {
   return InputDecorationTheme(
-      floatingLabelStyle: TextStyle(color: theme.colors.colors.blue),
-      focusColor: Colors.black12,
-      filled: true,
-      errorStyle: TextStyle(color: theme.colors.colors.blue),
-      fillColor: theme.colors.colors.lightGray,
-      labelStyle: TextStyle(),
-      errorBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: theme.colors.colors.red, width: 0.3),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: theme.colors.colors.lightGray),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      border: OutlineInputBorder(
-        borderSide: BorderSide(color: theme.colors.colors.orange),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: theme.colors.colors.darkGrey),
-        borderRadius: BorderRadius.circular(10),
-      ));
+    floatingLabelStyle: TextStyle(color: theme.colors.colors.green),
+    focusColor: Colors.black12,
+    filled: true,
+    errorStyle: TextStyle(color: theme.colors.colors.green),
+    fillColor: theme.colors.colorScheme!.onSecondary,
+ 
+  );
 }
 
 class AppThemeDark extends ITheme {

@@ -44,7 +44,7 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>CFBundleLocalizations</key>
-	<array>
+	<array> 
 		<string>en</string>
 		<string>es</string>
 	</array>
@@ -76,5 +76,7 @@
 	<string>Needed to access location</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Needed to access location</string>
+	<key>GADApplicationIdentifier</key>
+	<string></string>
 </dict>
 </plist>
